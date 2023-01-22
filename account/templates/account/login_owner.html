@@ -1,5 +1,4 @@
 {% load static %}
-{% load filters %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -68,35 +67,35 @@
       <nav>
           <div class="tab-links" id="nav-tab" role="tablist">
             <a class="tab-links-item active" href="#nav-tenant">Для жильца</a>
-            <a class="tab-links-item" href="{% url 'account:login' %}">Для администрации</a>
+            <a class="tab-links-item" href="{% url 'login' %}">Для администрации</a>
           </div>
       </nav>
     <div class="card-body login-card-body">
       <p class="login-box-msg">Вход в личный кабинет</p>
-        {{ form.non_field_errors }}
+
       <form action="" method="post">
           {% csrf_token %}
         <div class="input-group mb-3">
 {#          <input type="email" class="form-control" placeholder="Email">#}
-            {{ form.email|add_class:"form-control" }}
+
           <div class="input-group-append">
             <div class="input-group-text">
               <span class="fas fa-envelope"></span>
             </div>
           </div>
             <div class="form-error">
-                    {{ form.email.errors.as_text }}
+
                 </div>
         </div>
         <div class="input-group mb-3">
-          {{ form.password|add_class:"form-control" }}
+
           <div class="input-group-append">
             <div class="input-group-text">
               <span class="fas fa-lock"></span>
             </div>
           </div>
             <div class="form-error">
-                    {{ form.password.errors.as_text }}
+
                 </div>
         </div>
         <div class="row">
