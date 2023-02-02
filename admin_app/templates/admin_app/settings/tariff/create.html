@@ -1,0 +1,233 @@
+{% extends 'admin_app/base.html'%}
+{% load widget_tweaks %}
+{% block content %}
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Тарифы</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="/admin_app">Главная</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'tariff_list' %}">Тарифы</a></li>
+                    {% if name %}
+                    <li class="breadcrumb-item"><a href="{% url 'tariff' id %}">Тариф: {{ name }}</a></li>
+                    <li class="breadcrumb-item active">Редактирование</li>
+                    {% else %}
+                    <li class="breadcrumb-item active">Новый Тариф</li>
+                    {% endif %}
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="content">
+    <div class="card">
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-xs-12 col-md-7">
+
+                        <div class="col-xs-6 col-md-2">
+                            <label>Название</label>
+                            <div>
+                                {{ form.name }}
+                            </div>
+
+                        </div>
+                        <div class="col-xs-6 col-md-2">
+                            <label>Описание</label>
+                            <div>
+                                {{ form.description }}
+                            </div>
+
+                        </div>
+
+
+                    </div>
+                    <div class="col-xs-12 col-lg-7">
+                        <div id="form-tariffservice-rows">
+                            {{ formset.management_form }}
+                            {% for form in formset %}
+                            <div class="row tariffservice-row">
+                                {{ form.id|add_class:'formset_id' }}
+                                <div class="col-xs-6 col-md-2 row-service">
+                                    <label>Услуга</label>
+                                    <div class="input-group">
+                                        {{ form.service|add_class:'tariff_service' }}
+                                    </div>
+                                </div>
+                                <div class="col-xs-6 col-md-3">
+                                    <label>Цена</label>
+                                    <div class="input-group">
+                                        {{ form.price }}
+                                    </div>
+                                </div>
+                                <div class="col-xs-6 col-md-3">
+                                    <label>Валюта</label>
+                                    <div class="input-group">
+                                        {{ form.currency }}
+                                    </div>
+                                </div>
+                                <div class="col-xs-6 col-md-3">
+                                    <div class="form-group">
+                                        <label>Ед. изм.</label>
+                                        <div class="input-group">
+                                            {{ form.unit|add_class:"form-select unit-select" }}
+                                            <span class="input-group-btn">
+                                                    <a class="input-group-text" onclick="del_tariffservice(this)">
+                                                        <i class="fa fa-trash"></i>
+                                                    </a>
+                                                </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <div class="empty-form-formset">
+                            <div class="row tariffservice-row">
+                                {{ formset.empty_form.id }}
+                                <div class="col-xs-6 col-md-2 row-service">
+                                    <div class="form-group">
+                                        <label>Услуга</label>
+                                        <div class="input-group ">
+                                            {{ formset.empty_form.service|add_class:"tariff_service" }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xs-6 col-md-3">
+                                    <div class="form-group">
+                                        <label>Цена</label>
+                                        <div class="input-group">
+                                            {{ formset.empty_form.price }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xs-6 col-md-3">
+                                    <div class="form-group">
+                                        <label>Валюта</label>
+                                        <div class="input-group">
+                                            {{ formset.empty_form.currency }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xs-6 col-md-3">
+                                    <div class="form-group">
+                                        <label>Ед. изм.</label>
+                                        <div class="input-group">
+                                            {{ formset.empty_form.unit|add_class:"form-select unit-select" }}
+                                            <span class="input-group-btn">
+                                                    <a class="input-group-text" onclick="del_service(this)">
+                                                        <i class="fa fa-trash"></i>
+                                                    </a>
+                                                </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn btn-default btn-hover-change float-left margin-bottom-15 form-row-add-tariffservice-btn">
+                            Добавить услугу
+                        </button>
+                    </div>
+                </div>
+                <div style="text-align: center;" class="p-5">
+                    <input type="reset" value="отмена" class="btn btn-default">
+                    <input type="submit" value="сохранить" class="btn btn-success">
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}
+{% block script %}
+<script>
+$('.nav-link.active').removeClass('active');
+$('.nav-link').find('p:contains("Настройки системы")').parents('.nav-link').addClass('active').parent().addClass('menu-is-opening menu-open');
+$('.nav-link').find('p:contains("Тарифы")').parents('.nav-link').addClass('active');
+
+let new_form_service = function (){
+    let total_forms = $('#id_tariffservice_set-TOTAL_FORMS').val();
+    $('#id_tariffservice_set-TOTAL_FORMS').val(parseInt(total_forms)+1);
+    let new_form = $(".empty-form-formset .tariffservice-row").first().clone();
+    let new_form_id = new_form.find('#id_tariffservice_set-__prefix__-id');
+    new_form_id.attr('name', new_form_id.attr('name').replace('__prefix__', total_forms));
+    new_form_id.attr('id', new_form_id.attr('id').replace('__prefix__', total_forms));
+    let new_form_service = new_form.find('#id_tariffservice_set-__prefix__-service');
+    new_form_service.attr('name', new_form_service.attr('name').replace('__prefix__', total_forms));
+    new_form_service.attr('id', new_form_service.attr('id').replace('__prefix__', total_forms));
+    let new_form_price = new_form.find('#id_tariffservice_set-__prefix__-price');
+    new_form_price.attr('name', new_form_price.attr('name').replace('__prefix__', total_forms));
+    new_form_price.attr('id', new_form_price.attr('id').replace('__prefix__', total_forms));
+    let new_form_currency = new_form.find('#id_tariffservice_set-__prefix__-currency');
+    new_form_currency.attr('name', new_form_currency.attr('name').replace('__prefix__', total_forms));
+    new_form_currency.attr('id', new_form_currency.attr('id').replace('__prefix__', total_forms));
+    let new_form_unit = new_form.find('#id_tariffservice_set-__prefix__-unit');
+    new_form_unit.attr('name', new_form_unit.attr('name').replace('__prefix__', total_forms));
+    new_form_unit.attr('id', new_form_unit.attr('id').replace('__prefix__', total_forms));
+    $('#form-tariffservice-rows').append(new_form);
+}
+$('.form-row-add-tariffservice-btn').on('click', function (e){
+    e.preventDefault();
+    new_form_service();
+});
+
+let select_unit = function (service){
+    $.ajax({
+        type: "GET",
+        url: '{% url 'get_unit_by_service' %}',
+        data: {'id': service.options[service.selectedIndex].value},
+         success: function(response) {
+            $(service).parents('.tariffservice-row').find('.unit-select').val(response);
+         }
+    });
+}
+
+
+$('#form-tariffservice-rows').on('change', '.tariff_service', function (){
+    let service = $(this)[0];
+    select_unit(service);
+});
+
+
+{% if update is True %}
+    $('.row-service .select').each(function (index){
+        let service = $(this)[0];
+        select_unit(service);
+    });
+{% endif %}
+
+function del_service(elem){
+    var parent = $(elem).parent().parent().parent().parent().parent()[0]
+    var select = $(parent).find('select')
+    select.each(function(index){
+        $(select[index]).find('option')[0].selected = true
+    })
+    $(parent).css('display', 'none')
+
+}
+
+function del_tariffservice(elem){
+    var url = '/admin_app/delete_service_tariff'
+    var pk = $(elem).parents('.tariffservice-row').find('.formset_id').val()
+    var confirm1 = confirm('Вы уверены что хотите удалить этот объект?');
+    if (confirm1==false){
+       return
+    }
+    $.ajax({
+        headers: { "X-CSRFToken": '{{ csrf_token }}' },
+        type: "POST",
+        url: url,
+        data: {'pk': pk},
+        success: function(response){
+            console.log(response);
+            location.reload();
+        }
+    });
+}
+
+</script>
+{% endblock %}

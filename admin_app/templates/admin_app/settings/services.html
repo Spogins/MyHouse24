@@ -1,0 +1,300 @@
+{% extends 'admin_app/base.html'%}
+
+
+{% block header %}
+<style>
+    .asteriskField{
+        display: none;
+    }
+
+
+</style>
+{% endblock %}
+{% block content %}
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Редактирование услуг</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                  <li class="breadcrumb-item"><a href="/admin_app">Главная</a></li>
+                  <li class="breadcrumb-item active">Услуги</li>
+                </ol>
+              </div>
+        </div>
+    </div>
+</section>
+<section content="content">
+    <div class="row">
+        <div class="col-xs-12 col-12 mt-2">
+            <div class="card card-primary card-outline card-outline-tabs">
+                <div class="card-header p-0 border-bottom-0">
+                    <ul class="nav nav-tabs" id="custom-tabs-four-tab" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="custom-tabs-four-home-tab" data-toggle="pill"
+                               href="#custom-tabs-four-home" role="tab" aria-controls="custom-tabs-four-home"
+                               aria-selected="true">Услуги</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="custom-tabs-four-profile-tab" data-toggle="pill"
+                               href="#custom-tabs-four-profile" role="tab" aria-controls="custom-tabs-four-profile"
+                               aria-selected="false">Единицы измерения</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="col-xs-12 col-lg-7">
+                            <div class="tab-content" id="custom-tabs-four-tabContent">
+                                <div class="tab-pane fade active show" id="custom-tabs-four-home" role="tabpanel"
+                                     aria-labelledby="custom-tabs-four-home-tab">
+                                    <div class="form-services-rows">
+                                        {{ formset.management_form }}
+                                        {% for form in formset %}
+                                        <div class="row form-service">
+                                            <div class="formset-id">
+                                                {{ form.id }}
+                                            </div>
+                                            <div class="col-xs-12 col-sm-7">
+                                                <label class=" requiredField">
+                                                    Услуга
+                                                </label>
+                                                <div class="input-group">
+                                                    {{ form.name }}
+                                                </div>
+
+                                            </div>
+                                            <div class="col-xs-12 col-sm-5">
+                                                <div class="form-group">
+                                                    <label class=" requiredField">
+                                                        Ед. изм.
+                                                    </label>
+                                                    <div class="input-group">
+                                                        {{ form.unit }}
+                                                        <div class="input-group-append">
+                                                            <a class="input-group-text delete-service {% if form.object %}{% endif %}"
+                                                               href="">
+                                                                <span class="fa fa-trash"></span>
+                                                            </a>
+                                                        </div>
+                                                        <div class="form-error">
+                                                            {{ form.unit.errors.as_text }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-xs-12 col-md-12">
+                                                {{ form.show }}
+                                                <label>
+                                                    показывать в счетчиках
+                                                </label>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                    <button type="button"
+                                            class="btn btn-default btn-hover-change float-left form-row-add-service-btn">
+                                        Добавить
+                                    </button>
+                                    <div class="empty-form-formset">
+                                        <div class="empty-formset-item">
+                                            <div class="row form-service">
+                                                <div class="formset-id">
+                                                    {{ formset.empty_form.id }}
+                                                </div>
+                                                <div class="col-xs-12 col-sm-7">
+                                                    <label class=" requiredField">
+                                                        Услуга
+                                                    </label>
+                                                    <div class="input-group">
+                                                        {{ formset.empty_form.name}}
+                                                    </div>
+                                                </div>
+                                                <div class="col-xs-12 col-sm-5">
+                                                    <div class="form-group">
+                                                        <label class=" requiredField">
+                                                            Ед. изм.
+                                                        </label>
+                                                        <div class="input-group">
+                                                            {{ formset.empty_form.unit }}
+                                                            <div class="input-group-append">
+
+                                                                    <a class="input-group-text delete-unit" onclick="del_service(this)">
+                                                                    <span class="fa fa-trash"></span>
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-xs-12 col-md-12">
+
+                                                    {{ formset.empty_form.show }}
+                                                    <label>
+                                                        показывать в счетчиках
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="custom-tabs-four-profile" role="tabpanel"
+                                     aria-labelledby="custom-tabs-four-profile-tab">
+                                    {{ unit_formset.management_form }}
+                                    <div class="unit-rows">
+                                        {% for form in unit_formset %}
+                                        <div class="unit-row">
+                                            <div class="formset-id">
+                                                {{ form.id }}
+                                            </div>
+                                            <div class="form-group">
+                                                <label class=" requiredField">
+                                                    Ед. изм.
+                                                </label>
+                                                <div class="input-group">
+                                                    {{ form.name }}
+                                                    <div class="input-group-append">
+                                                        <a class="input-group-text delete-unit" href="">
+                                                      <span class="fa fa-trash"></span>
+                                                    </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                    <button type="button"
+                                            class="btn btn-default btn-hover-change pull-left form-row-add-serviceunit-btn">
+                                        Добавить
+                                    </button>
+                                    <div class="empty-form-formset">
+                                        <div class="unit-row">
+                                            <div class="formset-id">
+                                                {{ unit_formset.empty_form.id }}
+                                            </div>
+                                            <div class="form-group">
+                                                <label class=" requiredField">
+                                                    Ед. изм.
+                                                </label>
+                                                <div class="input-group">
+                                                    {{ unit_formset.empty_form.name }}
+                                                    <div class="input-group-append">
+                                                        <a class="input-group-text delete-unit" onclick="del_unit(this)">
+                                                            <span class="fa fa-trash"></span>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="text-align: center;" class="p-5">
+                            <input type="reset" value="отмена" class="btn btn-default">
+                            <input type="submit" value="сохранить" class="btn btn-success">
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+{% block script %}
+<script>
+$('.nav-link').find('p:contains("Настройки системы")').parents('.nav-link').addClass('active').parent().addClass('menu-is-opening menu-open');
+$('.nav-link').find('p:contains("Услуги")').parents('.nav-link').addClass('active');
+
+
+    let new_form_service = function (){
+        let total_forms = $('#id_service-TOTAL_FORMS').val();
+        $('#id_service-TOTAL_FORMS').val(parseInt(total_forms)+1);
+        let new_form = $(".empty-form-formset .empty-formset-item .form-service").first().clone();
+        let new_form_id = new_form.find('#id_service-__prefix__-id');
+        new_form_id.attr('name', new_form_id.attr('name').replace('__prefix__', total_forms));
+        new_form_id.attr('id', new_form_id.attr('id').replace('__prefix__', total_forms));
+        let new_form_name = new_form.find('#id_service-__prefix__-name');
+        new_form_name.attr('name', new_form_name.attr('name').replace('__prefix__', total_forms));
+        new_form_name.attr('id', new_form_name.attr('id').replace('__prefix__', total_forms));
+        let new_form_unit = new_form.find('#id_service-__prefix__-unit');
+        new_form_unit.attr('name', new_form_unit.attr('name').replace('__prefix__', total_forms));
+        new_form_unit.attr('id', new_form_unit.attr('id').replace('__prefix__', total_forms));
+        $('.form-services-rows').append(new_form);
+    }
+    $('.form-row-add-service-btn').on('click', function (e){
+        e.preventDefault();
+        new_form_service();
+    });
+
+    let new_form_unit = function (){
+        let total_forms = $('#id_form-TOTAL_FORMS').val();
+        $('#id_form-TOTAL_FORMS').val(parseInt(total_forms)+1);
+        let new_form = $(".empty-form-formset .unit-row").first().clone();
+        let new_form_id = new_form.find('#id_form-__prefix__-id');
+        new_form_id.attr('name', new_form_id.attr('name').replace('__prefix__', total_forms));
+        new_form_id.attr('id', new_form_id.attr('id').replace('__prefix__', total_forms));
+        let new_form_name = new_form.find('#id_form-__prefix__-name');
+        new_form_name.attr('name', new_form_name.attr('name').replace('__prefix__', total_forms));
+        new_form_name.attr('id', new_form_name.attr('id').replace('__prefix__', total_forms));
+        $('.unit-rows').append(new_form);
+    }
+
+    $('.form-row-add-serviceunit-btn').on('click', function (e){
+        e.preventDefault();
+        new_form_unit();
+    });
+
+    $('.delete-service').on('click', function (e){
+        e.preventDefault();
+        let url = '/admin_app/delete_service'
+        let pk = $(this).parents('.form-service').find('.formset-id input').val();
+        let confirm1 = confirm('Вы уверены что хотите удалить данную услугу?');
+        if (confirm1==false){
+            return
+        }
+        $.ajax({
+            headers: { "X-CSRFToken": '{{ csrf_token }}' },
+            type: "POST",
+            url: url,
+            data: {'pk': pk},
+            success: function(response){
+                console.log(response);
+                location.reload();
+            }
+        });
+    });
+
+    $('.delete-unit').on('click', function (e){
+        e.preventDefault();
+        let url = '/admin_app/delete_unit'
+        let pk = $(this).parents('.unit-row').find('.formset-id input').val();
+        let confirm1 = confirm('Вы уверены что хотите удалить этот объект?');
+        if (confirm1==false){
+           return
+        }
+        $.ajax({
+            headers: { "X-CSRFToken": '{{ csrf_token }}' },
+            type: "POST",
+            url: url,
+            data: {'pk': pk},
+            success: function(response){
+                console.log(response);
+                location.reload();
+            }
+        });
+    });
+
+function del_unit(elem){
+    var parent = $(elem).parent().parent().parent().parent()[0]
+    $(parent).remove()
+}
+function del_service(elem){
+    var parent = $(elem).parent().parent().parent().parent().parent()[0]
+    $(parent).remove()
+}
+
+</script>
+{% endblock %}

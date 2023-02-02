@@ -1,0 +1,100 @@
+{% extends 'admin_app/base.html' %}
+{% load static %}
+{% block content %}
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Тариф: {{ tariff.name }} </h1>
+            </div>
+            <div class="col-sm-6">
+                <ul class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="/admin_app">Главная</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'tariff_list' %}">Тарифы</a></li>
+                    <li class="breadcrumb-item active">Тариф: {{ tariff.name }}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="content">
+
+    <div class="box">
+        <div class="box-header with-border">
+            <h3 class="box-title"></h3>
+            <div class="box-tools" style="display: flex; justify-content: flex-end;">
+                <a href="{% url 'update_tariff' tariff.id %}" class="btn btn-primary btn-sm">
+                    <span class="hidden-xs">Редактировать тариф</span><i class="fa fa-pencil visible-xs"
+                                                                         aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>
+        <div class="box-body">
+            <table class="table table-bordered table-striped table-view">
+                <tbody>
+                <tr>
+                    <td>Название тарифа</td>
+                    <td>
+                        {{ tariff.name }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Описание</td>
+                    <td>{{ tariff.description }}</td>
+                </tr>
+                <tr>
+                    <td>Дата редактирования</td>
+                    <td>{{ tariff.date }}</td>
+                </tr>
+                </tbody>
+            </table>
+            <div class="table-responsive no-padding margin-top-15">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Услуга</th>
+                        <th>Ед. изм.</th>
+                        <th>Цена за ед., грн</th>
+                        <th>Валюта</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for elem in services %}
+                    <tr role="row">
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ elem.service }}</td>
+                        <td>{{ elem.unit }}</td>
+                        <td>{{ elem.price }}</td>
+                        <td>{{ elem.currency }}</td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+{% block script %}
+<script src="{% static 'plugins/datatables/jquery.dataTables.min.js'%}"></script>
+<script src="{% static 'plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-responsive/js/dataTables.responsive.min.js'%}"></script>
+<script src="{% static 'plugins/datatables-responsive/js/responsive.bootstrap4.min.js'%}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/dataTables.buttons.min.js'%}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/buttons.bootstrap4.min.js'%}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/buttons.html5.min.js'%}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/buttons.print.min.js'%}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/buttons.colVis.min.js'%}"></script>
+<script>
+$('.nav-link.active').removeClass('active');
+$('.nav-link').find('p:contains("Настройки системы")').parents('.nav-link').addClass('active').parent().addClass('menu-is-opening menu-open');
+$('.nav-link').find('p:contains("Тарифы")').parents('.nav-link').addClass('active');
+
+
+
+
+
+
+</script>
+{% endblock %}

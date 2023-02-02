@@ -1,0 +1,152 @@
+{% extends 'admin/base.html' %}
+{% block content %}
+        <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+              <div class="col-sm-6">
+                <h1>Владельцы квартир</h1>
+              </div>
+              <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                  <li class="breadcrumb-item"><a href="/admin">Главная</a></li>
+                  <li class="breadcrumb-item active">Владельцы квартир</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+    </section>
+
+    <section class="content">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="btn-group float-right margin-bottom mt-2 mr-5 mb-2">
+                    <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Выберите действие <span class="caret"></span>
+                    </button>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="{% url 'admin:create_owner' %}">Добавить владельца квартиры</a>
+                        <a class="dropdown-item" href="{% url 'admin:create_message' %}?has_debt=True">Отправить сообщение должникам</a>
+                        <a class="dropdown-item" href="">Отправить приглашение</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-xs-12 col-md-12">
+                <div class="card">
+                <div class="card-header">
+                    <div class="card-tools">
+                    <a href="{% url 'admin:owner_list' %}" class="btn btn-default btn-sm">
+                        <span class="hidden-sm">Очистить</span>
+                    </a>
+                </div>
+                </div>
+                    <div class="card-body">
+                        <table class="table table-bordered table-hover sorting-table" data-filter-control="true" >
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>ФИО</th>
+                                    <th style="min-width: 100px">Телефон</th>
+                                    <th>Email</th>
+                                    <th style="min-width: 200px">Дом</th>
+                                    <th style="min-width: 200px">Квартира</th>
+                                    <th>Добавлен</th>
+                                    <th>Статус</th>
+                                    <th style="width: 90px; min-width: 90px">Есть долг</th>
+                                    <th style="width: 114px; min-width: 114px">&nbsp;</th>
+                                </tr>
+                            <tr id="w0-filters" class="filters">
+                                <td>{{ form.id }}</td>
+                                <td>{{ form.fullname }}</td>
+                                <td>{{ form.phone }}</td>
+                                <td>{{ form.email }}</td>
+                                <td>{{ form.house }}</td>
+                                <td>{{ form.flat }}</td>
+                                <td>{{ form.date }}</td>
+                                <td>{{ form.status }}</td>
+                                <td>{{ form.debt }}</td>
+                                <td></td>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for owner in object_list %}
+                                <tr class="clickable-row" href="{% url 'admin:detail_owner' owner.id %}">
+                                    <td data-number="1">{{ owner.identify }}</td>
+                                    <td data-number="2">{{ owner.fullname }}</td>
+                                    <td data-number="3">{{ owner.phone }}</td>
+                                    <td data-number="4">{{ owner.user.email }}</td>
+                                    <td data-number="5">{{ owner.houses_str }}</td>
+                                    <td data-number="6">{{ owner.flats_str }}</td>
+                                    <td data-number="7">{{ owner.created|ru_strftime:"dd.MM.YYYY" }}</td>
+                                    <td data-number="8">
+                                        {% if owner.status == 'новый' %}
+                                        <small class="badge badge-warning">{{ owner.status }}</small>
+                                        {% elif owner.status == 'активен' %}
+                                            <small class="badge badge-success">{{ owner.status }}</small>
+                                        {% else %}
+                                            <small class="badge badge-danger">{{ owner.status }}</small>
+                                        {% endif %}
+                                    </td>
+                                    <td data-number="9">{% if owner.has_debt %}Да{% endif %}</td>
+                                    <td>
+                                        <div class="btn-group float-right">
+                                            <a class="btn btn-default btn-sm" href="{% url 'admin:create_message' %}?owner_id={{ owner.id }}" title="Отправить сообщение" data-toggle="tooltip"><i class="fas fa-envelope"></i></a>
+                                            <a class="btn btn-default btn-sm" href="{% url 'admin:update_owner' owner.user_id %}" title="Редактировать" data-toggle="tooltip"><i class="fas fa-pencil-alt"></i></a>
+                                            <a class="btn btn-default btn-sm" href="{% url 'admin:delete_owner' owner.user.id %}" title="Удалить" data-toggle="tooltip" data-pjax="0" data-method="post"><i class="fa fa-trash"></i></a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+{% block script %}
+    <script>
+
+    $('.nav-link.active').removeClass('active');
+        $('.nav-link').find('p:contains("Владельцы квартир")').parents('.nav-link').addClass('active');
+
+        $(".sorting-table").DataTable({
+          "responsive": true, "lengthChange": false, "autoWidth": false, "searching": false, "paging": false,
+            "bInfo" : false,
+            "bSortCellsTop": true,
+            "scrollX": true,
+          "buttons": [],
+            rowReorder: true,
+            columnDefs: [
+                { orderable: true, className: 'reorder', targets: 1 },
+                { orderable: true, className: 'reorder', targets: 6 },
+            { orderable: false, targets: '_all' }
+                ]
+        });
+
+        $.expr[':'].icontains = function(a, i, m) {
+          return $(a).text().toLowerCase()
+              .indexOf(m[3].toLowerCase()) >= 0;
+        };
+
+        $('#id_id, #id_fullname, #id_email, #id_phone, #id_flat, #id_date').on('keyup', function() {
+            let value = $(this).val().toLowerCase();
+            let number = $(this).data('number');
+            console.log(number);
+            console.log($(".table td[data-number='"+number+"']:icontains('" + value + "')"));
+            $(".table td[data-number='"+number+"']:icontains('" + value + "')").parent().show();
+            $(".table td[data-number='"+number+"']:not(:icontains('" + value + "'))").parent().hide();
+        });
+        $('#id_house, #id_debt, #id_status').on('change', function (){
+            let value = $(this).find('option:selected').text().toLowerCase();
+            let number = $(this).data('number');
+            console.log(value);
+            console.log($(".table td[data-number='"+number+"']:icontains('" + value + "')"));
+            $(".table td[data-number='"+number+"']:icontains('" + value + "')").parent().show();
+            $(".table td[data-number='"+number+"']:not(:icontains('" + value + "'))").parent().hide();
+        });
+    </script>
+{% endblock %}
