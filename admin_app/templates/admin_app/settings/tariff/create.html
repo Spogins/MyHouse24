@@ -30,24 +30,24 @@
                 <div class="row">
                     <div class="col-xs-12 col-md-7">
 
-                        <div class="col-xs-6 col-md-2">
+                        <div class="col-xs-6 col-md-8">
                             <label>Название</label>
                             <div>
-                                {{ form.name }}
+                                {{ form.name|add_class:'form-control' }}
                             </div>
 
                         </div>
-                        <div class="col-xs-6 col-md-2">
+                        <div class="col-xs-6 col-md-8">
                             <label>Описание</label>
                             <div>
-                                {{ form.description }}
+                                {{ form.description|add_class:'form-control' }}
                             </div>
 
                         </div>
 
 
                     </div>
-                    <div class="col-xs-12 col-lg-7">
+                    <div class="col-xs-12 col-lg-7" style="margin-top: 1rem;">
                         <div id="form-tariffservice-rows">
                             {{ formset.management_form }}
                             {% for form in formset %}
@@ -56,28 +56,28 @@
                                 <div class="col-xs-6 col-md-2 row-service">
                                     <label>Услуга</label>
                                     <div class="input-group">
-                                        {{ form.service|add_class:'tariff_service' }}
+                                        {{ form.service|add_class:'tariff_service form-control' }}
                                     </div>
                                 </div>
                                 <div class="col-xs-6 col-md-3">
                                     <label>Цена</label>
                                     <div class="input-group">
-                                        {{ form.price }}
+                                        {{ form.price|add_class:'form-control' }}
                                     </div>
                                 </div>
                                 <div class="col-xs-6 col-md-3">
                                     <label>Валюта</label>
                                     <div class="input-group">
-                                        {{ form.currency }}
+                                        {{ form.currency|add_class:'form-control' }}
                                     </div>
                                 </div>
                                 <div class="col-xs-6 col-md-3">
                                     <div class="form-group">
                                         <label>Ед. изм.</label>
                                         <div class="input-group">
-                                            {{ form.unit|add_class:"form-select unit-select" }}
+                                            {{ form.unit|add_class:"form-select form-control unit-select" }}
                                             <span class="input-group-btn">
-                                                    <a class="input-group-text" onclick="del_tariffservice(this)">
+                                                    <a class="input-group-text" onclick="del_tariffservice(this)" style="display: block;">
                                                         <i class="fa fa-trash"></i>
                                                     </a>
                                                 </span>
@@ -94,7 +94,7 @@
                                     <div class="form-group">
                                         <label>Услуга</label>
                                         <div class="input-group ">
-                                            {{ formset.empty_form.service|add_class:"tariff_service" }}
+                                            {{ formset.empty_form.service|add_class:"tariff_service form-control" }}
                                         </div>
                                     </div>
                                 </div>
@@ -102,7 +102,7 @@
                                     <div class="form-group">
                                         <label>Цена</label>
                                         <div class="input-group">
-                                            {{ formset.empty_form.price }}
+                                            {{ formset.empty_form.price|add_class:'form-control' }}
                                         </div>
                                     </div>
                                 </div>
@@ -110,7 +110,7 @@
                                     <div class="form-group">
                                         <label>Валюта</label>
                                         <div class="input-group">
-                                            {{ formset.empty_form.currency }}
+                                            {{ formset.empty_form.currency|add_class:'form-control' }}
                                         </div>
                                     </div>
                                 </div>
@@ -118,9 +118,9 @@
                                     <div class="form-group">
                                         <label>Ед. изм.</label>
                                         <div class="input-group">
-                                            {{ formset.empty_form.unit|add_class:"form-select unit-select" }}
+                                            {{ formset.empty_form.unit|add_class:"form-select form-control unit-select" }}
                                             <span class="input-group-btn">
-                                                    <a class="input-group-text" onclick="del_service(this)">
+                                                    <a class="input-group-text" onclick="del_service(this)" style="display: block;">
                                                         <i class="fa fa-trash"></i>
                                                     </a>
                                                 </span>

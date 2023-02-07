@@ -1,10 +1,13 @@
 from django.contrib.auth.models import User
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect
+from django.urls import reverse_lazy
 from django.views import View
 from django.views.decorators.http import require_POST
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
 
+from account.forms import UserChangeForm, ProfileChangeForm
+from account.models import Profile
 from admin_app.forms import *
 from admin_app.models import *
 
@@ -40,25 +43,6 @@ class CreateService(CreateView):
         for form in formset:
             form.save()
         return redirect('/admin_app/services/')
-
-
-# def services(request):
-#     formset = ServiceFormset(request.POST or None, queryset=Service.objects.all(), prefix='service')
-#     unit_formset = UnitFormset(request.POST or None, queryset=Unit.objects.all())
-#
-#     if request.method == 'POST':
-#         if unit_formset.is_valid() and formset.is_valid:
-#             unit_formset.save()
-#             for form in formset:
-#                 form.save()
-#                 print(form)
-#             return redirect('/admin_app/services/')
-#
-#     context = {
-#         'formset': formset,
-#         'unit_formset': unit_formset,
-#     }
-#     return render(request, 'admin_app/settings/services.html', context=context)
 
 
 @require_POST
@@ -125,7 +109,7 @@ class UpdateTariff(UpdateView):
         return context
 
     def post(self, request, *args, **kwargs):
-        formset = TariffServiceFormSet(request.POST or None, prefix='tariffservice_set')
+        formset = TariffServiceFormSet(request.POST, prefix='tariffservice_set')
         form = TariffCreateForm(request.POST, instance=Tariff.objects.get(id=self.kwargs['pk']))
         if form.is_valid():
             return self.form_valid(formset, form)
@@ -140,39 +124,6 @@ class UpdateTariff(UpdateView):
                     full_form.unit = full_form.service.unit
                     full_form.save()
         return redirect('/admin_app/tariff_list/')
-
-
-
-
-# def create_tariff(request, tariff_id):
-#     instance = None
-#     _filter = None
-#     if tariff_id != 0:
-#         instance = Tariff.objects.get(id=tariff_id)
-#     if TariffService.objects.filter(tariff=tariff_id):
-#         _filter = tariff_id
-#     form = TariffCreateForm(request.POST or None, instance=instance)
-#     formset = TariffServiceFormSet(request.POST or None, queryset=TariffService.objects.filter(tariff=_filter), prefix='tariffservice_set')
-#     if request.method == 'POST':
-#         if form.is_valid():
-#             tariff = form.save()
-#             for form in formset:
-#                 if form.is_valid():
-#                     if form.cleaned_data:
-#                         full_form = form.save()
-#                         full_form.tariff = tariff
-#                         full_form.unit = full_form.service.unit
-#                         full_form.save()
-#
-#         return redirect('/admin_app/tariff_list/')
-#
-#     context = {
-#         'form': form,
-#         'formset': formset,
-#     }
-#     if instance:
-#         context.update({'name': instance.name})
-#     return render(request, 'admin_app/settings/tariff/create.html', context=context)
 
 
 def get_unit_by_service(request):
@@ -209,5 +160,159 @@ class ShowTariff(DetailView):
         return context
 
 
+class RoleList(ListView):
+    model = Role
+    template_name = 'admin_app/settings/roles.html'
 
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = {
+            'forms': RoleFormSet(queryset=Role.objects.all())
+        }
+        return context
+
+    def post(self, request, *args, **kwargs):
+        forms = RoleFormSet(request.POST)
+        for form in forms:
+            form.save()
+        return redirect('/admin_app/roles/')
+
+
+class UserList(ListView):
+    model = User
+    template_name = 'admin_app/settings/user/index.html'
+
+
+class CreateUser(CreateView):
+    model = Profile
+    template_name = 'admin_app/settings/user/update.html'
+    user = User()
+    profile = Profile()
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'profile_form': ProfileChangeForm(instance=self.profile),
+            'register_form': UserChangeForm(instance=self.user)
+        }
+        return context
+
+    def post(self, request, *args, **kwargs):
+        form_user = UserChangeForm(request.POST, instance=self.user)
+        form_profile = ProfileChangeForm(request.POST, instance=self.profile)
+        if form_user.is_valid() and form_profile.is_valid():
+            return self.form_valid(form_user, form_profile)
+
+    def form_valid(self, form_user, form_profile):
+        created_user = form_user.save(commit=False)
+        created_user.username = form_user.cleaned_data['email']
+        created_user.set_password(form_user.cleaned_data['password'])
+        created_user.save()
+
+        created_profile = form_profile.save(commit=False)
+        created_profile.user_id = created_user.id
+        created_profile.save()
+        return redirect('/admin_app/user_list/')
+
+
+class UpdateUser(UpdateView):
+    model = Profile
+    template_name = 'admin_app/settings/user/update.html'
+
+    def get_context_data(self, **kwargs):
+
+        profile = Profile.objects.get(id=self.kwargs['pk'])
+        context = {
+            'profile_form': ProfileChangeForm(instance=profile),
+            'register_form': UserChangeForm(instance=profile.user)
+        }
+        if kwargs.get('form'):
+            context = kwargs.get('form')
+        return context
+
+    def post(self, request, *args, **kwargs):
+        profile = Profile.objects.get(id=self.kwargs['pk'])
+        form_user = UserChangeForm(request.POST, instance=profile.user)
+        form_profile = ProfileChangeForm(request.POST, instance=profile)
+        if form_user.is_valid() and form_profile.is_valid():
+            return self.form_valid(form_user, form_profile)
+        else:
+            return self.form_invalid(form_user, form_profile)
+
+    def form_valid(self, form_user, form_profile):
+        created_user = form_user.save()
+        created_user.username = form_user.cleaned_data['email']
+        if form_user.cleaned_data['password']:
+            created_user.set_password(form_user.cleaned_data['password'])
+        created_user.save()
+        form_profile.save()
+        return redirect('/admin_app/user_list/')
+
+    def form_invalid(self, form_user, form_profile):
+        """If the form is invalid, render the invalid form."""
+        context = {
+            'profile_form': form_profile,
+            'register_form': form_user
+        }
+        return self.render_to_response(context)
+
+
+class ShowProfile(DetailView):
+    model = User
+    template_name = 'admin_app/settings/user/profile.html'
+    context_object_name = 'user'
+
+
+def delete_user(request, user_id):
+    user = User.objects.get(id=user_id)
+    profile = user.profile
+    user.delete()
+    profile.delete()
+    return redirect('/admin_app/user_list/')
+
+
+class PaymentDetailsView(DetailView):
+    model = PaymentDetails
+    template_name = 'admin_app/settings/payment_details.html'
+    context_object_name = 'form'
+
+    def get_object(self, queryset=None):
+        return PaymentDetailsForm(instance=PaymentDetails.objects.get(id=1))
+
+    def post(self, request, *args, **kwargs):
+        form = PaymentDetailsForm(request.POST, instance=PaymentDetails.objects.get(id=1))
+        if form.is_valid():
+            return self.form_valid(form)
+
+    def form_valid(self, form):
+        form.save()
+        return redirect('/admin_app/payment_details/')
+
+
+class PaymentItemList(ListView):
+    model = PaymentItems
+    template_name = 'admin_app/settings/payment_item/index.html'
+
+
+class PaymentItemCreate(CreateView):
+    form_class = PaymentItemsForm
+    template_name = 'admin_app/settings/payment_item/create.html'
+    context_object_name = 'form'
+    success_url = reverse_lazy('payment_items')
+
+
+class PaymentItemUpdate(UpdateView):
+    model = PaymentItems
+    form_class = PaymentItemsForm
+    template_name = 'admin_app/settings/payment_item/create.html'
+    context_object_name = 'form'
+    success_url = reverse_lazy('payment_items')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['edit'] = True
+        return context
+
+
+def delete_payment(request, payment_id):
+    PaymentItems.objects.get(id=payment_id).delete()
+    return redirect('/admin_app/payment_items/')
 

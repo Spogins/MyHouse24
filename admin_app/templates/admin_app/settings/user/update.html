@@ -1,0 +1,172 @@
+{% extends 'admin_app/base.html' %}
+{% load widget_tweaks %}
+{% block header %}
+<style>
+    .errorlist{
+            padding-left: 0;
+        }
+
+        .errorlist li{
+            list-style: none;
+            background-color: #F8D7DA;
+            color: #9D1C24;
+            padding-left: 10px;
+        }
+
+
+
+
+
+</style>
+{% endblock %}
+{% block content %}
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Пользователи</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="/admin_app">Главная</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'user_list' %}">Пользователи</a></li>
+                    <li class="breadcrumb-item active">Пользователь</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="content">
+    <div class="card">
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                <div class="row">
+                    {{ register_form.errors }}
+                    {{ profile_form.errors }}
+                </div>
+                <div class="row">
+                    <div class="col-xs-12 col-md-6">
+                        <div class="col-xs-12 col-sm-8">
+                            <label class=" requiredField">
+                                Имя
+                            </label>
+                            <div class="input-group">
+                                {{ register_form.first_name|add_class:'form-control' }}
+                            </div>
+
+                        </div>
+                        <div class="col-xs-12 col-sm-8">
+                            <label class=" requiredField">
+                                Фамилия
+                            </label>
+                            <div class="input-group">
+                                {{ register_form.last_name|add_class:'form-control' }}
+                            </div>
+
+                        </div>
+                        <div class="col-xs-12 col-sm-8">
+                            <label class=" requiredField">
+                                Телефон
+                            </label>
+                            <div class="input-group">
+                                {{ profile_form.phone|add_class:'form-control' }}
+                            </div>
+
+                        </div>
+                        <div class="col-xs-12 col-sm-8">
+                            <label class=" requiredField">
+                                Роль
+                            </label>
+                            <div class="input-group">
+                                {{ profile_form.role|add_class:'form-control' }}
+                            </div>
+
+                        </div>
+                        <div class="col-xs-12 col-sm-8">
+                            <label class=" requiredField">
+                                Статус
+                            </label>
+                            <div class="input-group">
+                                {{ profile_form.status|add_class:'form-control' }}
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-md-6">
+                        <div class="col-xs-12 col-sm-8">
+                            <label class=" requiredField">
+                                Email (логин)
+                            </label>
+                            <div class="input-group">
+                                {{ register_form.email|add_class:'form-control' }}
+                            </div>
+
+                        </div>
+                        <div class="col-xs-12 col-sm-8 field-useradminform-password">
+                            <label class="control-label">{{ register_form.password.label }}</label>
+                            <div class="input-group">
+                                {{ register_form.password|add_class:'form-control' }}
+                                <span class="input-group-btn">
+                                        <button class="btn btn-default" type="button"
+                                                onclick="generatePassword()">
+                                            Сгенерировать
+                                        </button>
+                                        <button type="button" class="btn btn-primary" id="showPass">
+                                            <i class="fa fa-eye" aria-hidden="true"></i>
+                                        </button>
+                                </span>
+                            </div>
+                            <div class="help-block">{{ register_form.password.errors }}</div>
+                        </div>
+                        <div class="col-xs-12 col-sm-8">
+                            <label class=" requiredField">
+                                Повторить пароль
+                            </label>
+                            <div class="input-group">
+                                {{ register_form.confirm_password|add_class:'form-control'}}
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+                <div class="col-xs-12 text-right">
+                    <button type="reset" class="btn btn-default">Oтменить</button>
+                    <button type="submit" class="btn btn-success">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}
+{% block script %}
+<script>
+
+    $('.nav-link.active').removeClass('active');
+
+        $('.nav-link').find('p:contains("Настройки системы")').parents('.nav-link').addClass('active').parent().addClass('menu-is-opening menu-open');
+        $('.nav-link').find('p:contains("Пользователи")').parents('.nav-link').addClass('active');
+
+    $('#showPass').on('click', function(){
+        let inputText = $('#id_password, #id_confirm_password');
+        let inputType = inputText.prop('type');
+        if (inputType === 'password') {
+            inputText.prop('type', 'text');
+            $(this).children().removeClass('fa-eye').addClass('fa-eye-slash');
+        } else {
+            inputText.prop('type', 'password');
+            $(this).children().removeClass('fa-eye-slash').addClass('fa-eye');
+        }
+    });
+    let generatePassword = function (){
+        let randomstring = Math.random().toString(36).slice(-8);
+        $('#id_password, #id_confirm_password').val(randomstring);
+    }
+
+
+
+
+
+</script>
+{% endblock %}

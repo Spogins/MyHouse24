@@ -1,0 +1,73 @@
+{% extends 'admin_app/base.html' %}
+{% load widget_tweaks %}
+{% block content %}
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                {% if edit %}
+                    <h1>Редактирование</h1>
+                {% else %}
+                <h1>Новая статья</h1>
+                {% endif %}
+
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="/admin_app">Главная</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'payment_items' %}">Статьи приходов/расходов</a></li>
+                    {% if edit %}
+                        <li class="breadcrumb-item active">Редактирование</li>
+                    {% else %}
+                        <li class="breadcrumb-item active">Новая статья</li>
+                    {% endif %}
+
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="content">
+    <div class="card">
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-xs-6 col-lg-8">
+                        <div class="col-xs-6 col-md-6">
+                            <label>Название</label>
+                            <div>
+                                {{ form.name|add_class:'form-control' }}
+                            </div>
+                        </div>
+                        <div class="col-xs-6 col-md-6">
+                            <label>Приход/Расход</label>
+                            <div>
+                                {{ form.status|add_class:'form-control' }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-md-12">
+                        <div class="float-right">
+                            <input type="reset" value="Отмена" class="btn btn-default">
+                            <input type="submit" value="Сохранить" class="btn btn-success">
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}
+{% block script %}
+<script>
+    $('.nav-link.active').removeClass('active');
+
+        $('.nav-link').find('p:contains("Настройки системы")').parents('.nav-link').addClass('active').parent().addClass('menu-is-opening menu-open');
+        $('.nav-link').find('p:contains("Статьи платежей")').parents('.nav-link').addClass('active');
+
+
+
+</script>
+{% endblock %}

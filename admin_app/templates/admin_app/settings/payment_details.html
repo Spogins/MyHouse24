@@ -1,0 +1,66 @@
+{% extends 'admin_app/base.html' %}
+{% load widget_tweaks %}
+{% block content %}
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Платежные реквизиты</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="/admin_app">Главная</a></li>
+                    <li class="breadcrumb-item active">Платежные реквизиты</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="content">
+    <div class="card">
+        <form method="post">
+            {% csrf_token %}
+            <div class="col-xs-12 col-sm-5">
+                <div class="form-group">
+                    <label class=" requiredField">
+                        Название
+                    </label>
+                    <div class="input-group">
+
+                        {{ form.name|add_class:'form-control' }}
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-5">
+                <div class="form-group">
+                    <label class=" requiredField">
+                        Описание
+                    </label>
+                    <div class="input-group">
+
+                        {{ form.description|add_class:'form-control' }}
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="col-xs-12 text-right">
+                <div class="form-group margin-top-15 margin-right-15">
+                    <button type="submit" class="btn btn-success">Сохранить</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}
+{% block script %}
+<script>
+    $('.nav-link.active').removeClass('active');
+    $('.nav-link').find('p:contains("Настройки системы")').parents('.nav-link').addClass('active').parent().addClass('menu-is-opening menu-open');
+
+$('.nav-link').find('p:contains("Платежные реквизиты")').parents('.nav-link').addClass('active');
+
+
+</script>
+{% endblock %}

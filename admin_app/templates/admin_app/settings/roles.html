@@ -1,0 +1,90 @@
+{% extends 'admin_app/base.html' %}
+{% block content %}
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Роли</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="/admin_app">Главная</a></li>
+                    <li class="breadcrumb-item active">Роли</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="content">
+    <div class="card">
+        <form method="post">
+            {% csrf_token %}
+            <div class="card-body table-responsive no-padding">
+                <table class="table table-bordered table-hover table-striped">
+                    <thead>
+                    <tr>
+                        <th>Роль</th>
+                        <th class="text-center">Статистика</th>
+                        <th class="text-center">Касса</th>
+                        <th class="text-center">Квитанции на оплату</th>
+                        <th class="text-center">Лицевые счета</th>
+                        <th class="text-center">Квартиры</th>
+                        <th class="text-center">Владельцы квартир</th>
+                        <th class="text-center">Дома</th>
+                        <th class="text-center">Сообщения</th>
+                        <th class="text-center">Заявки вызова мастера</th>
+                        <th class="text-center">Счетчики</th>
+                        <th class="text-center">Управление сайтом</th>
+                        <th class="text-center">Услуги</th>
+                        <th class="text-center">Тарифы</th>
+                        <th class="text-center">Роли</th>
+                        <th class="text-center">Пользователи</th>
+                        <th class="text-center">Платежные реквизиты</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {{ forms.management_form }}
+                    {% for form in forms %}
+                    <div style="display: none;">{{ form.id }}{{ form.name }}</div>
+                    <tr>
+                        <td>{{ form.instance.name }}</td>
+                        <td>{{ form.statistic }}</td>
+                        <td>{{ form.cash_box }}</td>
+                        <td>{{ form.invoice }}</td>
+                        <td>{{ form.personal_account }}</td>
+                        <td>{{ form.apartment }}</td>
+                        <td>{{ form.owner }}</td>
+                        <td>{{ form.house }}</td>
+                        <td>{{ form.message }}</td>
+                        <td>{{ form.application }}</td>
+                        <td>{{ form.meter }}</td>
+                        <td>{{ form.site_management }}</td>
+                        <td>{{ form.service }}</td>
+                        <td>{{ form.tariff }}</td>
+                        <td>{{ form.role }}</td>
+                        <td>{{ form.users }}</td>
+                        <td>{{ form.requisites }}</td>
+
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-xs-12 text-right">
+                <div class="form-group margin-top-15 margin-right-15">
+                    <button type="submit" class="btn btn-success">Сохранить</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}
+{% block script %}
+<script>
+    $('.nav-link.active').removeClass('active');
+    $('.nav-link').find('p:contains("Настройки системы")').parents('.nav-link').addClass('active').parent().addClass('menu-is-opening menu-open');
+    $('.nav-link').find('p:contains("Роли")').parents('.nav-link').addClass('active');
+
+</script>
+{% endblock %}

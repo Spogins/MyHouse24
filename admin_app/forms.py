@@ -8,6 +8,14 @@ class UnitForm(forms.ModelForm):
         model = Unit
         fields = '__all__'
 
+    def clean(self):
+        try:
+            name = self.cleaned_data['name']
+        except ValueError:
+            raise forms.ValidationError('Данная единица измерения уже существует')
+
+        return self.cleaned_data
+
 
 class ServiceForm(forms.ModelForm):
     unit = forms.ModelChoiceField(label='Едм. изм.', queryset=Unit.objects.all(), empty_label='Выберите...', required=False)
@@ -18,6 +26,14 @@ class ServiceForm(forms.ModelForm):
         widgets = {
             'show': forms.CheckboxInput(attrs={'class': 'checkbox'}),
         }
+
+    def clean(self):
+        try:
+            name = self.cleaned_data['name']
+        except ValueError:
+            raise forms.ValidationError('Данный сервис уже существует')
+
+        return self.cleaned_data
 
 
 class TariffServiceForm(forms.ModelForm):
@@ -38,6 +54,25 @@ class TariffCreateForm(forms.ModelForm):
         fields = '__all__'
 
 
+class RoleForm(forms.ModelForm):
+    class Meta:
+        model = Role
+        fields = '__all__'
+
+
+class PaymentDetailsForm(forms.ModelForm):
+    class Meta:
+        model = PaymentDetails
+        fields = '__all__'
+
+
+class PaymentItemsForm(forms.ModelForm):
+    class Meta:
+        model = PaymentItems
+        fields = '__all__'
+
+
 ServiceFormset = modelformset_factory(model=Service, form=ServiceForm, extra=0)
 UnitFormset = modelformset_factory(model=Unit, form=UnitForm, extra=0)
 TariffServiceFormSet = modelformset_factory(model=TariffService, form=TariffServiceForm, extra=0)
+RoleFormSet = modelformset_factory(model=Role, form=RoleForm, extra=0)

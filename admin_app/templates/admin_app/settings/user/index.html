@@ -1,0 +1,163 @@
+{% extends 'admin_app/base.html' %}
+{% load static %}
+{% block header %}
+{% endblock %}
+{% block content %}
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Пользователи</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="/admin_app">Главная</a></li>
+                    <li class="breadcrumb-item active">Пользователи</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12 col-md-12">
+            <div class="float-right mb-2 mt-2">
+                <a href="{% url 'create_user' %}" class="btn btn-success">Добавить пользователя</a>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12 col-md 12">
+            <div class="card">
+                <div class="card-body">
+                    <table class="table table-bordered table-hover sorting-table" data-filter-control="true">
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Пользователь</th>
+                            <th>Роль</th>
+                            <th>Телефон</th>
+                            <th>Email</th>
+                            <th>Статус</th>
+                            <th style="width: 114px; min-width: 114px">&nbsp;</th>
+                        </tr>
+                        <tr id="w0-filters" class="filters">
+                            <th>&nbsp;
+                            </th>
+                            <th><input type="text" class="form-control" id="filter-name" data-number="2"></th>
+                            <th><select class="form-control" id="filter-role" data-number="3">
+                                <option value=""></option>
+                                <option value="admin">Директор</option>
+                                <option value="manager">Управляющий</option>
+                                <option value="accountant">Бухгалтер</option>
+                                <option value="electrician">Электрик</option>
+                                <option value="plumber">Сантехник</option>
+                            </select>
+                            </th>
+                            <th><input type="text" class="form-control" id="filter-phone" data-number="4"></th>
+                            <th><input type="text" class="form-control" id="filter-email" data-number="5">
+                            </th>
+                            <th><select class="form-control" id="filter-status" data-number="6">
+                                <option value=""></option>
+                                <option value="10">Активен</option>
+                                <option value="5">Новый</option>
+                                <option value="0">Отключен</option>
+                            </select>
+                            </th>
+                            <th>&nbsp;</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for user in user_list %}
+                        <tr>
+                            <td>{{ user.id }}</td>
+                            <td class="user-fullname" data-number="2" onclick="show_profile({{user.id}})">{{ user.get_full_name }}</td>
+                            <td data-number="3" onclick="show_profile({{user.id}})">{{ user.profile.role }}</td>
+                            <td data-number="4" onclick="show_profile({{user.id}})">{{ user.profile.phone }}</td>
+                            <td data-number="5" onclick="show_profile({{user.id}})">{{ user.email }}</td>
+                            <td data-number="6" onclick="show_profile({{user.id}})">
+                                {% if user.profile.status == 'Новый' %}
+                                <small class="badge badge-warning">{{ user.profile.status }}</small>
+                                {% elif user.profile.status == 'Активен' %}
+                                <small class="badge badge-success">{{ user.profile.status }}</small>
+                                {% elif user.profile.status == 'Отключен' %}
+                                <small class="badge badge-danger">{{ user.profile.status }}</small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group float-right">
+                                    <a class="btn btn-default btn-sm" href="" title="Отправить приглашение"
+                                       data-toggle="tooltip"><i class="fas fa-redo-alt"></i></a>
+                                    <a class="btn btn-default btn-sm" href="{% url 'update_user' user.profile.id %}"
+                                       title="Редактировать" data-toggle="tooltip"><i class="fas fa-pencil-alt"></i></a>
+                                    <a class="btn btn-default btn-sm {% if user.is_superuser %}disabled{% endif %}"
+                                       onclick="{% if not user.is_superuser %}del_user({{user.id}}){% endif %}"
+                                       title="Удалить" data-toggle="tooltip" data-pjax="0" data-method="post"><i
+                                            class="fa fa-trash"></i></a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+{% block script %}
+<script>
+    $(function() {
+        $('.nav-link.active').removeClass('active');
+
+        $('.nav-link').find('p:contains("Настройки системы")').parents('.nav-link').addClass('active').parent().addClass('menu-is-opening menu-open');
+        $('.nav-link').find('p:contains("Пользователи")').parents('.nav-link').addClass('active');
+
+        $.expr[':'].icontains = function(a, i, m) {
+          return $(a).text().toLowerCase()
+              .indexOf(m[3].toLowerCase()) >= 0;
+        };
+
+        $('#filter-name, #filter-phone, #filter-email').on('keyup', function() {
+            let value = $(this).val().toLowerCase();
+            let number = $(this).data('number');
+            console.log(number);
+            console.log($(".table td[data-number='"+number+"']:icontains('" + value + "')"));
+            $(".table td[data-number='"+number+"']:icontains('" + value + "')").parent().show();
+            $(".table td[data-number='"+number+"']:not(:icontains('" + value + "'))").parent().hide();
+        });
+        $('#filter-role, #filter-status').on('change', function (){
+            let value = $(this).find('option:selected').text().toLowerCase();
+            let number = $(this).data('number');
+            console.log(value);
+            console.log($(".table td[data-number='"+number+"']:icontains('" + value + "')"));
+            $(".table td[data-number='"+number+"']:icontains('" + value + "')").parent().show();
+            $(".table td[data-number='"+number+"']:not(:icontains('" + value + "'))").parent().hide();
+        });
+
+    });
+
+function del_user(id){
+    var confirm1 = confirm('Вы уверены что хотите удалить этот объект?');
+    if (confirm1==false){
+       return
+    }
+    $.ajax({
+        headers: { "X-CSRFToken": '{{ csrf_token }}' },
+        type: "POST",
+        url: 'delete_user/' + id,
+        success: function(response){
+            console.log(response);
+            location.reload();
+        }
+    });
+}
+
+function show_profile(id){
+    console.log(id)
+    window.location.href = '/admin_app/show_profile/'+id
+}
+</script>
+{% endblock %}

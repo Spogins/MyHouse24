@@ -1,0 +1,98 @@
+{% extends 'admin_app/base.html' %}
+{% block header %}
+{% endblock %}
+{% block content %}
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Статьи приходов/расходов</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="/admin_фзз">Главная</a></li>
+                    <li class="breadcrumb-item active">Статьи приходов/расходов</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12 col-md-12">
+            <div class="float-right mb-2 mt-2">
+                <a href="{% url 'create_payment' %}" class="btn btn-success">Добавить статью</a>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12 col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <table class="table table-bordered table-hover sorting-table" data-filter-control="true">
+                        <thead>
+                        <tr>
+                            <th>Название</th>
+                            <th>Приход/расход</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for paymentitem in paymentitems_list %}
+                        <tr>
+                            <td>{{ paymentitem.name }}</td>
+                            <td>{{ paymentitem.status }}</td>
+                            <td>
+                                <div class="btn-group float-right">
+                                    <a class="btn btn-default btn-sm"
+                                       href="{% url 'update_payment' paymentitem.id %}" title="Редактировать"
+                                       data-toggle="tooltip"><i class="fas fa-pencil-alt"></i></a>
+                                    <a class="btn btn-default btn-sm"
+                                       onclick="del_payment({{ paymentitem.id }})" title="Удалить"
+                                       data-toggle="tooltip" data-pjax="0" data-method="post"><i
+                                            class="fa fa-trash"></i></a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+{% block script %}
+<script>
+
+    $('.nav-link.active').removeClass('active');
+
+    $('.nav-link').find('p:contains("Настройки системы")').parents('.nav-link').addClass('active').parent().addClass('menu-is-opening menu-open');
+    $('.nav-link').find('p:contains("Статьи платежей")').parents('.nav-link').addClass('active');
+
+        $(".sorting-table").DataTable({
+          "responsive": true, "lengthChange": false, "autoWidth": false, "searching": false, "paging": false,
+            "bInfo" : false,
+          "buttons": []
+        }).buttons().container().appendTo('.sorting-table_wrapper .col-md-6:eq(0)');
+
+    function del_payment(id){
+        var confirm1 = confirm('Вы уверены что хотите удалить этот объект?');
+        if (confirm1==false){
+           return
+        }
+        $.ajax({
+            headers: { "X-CSRFToken": '{{ csrf_token }}' },
+            type: "POST",
+            url: 'delete_payment/' + id,
+            success: function(response){
+                console.log(response);
+                location.reload();
+            }
+        });
+    }
+
+</script>
+{% endblock %}
