@@ -1,0 +1,170 @@
+{% extends 'admin_app/base.html'%}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block content%}
+
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Редактирование страницы</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="#">Главная</a></li>
+                    <li class="breadcrumb-item active">Редактирование страницы</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="content">
+
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="card">
+                <div class="card-header with-border">
+                    <h3 class="card-title">Редактирование страницы "Главная"</h3>
+                    <div class="card-tools">
+                        <a href="/admin/website/update-seo-files" class="btn btn-default btn-sm updateSeoFiles">
+                            <span class="hidden-xs">Обновить robots и sitemap</span><i class="fa fa-refresh visible-xs"
+                                                                                       aria-hidden="true"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form id="w0" action="" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <h3 class="page-header">Слайдер</h3>
+                        <div class="row site-main-slider">
+                            {{ formset.management_form }}
+                            {% for form in formset %}
+                            <div class="col-md-4">
+                                <h4>Слайд {{ forloop.counter }}</h4>
+                                <div class="form-group formset_id">
+                                    {{ form.id }}
+                                </div>
+                                <img src="{% if form.image.value.url != Null %}{{ MEDIA_URL }}{{ form.image.value.url }}{% else %}{% static 'dist/img/empty.jpg' %}{% endif %}"
+                                     alt="" class="img-responsive margin-bottom-15">
+                                <div class="form-group margin-bottom-30 field-websitehomeslide-0-imagefile">
+                                    <label class="control-label">Рекомендуемый
+                                        размер: (1920x800)</label>
+                                    {{ form.image }}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h3 class="page-header">Краткая информация</h3>
+                                <div class="col-sm-12">
+                                    <label>Заголовок</label>
+                                    <div>
+                                        {{ form.title|add_class:'form-control' }}
+                                    </div>
+                                </div>
+                                <div class="col-sm-12">
+                                    <label>Краткий текст</label>
+                                    <div>
+                                        {{ form.description|add_class:'form-control description' }}
+                                    </div>
+                                </div>
+                                <div class="col-sm-12">
+
+                                    <div>
+                                        {{ form.show_link }} <label>Показывать ссылки на приложения</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <h3 class="page-header">Рядом с нами</h3>
+                                <div class="near-block row">
+
+                                    {{ near_formset.management_form }}
+                                    {% for form in near_formset %}
+                                    <div class="col-md-4">
+                                        <h4>Блок {{ forloop.counter }}</h4>
+                                        <div class="formset_id">
+                                            {{ form.id }}
+                                        </div>
+                                        <img src="{% if form.image.value.url != Null %}{{ MEDIA_URL }}{{ form.image.value.url }}{% else %}{% static 'dist/img/empty.jpg' %}{% endif %}"
+                                             alt="" class="img-responsive margin-bottom-15 w-100">
+                                        {{ form.image }}
+
+                                        <div class="col-sm-12">
+                                            <label>Название</label>
+                                            <div>
+                                                {{ form.title|add_class:'form-control' }}
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <label>Описание</label>
+                                            <div>
+                                                {{ form.description|add_class:'form-control description' }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <h3 class="page-header">Настройки SEO</h3>
+                                <div class="col-sm-12">
+                                    <label>Title</label>
+                                    <div>
+                                        {{ seo_form.title|add_class:'form-control' }}
+                                    </div>
+                                </div>
+                                <div class="col-sm-12">
+                                    <label>Description</label>
+                                    <div>
+                                        {{ seo_form.description|add_class:'form-control' }}
+                                    </div>
+                                </div>
+                                <div class="col-sm-12">
+                                    <label>Keywords</label>
+                                    <div>
+                                        {{ seo_form.keywords|add_class:'form-control' }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="text-align: center;" class="p-5">
+                            <button type="submit" class="btn btn-success">Сохранить</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+{% block script %}
+<script>
+
+    $('.nav-link.active').removeClass('active');
+
+        $('.nav-link').find('p:contains("Управление сайтом")').parents('.nav-link').addClass('active').parent().addClass('menu-is-opening menu-open');
+        $('.nav-link').find('p:contains("Главная")').parents('.nav-link').addClass('active');
+
+        $('.description').summernote({
+             lang:'ru-RU',
+  styleTags: [
+    'p', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'
+	],
+            toolbar: [
+                ['style', ['style']],
+                ['font', ['bold', 'underline', 'clear']],
+                ['para', ['ul', 'ol', 'paragraph']],
+            ]
+  });
+
+
+
+
+
+</script>
+{% endblock %}

@@ -29,14 +29,6 @@
     [class*=sidebar-light-] {
         background-color: #f9fafc;;
     }
-    .close {
-        position: absolute;
-        top: 0;
-        right: 0;
-        z-index: 2;
-        padding: 3px 8px;
-        color: inherit;
-    }
 .brand-link{
   text-align: center;
   background-color: white;
@@ -44,7 +36,6 @@
 .brand-link .brand-image{
   float: none;
 }
-
 
     </style>
     {% block header%}
@@ -69,7 +60,7 @@
                 <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
             </li>
             <li class="nav-item d-none d-sm-inline-block">
-                <a href="#" class="nav-link">Панель администратора</a>
+                <a href="#" class="nav-link">перейти на сайт</a>
             </li>
         </ul>
 
@@ -106,185 +97,94 @@
 
                     <li class="nav-item">
                         <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-chart-line"></i>
+                            <i class="nav-icon far fa-envelope"></i>
                             <p>
-                                Статистика
+                                Сводка
+                                <i class="fas fa-angle-left right"></i>
                             </p>
                         </a>
+                        <ul class="nav nav-treeview">
+                            {% for flat in flats %}
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>{{ flat.house.name }}, кв.{{ flat.number }}</p>
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
                     </li>
-
-
                     <li class="nav-item">
                         <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-dollar-sign"></i>
+                            <i class="nav-icon far fa-envelope"></i>
                             <p>
-                                Касса
+                                Квитанции
+                                <i class="fas fa-angle-left right"></i>
                             </p>
                         </a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="nav-icon far fa-copy"></i>
-                            <p>
-                                Квитанции на оплату
-                            </p>
-                        </a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="nav-icon far fa-credit-card"></i>
-                            <p>
-                                Лицевые счета
-                            </p>
-                        </a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-key"></i>
-                            <p>
-                                Квартиры
-                            </p>
-                        </a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-users"></i>
-                            <p>
-                                Владельцы квартир
-                            </p>
-                        </a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="nav-icon far fa-building"></i>
-                            <p>
-                                Дома
-                            </p>
-                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Все квитанции</p>
+                                </a>
+                            </li>
+                            {% for flat in flats %}
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>{{ flat.house.name }}, кв.{{ flat.number }}</p>
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
                     </li>
 
                     <li class="nav-item">
                         <a href="#" class="nav-link">
                             <i class="nav-icon far fa-envelope"></i>
                             <p>
+                                Тарифы
+                                <i class="fas fa-angle-left right"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            {% for flat in flats %}
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>{{ flat.house.name }}, кв.{{ flat.number }}</p>
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-columns"></i>
+                            <p>
                                 Сообщения
                             </p>
                         </a>
                     </li>
-
                     <li class="nav-item">
                         <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-wrench"></i>
+                            <i class="nav-icon fas fa-columns"></i>
                             <p>
-                                Заявки вызова мастера
+                                Вызов мастера
                             </p>
                         </a>
                     </li>
 
                     <li class="nav-item">
                         <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-tachometer-alt"></i>
+                            <i class="nav-icon fas fa-columns"></i>
                             <p>
-                                Показания счетчиков
+                                Профиль
                             </p>
                         </a>
                     </li>
-
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-desktop"></i>
-                            <p>
-                                Управление сайтом
-                                <i class="fas fa-angle-left right"></i>
-                            </p>
-                        </a>
-                        <ul class="nav nav-treeview">
-                            <li class="nav-item">
-                                <a href="{% url 'main_page' %}" class="nav-link">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Главная</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="#" class="nav-link">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>О нас</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="#" class="nav-link">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Услуги</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="#" class="nav-link">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Контакты</p>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-cogs"></i>
-                            <p>
-                                Настройки системы
-                                <i class="fas fa-angle-left right"></i>
-                            </p>
-                        </a>
-                        <ul class="nav nav-treeview">
-
-                            <li class="nav-item">
-                                <a href="{% url 'services' %}" class="nav-link">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Услуги</p>
-                                </a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a href="{% url 'tariff_list' %}" class="nav-link">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Тарифы</p>
-                                </a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a href="{% url 'roles' %}" class="nav-link">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Роли</p>
-                                </a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a href="{% url 'user_list' %}" class="nav-link">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Пользователи</p>
-                                </a>
-                            </li>
-
-
-                            <li class="nav-item">
-                                <a href="{% url 'payment_details' %}" class="nav-link">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Платежные реквизиты</p>
-                                </a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a href="{% url 'payment_items' %}" class="nav-link">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Статьи платежей</p>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-
                 </ul>
             </nav>
             <!-- /.sidebar-menu -->
@@ -312,8 +212,6 @@
 <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
 <script src="{% static 'dist/js/pages/dashboard3.js'%}"></script>
 <script src="{% static 'dist/js/custom.js'%}"></script>
-<!-- OPTIONAL SCRIPTS -->
-<script src="{% static 'plugins/chart.js/Chart.js' %}"></script>
 <script src="{% static 'plugins/summernote/summernote-bs4.min.js'%}"></script>
 <script src="{% static 'plugins/summernote/lang/summernote-ru-RU.js'%}"></script>
 <script src="{% static 'plugins/datatables/jquery.dataTables.min.js'%}"></script>

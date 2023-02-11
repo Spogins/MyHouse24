@@ -72,7 +72,42 @@ class PaymentItemsForm(forms.ModelForm):
         fields = '__all__'
 
 
+class MainPageForm(forms.ModelForm):
+    class Meta:
+        model = MainPage
+        exclude = ['seo']
+
+
+class SlideForm(forms.ModelForm):
+    class Meta:
+        model = Slide
+        fields = '__all__'
+        widget = {
+            'image': forms.FileInput(attrs={
+                'type': 'file',
+                'name': 'files[]',
+                'class': 'imageInput',
+                'accept': '.jpg, .img, .png, .gif',
+                'style': 'display: none'}),
+        }
+
+
+class SeoCreateForm(forms.ModelForm):
+    class Meta:
+        model = SeoText
+        fields = '__all__'
+
+
+class NearBlockForm(forms.ModelForm):
+
+    class Meta:
+        model = NearBlock
+        fields = '__all__'
+
+
 ServiceFormset = modelformset_factory(model=Service, form=ServiceForm, extra=0)
 UnitFormset = modelformset_factory(model=Unit, form=UnitForm, extra=0)
 TariffServiceFormSet = modelformset_factory(model=TariffService, form=TariffServiceForm, extra=0)
 RoleFormSet = modelformset_factory(model=Role, form=RoleForm, extra=0)
+SlideFormSet = modelformset_factory(model=Slide, form=SlideForm, extra=0)
+NearBlockFormSet = modelformset_factory(model=NearBlock, form=NearBlockForm, extra=0)

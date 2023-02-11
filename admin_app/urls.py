@@ -25,5 +25,5 @@ urlpatterns = [
     path('create_payment/', PaymentItemCreate.as_view(), name='create_payment'),
     path('update_payment/<int:pk>', PaymentItemUpdate.as_view(), name='update_payment'),
     path('payment_items/delete_payment/<int:payment_id>', delete_payment, name='delete_payment'),
-
+    path('main_page/', MainPageView.as_view(), name='main_page'),
 ]

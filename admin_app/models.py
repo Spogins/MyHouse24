@@ -7,16 +7,10 @@ class House(models.Model):
     pass
 
 
-class SeoBlock(models.Model):
+class SeoText(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
     keywords = models.TextField()
-
-
-class HomePage(models.Model):
-    slide_1 = models.ImageField(upload_to='slides/', null=True, blank=True)
-    slide_2 = models.ImageField(upload_to='slides/', null=True, blank=True)
-    slide_3 = models.ImageField(upload_to='slides/', null=True, blank=True)
 
 
 class Unit(models.Model):
@@ -96,7 +90,19 @@ class PaymentItems(models.Model):
     status = models.CharField(choices=Status.choices, max_length=20, default='Приход')
 
 
+class MainPage(models.Model):
+    title = models.CharField(max_length=100, null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
+    show_link = models.BooleanField(default=True)
+    seo = models.ForeignKey(SeoText, on_delete=models.SET_NULL, null=True)
 
 
+class Slide(models.Model):
+    image = models.ImageField(upload_to='slides/', null=True, blank=True)
 
+
+class NearBlock(models.Model):
+    image = models.ImageField(upload_to='near/', null=True, blank=True)
+    title = models.CharField(max_length=100, null=True, blank=True)
+    description = models.TextField(max_length=300, null=True, blank=True)
 

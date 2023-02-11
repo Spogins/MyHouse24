@@ -1,0 +1,140 @@
+{% extends 'admin/base.html'%}
+{% load static%}
+{% load crispy_forms_tags %}
+{% load filters %}
+{% block content%}
+    <section class="content-header">
+    <div class="container-fluid">
+            <div class="row mb-2">
+              <div class="col-sm-6">
+                <h1>Редактирование страницы</h1>
+              </div>
+              <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                  <li class="breadcrumb-item"><a href="#">Главная</a></li>
+                  <li class="breadcrumb-item active">Редактирование страницы</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+    </section>
+
+     <section class="content">
+
+        <div class="row">
+            <div class="col-xs-12 col-12 mt-2">
+                <div class="card">
+                    <div class="card-header with-border">
+                        <h3 class="card-title">Редактирование страницы "услуги"</h3>
+                        <div class="card-tools">
+                            <a href="/admin/website/update-seo-files" class="btn btn-default btn-sm updateSeoFiles">
+                            <span class="hidden-xs">Обновить robots и sitemap</span><i class="fa fa-refresh visible-xs" aria-hidden="true"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <form id="w0" action="" method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="row site-main-slider">
+                                {{ formset.management_form }}
+                                {% for form in formset %}
+                                    <div class="col-md-4">
+                                    <h4>
+                                        Услуга {{ form.prefix|to_int }}
+                                        <a href="{% if form.id.value %}{% url 'admin:delete_service_page' form.id.value %}{% endif %}" class="float-right text-red" data-confirm="Удалить?"><i class="fa fa-trash"></i></a>
+                                    </h4>
+                                    <img src="{% if form.image.value.url %}{{ MEDIA_URL }}{{ form.image.value.url }}{% else %}{% static 'dist/img/empty.jpg' %}{% endif %}" alt="" class="img-responsive mb-0">
+                                    <div class="form-group formset_id">
+                                        {{ form.id }}
+                                    </div>
+                                    <div class="form-group margin-bottom-0 field-websitehomeslide-0-imagefile">
+                                        <label class="control-label" for="websitehomeslide-0-imagefile">Рекомендуемый размер: (650x300)</label>
+                                        {{ form.image }}
+                                    </div>
+                                    {{ form.name|as_crispy_field }}
+                                    {{ form.description|as_crispy_field }}
+                                </div>
+                                {% endfor %}
+                            <div class="empty-form-formset">
+                                    <div class="col-md-4">
+                                    <h4>Услуга </h4>
+                                    <img src="{% static 'dist/img/empty.jpg' %}" alt="" class="img-responsive mb-0">
+                                    <div class="form-group formset_id">
+                                        {{ formset.empty_form.id }}
+                                    </div>
+                                    <div class="form-group margin-bottom-0 field-websitehomeslide-0-imagefile">
+                                        <label class="control-label" for="websitehomeslide-0-imagefile">Рекомендуемый размер: (1920x800)</label>
+                                        {{ formset.empty_form.image }}
+                                    </div>
+                                    {{ formset.empty_form.name|as_crispy_field }}
+                                    {{ formset.empty_form.description|as_crispy_field }}
+                                </div>
+                            </div>
+                            </div>
+                            <div class="col-md-12">
+                                <h3 class="page-header">Настройки SEO</h3>
+                                {% for field in seo_form %}
+                                <div>
+                                    {{ field|as_crispy_field }}
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <div style="text-align: center;" class="p-5">
+                                <input type="reset" value="отмена" class="btn btn-default">
+                                <input type="submit" value="Добавить услугу" class="btn btn-success add-service">
+                                <input type="submit" value="сохранить" class="btn btn-success">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+     </section>
+{% endblock %}
+{% block script %}
+    <script>
+
+    $('.nav-link.active').removeClass('active');
+
+        $('.nav-link').find('p:contains("Управление сайтом")').parents('.nav-link').addClass('active').parent().addClass('menu-is-opening menu-open');
+        $('.nav-link').find('p:contains("Услуги")').parents('.nav-link').addClass('active');
+
+        let new_form = function (){
+            let total_forms = $('#id_form-TOTAL_FORMS').val();
+            $('#id_form-TOTAL_FORMS').val(parseInt(total_forms)+1);
+            let new_form = $(".empty-form-formset .col-md-4").first().clone();
+            new_form.find('h4').html('Услуга '+(parseInt(total_forms)+1)+'<a href="" class="float-right text-red" data-confirm="Удалить?"><i class="fa fa-trash"></i></a>');
+            let new_form_id = new_form.find('#id_form-__prefix__-id');
+            new_form_id.attr('name', new_form_id.attr('name').replace('__prefix__', total_forms));
+            new_form_id.attr('id', new_form_id.attr('id').replace('__prefix__', total_forms));
+            let new_form_image = new_form.find('#id_form-__prefix__-image');
+            new_form_image.attr('name', new_form_image.attr('name').replace('__prefix__', total_forms));
+            new_form_image.attr('id', new_form_image.attr('id').replace('__prefix__', total_forms));
+            let new_form_name = new_form.find('#id_form-__prefix__-name');
+            new_form_name.attr('name', new_form_name.attr('name').replace('__prefix__', total_forms));
+            new_form_name.attr('id', new_form_name.attr('id').replace('__prefix__', total_forms));
+            let new_form_desc = new_form.find('#id_form-__prefix__-description');
+            new_form_desc.attr('name', new_form_desc.attr('name').replace('__prefix__', total_forms));
+            new_form_desc.attr('id', new_form_desc.attr('id').replace('__prefix__', total_forms));
+            $('.site-main-slider').append(new_form);
+        }
+        $('.add-service').on('click', function (e){
+            e.preventDefault();
+            new_form();
+        });
+
+        $('.col-md-4 textarea').summernote({
+            minHeight: 200,
+            maxHeight: 200,
+             lang:'ru-RU',
+          styleTags: [
+            'p', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'
+            ],
+            toolbar: [
+                ['style', ['style']],
+                ['font', ['bold', 'underline', 'clear']],
+                ['para', ['ul', 'ol', 'paragraph']],
+            ]
+  });
+    </script>
+{% endblock %}

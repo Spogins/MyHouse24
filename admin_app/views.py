@@ -5,6 +5,9 @@ from django.urls import reverse_lazy
 from django.views import View
 from django.views.decorators.http import require_POST
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
+from django.views.generic.base import TemplateResponseMixin, TemplateView
+from django.views.generic.edit import FormMixin
+from django.views.generic.list import MultipleObjectMixin
 
 from account.forms import UserChangeForm, ProfileChangeForm
 from account.models import Profile
@@ -316,3 +319,57 @@ def delete_payment(request, payment_id):
     PaymentItems.objects.get(id=payment_id).delete()
     return redirect('/admin_app/payment_items/')
 
+
+class MainPageView(CreateView):
+    template_name = 'admin_app/pages/main_page.html'
+    instance = MainPage.objects.all()[0]
+    instance_seo = instance.seo
+
+    def get_context_data(self, **kwargs):
+        formset = SlideFormSet(queryset=Slide.objects.all(), prefix='slide')
+        form = MainPageForm(instance=self.instance)
+        near_formset = NearBlockFormSet(queryset=NearBlock.objects.all(), prefix='near')
+        seo_form = SeoCreateForm(instance=self.instance_seo, prefix='seo')
+        context = {
+            'formset': formset,
+            'form': form,
+            'near_formset': near_formset,
+            'seo_form': seo_form
+        }
+        return context
+
+    def post(self, request, *args, **kwargs):
+        formset = SlideFormSet(request.POST, request.FILES, queryset=Slide.objects.all(), prefix='slide')
+        form = MainPageForm(request.POST, instance=self.instance)
+        near_formset = NearBlockFormSet(request.POST, request.FILES, queryset=NearBlock.objects.all(), prefix='near')
+        seo_form = SeoCreateForm(request.POST, instance=self.instance_seo, prefix='seo')
+        if form.is_valid() and seo_form.is_valid() and formset.is_valid() and near_formset.is_valid():
+            return self.form_valid(form, seo_form, formset, near_formset)
+        else:
+            return self.form_invalid(form, seo_form, formset, near_formset)
+
+    def form_valid(self, form, seo_form, formset, near_formset):
+        print('++++++++++')
+        form.save()
+        seo_form.save()
+        for form in formset:
+            form.save()
+        for n_form in near_formset:
+            n_form.save()
+        return redirect('/admin_app/main_page/')
+
+    def form_invalid(self, form, seo_form, formset, near_formset):
+        print(form.errors)
+        print('-------------')
+        print(formset.errors)
+        print('-------------')
+        print(near_formset.errors)
+        print('-------------')
+        print(seo_form.errors)
+        context = {
+            'formset': formset,
+            'form': form,
+            'near_formset': near_formset,
+            'seo_form': seo_form
+        }
+        return self.render_to_response(context)
