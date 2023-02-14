@@ -89,7 +89,7 @@
     <!-- Main Sidebar Container -->
     <aside class="main-sidebar sidebar-light-primary elevation-1">
         <!-- Brand Logo -->
-        <a href="#" class="brand-link">
+        <a href="/" class="brand-link">
             <img src="{% static 'dist/img/logo.svg'%}" alt="AdminLTE Logo" class="brand-image">
         </a>
 
@@ -205,25 +205,25 @@
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
-                                <a href="{% url 'main_page' %}" class="nav-link">
+                                <a href="{% url 'main_pagev' %}" class="nav-link">
                                     <i class="far fa-circle nav-icon"></i>
                                     <p>Главная</p>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="#" class="nav-link">
+                                <a href="{% url 'info_pagev' %}" class="nav-link">
                                     <i class="far fa-circle nav-icon"></i>
                                     <p>О нас</p>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="#" class="nav-link">
+                                <a href="{% url 'service_pagev' %}" class="nav-link">
                                     <i class="far fa-circle nav-icon"></i>
                                     <p>Услуги</p>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="#" class="nav-link">
+                                <a href="{% url 'contact_pagev' %}" class="nav-link">
                                     <i class="far fa-circle nav-icon"></i>
                                     <p>Контакты</p>
                                 </a>

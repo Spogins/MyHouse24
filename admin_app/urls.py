@@ -25,5 +25,14 @@ urlpatterns = [
     path('create_payment/', PaymentItemCreate.as_view(), name='create_payment'),
     path('update_payment/<int:pk>', PaymentItemUpdate.as_view(), name='update_payment'),
     path('payment_items/delete_payment/<int:payment_id>', delete_payment, name='delete_payment'),
-    path('main_page/', MainPageView.as_view(), name='main_page'),
+    path('main_page/', MainPageView.as_view(), name='main_pagev'),
+    path('info_page/', InfoPage.as_view(), name='info_pagev'),
+    path('service_page/', ServicePageView.as_view(), name='service_pagev'),
+    path('contact_page/', ContactPageView.as_view(), name='contact_pagev'),
+    path('delete_document/<int:pk>', delete_document, name='delete_document'),
+    path('delete_image_gallery/<int:image_id>', delete_from_gallery, name='delete_image'),
+    path('delete_service_page/<int:service_id>', delete_service_page, name='delete_service_page'),
+    path('clone_tariff/<int:pk>', CloneTariff.as_view(), name='clone_tariff'),
+
+
 ]

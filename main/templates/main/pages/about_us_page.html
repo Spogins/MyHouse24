@@ -1,0 +1,76 @@
+{% extends 'main/base.html'%}
+{% block content %}
+<div class="container w-75">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'main_page'%}">Главная</a></li>
+            <li class="breadcrumb-item active" aria-current="page">О нас</li>
+        </ol>
+    </nav>
+    <div class="col-xs-12 about">
+        <div class="page-header">
+            <h1>{{ page.title }}</h1>
+        </div>
+        <div class="row flex-row-reverse">
+            <div class="col-md-3 text-end">
+                <img src="{{ page.image.url }}" alt="" class="w-100 margin-bottom-15">
+            </div>
+            <div class="col-md-9">
+                {{ page.description|safe }}
+            </div>
+        </div>
+    </div>
+    <div class="gallery g1">
+        <div class="row">
+            {% for image in gallery_main %}
+            <div class="col-xs-12 col-sm-6 col-md-3 item" data-src="/upload/WebsiteAboutImage/86/image.jpg">
+                <a href="" class="big">
+                    <img src="{{ image.image.url }}" alt="" class="img-responsive img-thumbnail">
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="col-xs-12 about">
+        <div class="page-header">
+            <h1>{{ page.extra_title }}</h1>
+        </div>
+        {{ page.extra_description|safe }}
+    </div>
+
+    <div class="gallery g2" style="margin-top:3rem;">
+        <div class="row">
+            {% for image in gallery_additional %}
+            <div class="col-xs-12 col-sm-6 col-md-3 item" data-src="/upload/WebsiteAboutImage/86/image.jpg">
+                <a href="" class="big">
+                    <img src="{{ image.image.url }}" alt="" class="img-responsive img-thumbnail">
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="col-md-12">
+        <div class="page-header">
+            <h3>Документы</h3>
+        </div>
+        {% for document in documents %}
+        <div class="media d-flex">
+            <div class="media-left">
+                <div class="media-object" style="margin-right: 10px;">
+                    <i class="far fa-file-pdf fa-3x"></i>
+                </div>
+            </div>
+            <div class="media-body col">
+                <h4 class="media-heading" style="margin-bottom: 5px; font-size: 18px">{{ document.name }}</h4>
+                <a href="{{ document.file.url }}" download="" style="text-decoration: none;"><i class="fa fa-download"
+                                                                                                aria-hidden="true"></i>
+                    Скачать</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+{% endblock %}

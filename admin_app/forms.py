@@ -105,9 +105,49 @@ class NearBlockForm(forms.ModelForm):
         fields = '__all__'
 
 
+class InfoForm(forms.ModelForm):
+    class Meta:
+        model = Info
+        exclude = ['seo']
+
+
+class GalleryForm(forms.ModelForm):
+    class Meta:
+        model = Gallery
+        fields = '__all__'
+
+
+class DocumentForm(forms.ModelForm):
+    class Meta:
+        model = Document
+        fields = ['file', 'name']
+        widget = {
+            'file': forms.FileInput(attrs={
+                'type': 'file',
+                'name': 'files[]',
+                'accept': '.jpg, .pdf'}),
+        }
+
+
+class ServiceBlockForm(forms.ModelForm):
+    class Meta:
+        model = ServicePage
+        fields = '__all__'
+
+
+class ContactPageForm(forms.ModelForm):
+    class Meta:
+        model = ContactPage
+        exclude = ['seo']
+
+
 ServiceFormset = modelformset_factory(model=Service, form=ServiceForm, extra=0)
 UnitFormset = modelformset_factory(model=Unit, form=UnitForm, extra=0)
 TariffServiceFormSet = modelformset_factory(model=TariffService, form=TariffServiceForm, extra=0)
 RoleFormSet = modelformset_factory(model=Role, form=RoleForm, extra=0)
 SlideFormSet = modelformset_factory(model=Slide, form=SlideForm, extra=0)
 NearBlockFormSet = modelformset_factory(model=NearBlock, form=NearBlockForm, extra=0)
+GalleryFormSet = modelformset_factory(model=Gallery, form=GalleryForm, extra=0)
+ExtraGalleryFormSet = modelformset_factory(model=Gallery, form=GalleryForm, extra=0)
+DocumentFormSet = modelformset_factory(model=Document, form=DocumentForm, extra=0)
+ServiceBlockFormSet = modelformset_factory(model=ServiceBlock, form=ServiceBlockForm, extra=0)

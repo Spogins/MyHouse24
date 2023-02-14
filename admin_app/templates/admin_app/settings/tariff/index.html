@@ -45,7 +45,7 @@
                                         <td onclick="show_tariff('{{tariff.id}}')">{{ tariff.date }}</td>
                                         <td>
                                             <div class="btn-group float-right">
-
+                                                <a class="btn btn-default btn-sm" href="{% url 'clone_tariff' tariff.id %}" title="Копировать" data-toggle="tooltip"><i class="fa fa-clone"></i></a>
                                                 <a class="btn btn-default btn-sm" href="{% url 'update_tariff' tariff.id %}" title="Редактировать" data-toggle="tooltip"><i class="fas fa-pencil-alt"></i></a>
                                                 <a class="btn btn-default btn-sm" onclick="del_tariff('{{tariff.id}}')" title="Удалить" data-toggle="tooltip" data-pjax="0" data-method="post"><i class="fa fa-trash"></i></a>
                                             </div>

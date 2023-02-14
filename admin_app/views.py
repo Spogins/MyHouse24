@@ -31,8 +31,12 @@ class CreateService(CreateView):
     def get_context_data(self, **kwargs):
         context = {
             'formset': ServiceFormset(queryset=Service.objects.all(), prefix='service'),
-            'unit_formset': UnitFormset(queryset=Unit.objects.all())
+            'unit_formset': UnitFormset(queryset=Unit.objects.all()),
+            'service': [x.service for x in TariffService.objects.all()],
+            'unit': [x.unit for x in TariffService.objects.all()]
         }
+        print([x.service.id for x in TariffService.objects.all()])
+        print([x.unit.id for x in TariffService.objects.all()])
         return context
 
     def post(self, request, *args, **kwargs):
@@ -126,6 +130,40 @@ class UpdateTariff(UpdateView):
                     full_form.tariff = tariff
                     full_form.unit = full_form.service.unit
                     full_form.save()
+        return redirect('/admin_app/tariff_list/')
+
+
+class CloneTariff(UpdateView):
+    model = Tariff
+    template_name = 'admin_app/settings/tariff/create.html'
+    success_url = '/admin_app/tariff_list/'
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'form': TariffCreateForm(instance=Tariff.objects.get(id=self.kwargs['pk'])),
+            'formset': TariffServiceFormSet(queryset=TariffService.objects.filter(tariff=self.kwargs['pk']),
+                                            prefix='tariffservice_set'),
+            'name': Tariff.objects.get(id=self.kwargs['pk']).name,
+            'id': self.kwargs['pk']
+        }
+        return context
+
+    def post(self, request, *args, **kwargs):
+        formset = TariffServiceFormSet(request.POST, queryset=None, prefix='tariffservice_set')
+        form = TariffCreateForm(request.POST)
+        if form.is_valid():
+            return self.form_valid(formset, form)
+
+    def form_valid(self, formset, form):
+        tariff = form.save()
+        for form in formset:
+            if form.is_valid():
+                if form.cleaned_data:
+                    pass
+                    # full_form = form.save()
+                    # full_form.tariff = tariff
+                    # full_form.unit = full_form.service.unit
+                    # full_form.save()
         return redirect('/admin_app/tariff_list/')
 
 
@@ -349,7 +387,6 @@ class MainPageView(CreateView):
             return self.form_invalid(form, seo_form, formset, near_formset)
 
     def form_valid(self, form, seo_form, formset, near_formset):
-        print('++++++++++')
         form.save()
         seo_form.save()
         for form in formset:
@@ -359,13 +396,6 @@ class MainPageView(CreateView):
         return redirect('/admin_app/main_page/')
 
     def form_invalid(self, form, seo_form, formset, near_formset):
-        print(form.errors)
-        print('-------------')
-        print(formset.errors)
-        print('-------------')
-        print(near_formset.errors)
-        print('-------------')
-        print(seo_form.errors)
         context = {
             'formset': formset,
             'form': form,
@@ -373,3 +403,145 @@ class MainPageView(CreateView):
             'seo_form': seo_form
         }
         return self.render_to_response(context)
+
+
+class InfoPage(CreateView):
+    template_name = 'admin_app/pages/info_page.html'
+    instance = Info.objects.all()[0]
+
+    def get_context_data(self, **kwargs):
+        form = InfoForm(instance=self.instance)
+        formset = GalleryFormSet(queryset=Gallery.objects.filter(additional=False), prefix='gallery')
+        extra_formset = ExtraGalleryFormSet(queryset=Gallery.objects.filter(additional=True), prefix='extra_gallery')
+        doc_formset = DocumentFormSet(queryset=Document.objects.all(), prefix='doc')
+        seo_form = SeoCreateForm(instance=self.instance.seo, prefix='seo')
+        context = {
+            'form': form,
+            'formset': formset,
+            'doc_formset': doc_formset,
+            'seo_form': seo_form,
+            'extra_formset': extra_formset
+        }
+        return context
+
+    def post(self, request, *args, **kwargs):
+        form = InfoForm(request.POST, request.FILES, instance=self.instance)
+        formset = GalleryFormSet(request.POST, request.FILES, queryset=Gallery.objects.filter(additional=False), prefix='gallery')
+        extra_formset = ExtraGalleryFormSet(request.POST, request.FILES, queryset=Gallery.objects.filter(additional=True), prefix='extra_gallery')
+        doc_formset = DocumentFormSet(request.POST, request.FILES, queryset=Document.objects.all(), prefix='doc')
+        seo_form = SeoCreateForm(request.POST, instance=self.instance.seo, prefix='seo')
+        if form.is_valid() and formset.is_valid() and doc_formset.is_valid() and seo_form.is_valid() and extra_formset.is_valid():
+            return self.form_valid(form, formset, doc_formset, seo_form, extra_formset)
+        else:
+            return self.form_invalid(form, formset, doc_formset, seo_form, extra_formset)
+
+    def form_valid(self, form, formset, doc_formset, seo_form, extra_formset):
+        form.save()
+        doc_formset.save()
+        seo_form.save()
+        for x in extra_formset:
+            form = x.save()
+            form.additional = True
+            form.save()
+        for q in formset:
+            form = q.save()
+            form.additional = False
+            form.save()
+        return redirect('/admin_app/info_page/')
+
+    def form_invalid(self, form, formset, doc_formset, seo_form, extra_formset):
+        context = {
+            'form': form,
+            'formset': formset,
+            'doc_formset': doc_formset,
+            'seo_form': seo_form,
+            'extra_formset': extra_formset
+        }
+        return self.render_to_response(context)
+
+
+def delete_document(request, pk):
+    Document.objects.get(pk=pk).delete()
+    return redirect('/admin_app/info_page/')
+
+
+def delete_from_gallery(request, image_id):
+    Gallery.objects.get(id=image_id).delete()
+    return redirect('/admin_app/info_page/')
+
+
+class ServicePageView(CreateView):
+    template_name = 'admin_app/pages/service_page.html'
+    instance = ServicePage.objects.all()[0]
+
+    def get_context_data(self, **kwargs):
+        formset = ServiceBlockFormSet(queryset=ServiceBlock.objects.all())
+        seo_form = SeoCreateForm(instance=self.instance.seo)
+        context = {
+            'formset': formset,
+            'seo_form': seo_form,
+        }
+        return context
+
+    def post(self, request, *args, **kwargs):
+        formset = ServiceBlockFormSet(request.POST, request.FILES, queryset=ServiceBlock.objects.all())
+        seo_form = SeoCreateForm(request.POST, instance=self.instance.seo)
+        if formset.is_valid() and seo_form.is_valid():
+            return self.form_valid(formset, seo_form)
+        else:
+            return self.form_invalid(formset, seo_form)
+
+    def form_valid(self, formset, seo_form):
+        formset.save()
+        seo_form.save()
+        return redirect('/admin_app/service_page/')
+
+    def form_invalid(self, formset, seo_form):
+        print(formset.errors)
+        print('---------')
+        print(seo_form.errors)
+        context = {
+            'formset': formset,
+            'seo_form': seo_form,
+        }
+        return self.render_to_response(context)
+
+
+def delete_service_page(request, service_id):
+    ServiceBlock.objects.filter(id=service_id).delete()
+    return redirect('/admin_app/service_page/')
+
+
+class ContactPageView(CreateView):
+    template_name = 'admin_app/pages/contact_page.html'
+    instance = ContactPage.objects.all()[0]
+
+    def get_context_data(self, **kwargs):
+        form = ContactPageForm(instance=self.instance, prefix='form')
+        seo_form = SeoCreateForm(instance=self.instance.seo, prefix='seo')
+        context = {
+            'form': form,
+            'seo_form': seo_form,
+        }
+        return context
+
+    def post(self, request, *args, **kwargs):
+        form = ContactPageForm(request.POST, instance=self.instance, prefix='form')
+        seo_form = SeoCreateForm(request.POST, instance=self.instance.seo, prefix='seo')
+        if form.is_valid() and seo_form.is_valid():
+            return self.form_valid(form, seo_form)
+        else:
+            return self.form_invalid(form, seo_form)
+
+    def form_valid(self, form, seo_form):
+        form.save()
+        seo_form.save()
+        return redirect('/admin_app/contact_page/')
+
+    def form_invalid(self, form, seo_form):
+        context = {
+            'form': form,
+            'seo_form': seo_form,
+        }
+        return self.render_to_response(context)
+

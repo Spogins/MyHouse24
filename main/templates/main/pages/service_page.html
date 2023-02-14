@@ -1,0 +1,32 @@
+{% extends 'main/base.html'%}
+{% block content %}
+<div class="container w-75">
+        <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'main_page'%}">Главная</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Услуги</li>
+      </ol>
+    </nav>
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="page-header">
+                <h1>Наши услуги</h1>
+            </div>
+        </div>
+    </div>
+    {% for service in services %}
+        <div class="row">
+            <div class="col-xs-12 col-md-7">
+                <img src="{{ service.image.url }}" class="img-responsive img-thumbnail" alt="">
+            </div>
+            <div class="col-xs-12 col-md-5">
+                <div class="page-header">
+                    <h3>{{ service.name }}</h3>
+                </div>
+                {{ service.description|safe }}
+            </div>
+        </div>
+    {% endfor %}
+
+</div>
+{% endblock %}
