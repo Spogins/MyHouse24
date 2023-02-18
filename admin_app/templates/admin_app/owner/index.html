@@ -1,4 +1,5 @@
-{% extends 'admin/base.html' %}
+{% extends 'admin_app/base.html' %}
+{% load widget_tweaks %}
 {% block content %}
         <section class="content-header">
         <div class="container-fluid">
@@ -8,7 +9,7 @@
               </div>
               <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
-                  <li class="breadcrumb-item"><a href="/admin">Главная</a></li>
+                  <li class="breadcrumb-item"><a href="/admin_app">Главная</a></li>
                   <li class="breadcrumb-item active">Владельцы квартир</li>
                 </ol>
               </div>
@@ -24,9 +25,9 @@
                         Выберите действие <span class="caret"></span>
                     </button>
                     <div class="dropdown-menu">
-                        <a class="dropdown-item" href="{% url 'admin:create_owner' %}">Добавить владельца квартиры</a>
-                        <a class="dropdown-item" href="{% url 'admin:create_message' %}?has_debt=True">Отправить сообщение должникам</a>
-                        <a class="dropdown-item" href="">Отправить приглашение</a>
+                        <a class="dropdown-item" href="{% url 'create_owner' %}">Добавить владельца квартиры</a>
+                        <a class="dropdown-item" href="{% url 'create_message' %}?has_debt=True">Отправить сообщение должникам</a>
+                        <a class="dropdown-item" href="{% url 'invite' %}">Отправить приглашение</a>
                     </div>
                 </div>
             </div>
@@ -37,7 +38,7 @@
                 <div class="card">
                 <div class="card-header">
                     <div class="card-tools">
-                    <a href="{% url 'admin:owner_list' %}" class="btn btn-default btn-sm">
+                    <a href="{% url 'owner_list' %}" class="btn btn-default btn-sm">
                         <span class="hidden-sm">Очистить</span>
                     </a>
                 </div>
@@ -72,18 +73,18 @@
                             </thead>
                             <tbody>
                             {% for owner in object_list %}
-                                <tr class="clickable-row" href="{% url 'admin:detail_owner' owner.id %}">
+                                <tr class="clickable-row" href="{% url 'detail_owner' owner.user_id %}">
                                     <td data-number="1">{{ owner.identify }}</td>
                                     <td data-number="2">{{ owner.fullname }}</td>
                                     <td data-number="3">{{ owner.phone }}</td>
                                     <td data-number="4">{{ owner.user.email }}</td>
                                     <td data-number="5">{{ owner.houses_str }}</td>
                                     <td data-number="6">{{ owner.flats_str }}</td>
-                                    <td data-number="7">{{ owner.created|ru_strftime:"dd.MM.YYYY" }}</td>
+                                    <td data-number="7">{{ owner.user.date_joined }}</td>
                                     <td data-number="8">
-                                        {% if owner.status == 'новый' %}
+                                        {% if owner.status == 'Новый' %}
                                         <small class="badge badge-warning">{{ owner.status }}</small>
-                                        {% elif owner.status == 'активен' %}
+                                        {% elif owner.status == 'Активен' %}
                                             <small class="badge badge-success">{{ owner.status }}</small>
                                         {% else %}
                                             <small class="badge badge-danger">{{ owner.status }}</small>
@@ -92,9 +93,9 @@
                                     <td data-number="9">{% if owner.has_debt %}Да{% endif %}</td>
                                     <td>
                                         <div class="btn-group float-right">
-                                            <a class="btn btn-default btn-sm" href="{% url 'admin:create_message' %}?owner_id={{ owner.id }}" title="Отправить сообщение" data-toggle="tooltip"><i class="fas fa-envelope"></i></a>
-                                            <a class="btn btn-default btn-sm" href="{% url 'admin:update_owner' owner.user_id %}" title="Редактировать" data-toggle="tooltip"><i class="fas fa-pencil-alt"></i></a>
-                                            <a class="btn btn-default btn-sm" href="{% url 'admin:delete_owner' owner.user.id %}" title="Удалить" data-toggle="tooltip" data-pjax="0" data-method="post"><i class="fa fa-trash"></i></a>
+                                            <a class="btn btn-default btn-sm" href="{% url 'create_message' %}?owner_id={{ owner.id }}" title="Отправить сообщение" data-toggle="tooltip"><i class="fas fa-envelope"></i></a>
+                                            <a class="btn btn-default btn-sm" href="{% url 'update_owner' owner.user_id %}" title="Редактировать" data-toggle="tooltip"><i class="fas fa-pencil-alt"></i></a>
+                                            <a class="btn btn-default btn-sm" href="{% url 'delete_owner' owner.user.id %}" title="Удалить" data-toggle="tooltip" data-pjax="0" data-method="post"><i class="fa fa-trash"></i></a>
                                         </div>
                                     </td>
                                 </tr>

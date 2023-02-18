@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 # Create your models here.
 
@@ -12,11 +13,12 @@ class Owner(models.Model):
     info = models.TextField('О владельце (заметки)')
     phone = models.CharField('Телефон', max_length=15)
     viber = models.CharField('Viber', max_length=15)
+    identify = models.DecimalField("ID", max_digits=6, decimal_places=0, unique=True, null=True)
 
     class Status(models.TextChoices):
-        active = 'Активен'
-        new = 'Новый'
-        disabled = 'Отключен'
+        active = 'Активен', _('Активен')
+        new = 'Новый', _('Новый')
+        disabled = 'Отключен', _('Отключен')
 
     status = models.CharField("Статус", choices=Status.choices, max_length=20, default='Новый')
 
@@ -43,6 +45,7 @@ class Profile(models.Model):
 
     role = models.CharField("Роль", choices=Role.choices, max_length=20, default='Директор')
     status = models.CharField("Статус", choices=Status.choices, max_length=20, default='Новый')
+
 
 
 

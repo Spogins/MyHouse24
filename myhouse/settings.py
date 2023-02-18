@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'cabinet.apps.CabinetConfig',
     'main.apps.MainConfig',
     'widget_tweaks',
+
 ]
 
 MIDDLEWARE = [

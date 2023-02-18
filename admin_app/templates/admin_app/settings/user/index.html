@@ -69,30 +69,30 @@
                         </tr>
                         </thead>
                         <tbody>
-                        {% for user in user_list %}
+                        {% for profile in profile_list %}
                         <tr>
-                            <td>{{ user.id }}</td>
-                            <td class="user-fullname" data-number="2" onclick="show_profile({{user.id}})">{{ user.get_full_name }}</td>
-                            <td data-number="3" onclick="show_profile({{user.id}})">{{ user.profile.role }}</td>
-                            <td data-number="4" onclick="show_profile({{user.id}})">{{ user.profile.phone }}</td>
-                            <td data-number="5" onclick="show_profile({{user.id}})">{{ user.email }}</td>
-                            <td data-number="6" onclick="show_profile({{user.id}})">
-                                {% if user.profile.status == 'Новый' %}
-                                <small class="badge badge-warning">{{ user.profile.status }}</small>
-                                {% elif user.profile.status == 'Активен' %}
-                                <small class="badge badge-success">{{ user.profile.status }}</small>
-                                {% elif user.profile.status == 'Отключен' %}
-                                <small class="badge badge-danger">{{ user.profile.status }}</small>
+                            <td>{{ profile.id }}</td>
+                            <td class="user-fullname" data-number="2" onclick="show_profile({{profile.user_id}})">{{ profile.user.get_full_name }}</td>
+                            <td data-number="3" onclick="show_profile({{profile.user_id}})">{{ profile.role }}</td>
+                            <td data-number="4" onclick="show_profile({{profile.user_id}})">{{ profile.phone }}</td>
+                            <td data-number="5" onclick="show_profile({{profile.user_id}})">{{ email }}</td>
+                            <td data-number="6" onclick="show_profile({{profile.user_id}})">
+                                {% if profile.status == 'Новый' %}
+                                <small class="badge badge-warning">{{ profile.status }}</small>
+                                {% elif profile.status == 'Активен' %}
+                                <small class="badge badge-success">{{ profile.status }}</small>
+                                {% elif profile.status == 'Отключен' %}
+                                <small class="badge badge-danger">{{ profile.status }}</small>
                                 {% endif %}
                             </td>
                             <td>
                                 <div class="btn-group float-right">
                                     <a class="btn btn-default btn-sm" href="" title="Отправить приглашение"
                                        data-toggle="tooltip"><i class="fas fa-redo-alt"></i></a>
-                                    <a class="btn btn-default btn-sm" href="{% url 'update_user' user.profile.id %}"
+                                    <a class="btn btn-default btn-sm" href="{% url 'update_user' profile.user_id %}"
                                        title="Редактировать" data-toggle="tooltip"><i class="fas fa-pencil-alt"></i></a>
-                                    <a class="btn btn-default btn-sm {% if user.is_superuser %}disabled{% endif %}"
-                                       onclick="{% if not user.is_superuser %}del_user({{user.id}}){% endif %}"
+                                    <a class="btn btn-default btn-sm {% if profile.user.is_superuser %}disabled{% endif %}"
+                                       onclick="{% if not profile.user.is_superuser %}del_user({{profile.user_id}}){% endif %}"
                                        title="Удалить" data-toggle="tooltip" data-pjax="0" data-method="post"><i
                                             class="fa fa-trash"></i></a>
                                 </div>

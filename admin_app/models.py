@@ -1,10 +1,27 @@
 from django.db import models
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+
+from account.models import Profile
 
 
 # Create your models here.
 class House(models.Model):
-    pass
+    name = models.CharField("Название", max_length=150, null=True)
+    address = models.CharField("Адрес", max_length=150, null=True)
+    image1 = models.ImageField("Изображение #1. Размер: (522x350)", upload_to='house/', null=True, blank=True)
+    image2 = models.ImageField("Изображение #2. Размер: (248x160)", upload_to='house/', null=True, blank=True)
+    image3 = models.ImageField("Изображение #3. Размер: (248x160)", upload_to='house/', null=True, blank=True)
+    image4 = models.ImageField("Изображение #4. Размер: (248x160)", upload_to='house/', null=True, blank=True)
+    image5 = models.ImageField("Изображение #5. Размер: (248x160)", upload_to='house/', null=True, blank=True)
+    users = models.ManyToManyField(Profile)
+
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return reverse('admin:detail_house',
+                       args=[self.id])
 
 
 class SeoText(models.Model):
@@ -147,3 +164,8 @@ class ContactPage(models.Model):
     e_mail = models.EmailField(max_length=30, null=True, blank=True)
     map = models.TextField(null=True, blank=True)
     seo = models.ForeignKey(SeoText, on_delete=models.SET_NULL, null=True)
+
+
+class Invite(models.Model):
+    phone = models.CharField('Телефон', max_length=15)
+    mail = models.EmailField(max_length=30, null=True, blank=True)

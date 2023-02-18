@@ -1,0 +1,77 @@
+{% extends 'admin_app/base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% block content %}
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Пригласить владельца квартир</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="/admin_app">Главная</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'owner_list' %}">Владельцы квартир</a></li>
+                    <li class="breadcrumb-item active">Пригласить владельца квартир</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12 col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-tools" style="
+    display: contents;
+">
+                        <h4>Отправить приглашение</h4>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="col-xs-6 col-md-8">
+                                <label>Телефон</label>
+                                <div class="input-group">
+                                    {{ form.phone|add_class:'form-control' }}
+                                </div>
+
+                            </div>
+                            <div class="col-xs-6 col-md-8">
+                                <label>E-Mail</label>
+                                <div class="input-group">
+                                    {{ form.mail|add_class:'form-control' }}
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="row " style="
+    display: flex;
+    justify-content: center;
+    margin-top:3rem;
+">
+                        <button type="submit" class="btn btn-success">Отправить приглашение</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+{% block script %}
+<script>
+
+    $('.nav-link.active').removeClass('active');
+        $('.nav-link').find('p:contains("Владельцы квартир")').parents('.nav-link').addClass('active');
+
+
+
+</script>
+{% endblock %}

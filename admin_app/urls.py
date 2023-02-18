@@ -33,6 +33,11 @@ urlpatterns = [
     path('delete_image_gallery/<int:image_id>', delete_from_gallery, name='delete_image'),
     path('delete_service_page/<int:service_id>', delete_service_page, name='delete_service_page'),
     path('clone_tariff/<int:pk>', CloneTariff.as_view(), name='clone_tariff'),
-
-
+    path('owner_list/', OwnerList.as_view(), name='owner_list'),
+    path('create_owner', CreateOwner.as_view(), name='create_owner'),
+    path('update_owner/<int:pk>', UpdateOwner.as_view(), name='update_owner'),
+    path('detail_owner/<int:pk>', DetailOwner.as_view(), name='detail_owner'),
+    path('delete_owner/<int:owner_id>', delete_owner, name='delete_owner'),
+    path('create_message', MessageCreate.as_view(), name='create_message'),
+    path('invite/', InviteView.as_view(), name='invite'),
 ]

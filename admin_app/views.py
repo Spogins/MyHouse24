@@ -9,8 +9,8 @@ from django.views.generic.base import TemplateResponseMixin, TemplateView
 from django.views.generic.edit import FormMixin
 from django.views.generic.list import MultipleObjectMixin
 
-from account.forms import UserChangeForm, ProfileChangeForm
-from account.models import Profile
+from account.forms import *
+from account.models import *
 from admin_app.forms import *
 from admin_app.models import *
 
@@ -35,8 +35,6 @@ class CreateService(CreateView):
             'service': [x.service for x in TariffService.objects.all()],
             'unit': [x.unit for x in TariffService.objects.all()]
         }
-        print([x.service.id for x in TariffService.objects.all()])
-        print([x.unit.id for x in TariffService.objects.all()])
         return context
 
     def post(self, request, *args, **kwargs):
@@ -160,10 +158,6 @@ class CloneTariff(UpdateView):
             if form.is_valid():
                 if form.cleaned_data:
                     pass
-                    # full_form = form.save()
-                    # full_form.tariff = tariff
-                    # full_form.unit = full_form.service.unit
-                    # full_form.save()
         return redirect('/admin_app/tariff_list/')
 
 
@@ -219,8 +213,9 @@ class RoleList(ListView):
 
 
 class UserList(ListView):
-    model = User
+    model = Profile
     template_name = 'admin_app/settings/user/index.html'
+
 
 
 class CreateUser(CreateView):
@@ -545,3 +540,108 @@ class ContactPageView(CreateView):
         }
         return self.render_to_response(context)
 
+
+class OwnerList(ListView):
+    model = Owner
+    form_class = OwnerFilterForm
+    template_name = 'admin_app/owner/index.html'
+
+
+class CreateOwner(CreateView):
+    template_name = 'admin_app/owner/update.html'
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'user_form': UserChangeForm(),
+            'owner_form': OwnerChangeForm(prefix='owner')
+        }
+        return context
+
+    def post(self, request, *args, **kwargs):
+        form_user = UserChangeForm(request.POST)
+        owner_form = OwnerChangeForm(request.POST, request.FILES, prefix='owner')
+        if form_user.is_valid() and owner_form.is_valid():
+            return self.form_valid(form_user, owner_form)
+        else:
+            return self.form_invalid(form_user, owner_form)
+
+    def form_valid(self, form_user, owner_form):
+        created_user = form_user.save(commit=False)
+        created_user.username = form_user.cleaned_data['email']
+        created_user.set_password(form_user.cleaned_data['password'])
+        created_user.save()
+
+        created_owner = owner_form.save(commit=False)
+        created_owner.user_id = created_user.id
+        created_owner.save()
+        return redirect('/admin_app/owner_list')
+
+    def form_invalid(self, form_user, owner_form):
+        context = {
+            'user_form': form_user.errors,
+            'owner_form': owner_form.errors
+        }
+        return self.render_to_response(context)
+
+
+class UpdateOwner(UpdateView):
+    model = Owner
+    template_name = 'admin_app/owner/update.html'
+
+    def get_context_data(self, **kwargs):
+        owner = Owner.objects.get(user_id=self.kwargs['pk'])
+        print(owner)
+        context = {
+            'owner_form': OwnerChangeForm(instance=owner),
+            'user_form': UserChangeForm(instance=owner.user)
+        }
+        return context
+
+    def post(self, request, *args, **kwargs):
+        owner = Owner.objects.get(user_id=self.kwargs['pk'])
+        user_form = UserChangeForm(request.POST, instance=owner.user)
+        owner_form = OwnerChangeForm(request.POST, request.FILES, instance=owner)
+        if user_form.is_valid() and owner_form.is_valid():
+            return self.form_valid(user_form, owner_form)
+        else:
+            return self.form_invalid(user_form, owner_form)
+
+    def form_valid(self, user_form, owner_form):
+        created_user = user_form.save()
+        created_user.username = user_form.cleaned_data['email']
+        if user_form.cleaned_data['password']:
+            created_user.set_password(user_form.cleaned_data['password'])
+        created_user.save()
+        owner_form.save()
+        return redirect('/admin_app/owner_list')
+
+    def form_invalid(self, user_form, owner_form):
+        """If the form is invalid, render the invalid form."""
+        context = {
+            'owner_form': owner_form,
+            'user_form': user_form
+        }
+        return self.render_to_response(context)
+
+
+class DetailOwner(DetailView):
+    model = Owner
+    template_name = 'admin_app/owner/detail.html'
+    context_object_name = 'owner'
+
+
+def delete_owner(request, owner_id):
+    Owner.objects.filter(user_id=owner_id).update(status=Owner.Status.disabled)
+    return redirect('/admin_app/owner_list/')
+
+
+class InviteView(CreateView):
+    template_name = 'admin_app/owner/invite.html'
+
+    def get_context_data(self, **kwargs):
+        context = {'form': InviteForm()}
+        return context
+
+
+class MessageCreate(CreateView):
+    pass

@@ -141,6 +141,15 @@ class ContactPageForm(forms.ModelForm):
         exclude = ['seo']
 
 
+class InviteForm(forms.ModelForm):
+    class Meta:
+        model = Invite
+        fields = ['phone', 'mail']
+        widget = {
+            'phone': forms.TextInput(attrs={'data-mask': "(000)-000-00-00", 'placeholder': '(000)-000-00-00'}),
+        }
+
+
 ServiceFormset = modelformset_factory(model=Service, form=ServiceForm, extra=0)
 UnitFormset = modelformset_factory(model=Unit, form=UnitForm, extra=0)
 TariffServiceFormSet = modelformset_factory(model=TariffService, form=TariffServiceForm, extra=0)

@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from django import forms
 
 from account.models import *
+from admin_app.models import *
 
 
 class ProfileChangeForm(forms.ModelForm):
@@ -99,3 +100,29 @@ class LoginOwnerForm(LoginForm):
         return self.cleaned_data
 
 
+class OwnerFilterForm(forms.Form):
+    id = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'data-number': '1'}))
+    fullname = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'data-number': '2'}))
+    phone = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'data-number': '3'}))
+    email = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'data-number': '4'}))
+    house = forms.ModelChoiceField(queryset=House.objects.all(), empty_label='',
+                                   widget=forms.Select(attrs={'class': 'form-control', 'data-number': '5'}))
+    flat = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'data-number': '6'}))
+    date = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'data-number': '7'}))
+    status = forms.ChoiceField(choices=Owner.Status.choices,
+                               widget=forms.Select(attrs={'class': 'form-control', 'data-number': '8'}))
+    debt = forms.ChoiceField(choices=(('', ''), ('Да', 'Да')),
+                             widget=forms.Select(attrs={'class': 'form-control', 'data-number': '9'}))
+
+
+class OwnerChangeForm(forms.ModelForm):
+    avatar = forms.ImageField(required=False, error_messages={'invalid': "Только изображения"}, widget=forms.FileInput,
+                              label="Сменить изображения")
+
+    class Meta:
+        model = Owner
+        exclude = ['user', 'created']
+        widgets = {
+            'phone': forms.TextInput(attrs={'data-mask': "(000)-000-00-00",
+                                            'placeholder': '(000)-000-00-00'}),
+        }

@@ -1,0 +1,227 @@
+{% extends 'admin_app/base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block header %}
+<link rel="stylesheet" href="{% static 'plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css' %}">
+{% endblock %}
+{% block content %}
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Новый владелец</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="/admin_app">Главная</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'owner_list' %}">Владельцы квартир</a></li>
+                    <li class="breadcrumb-item active">Новый владелец</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="content">
+    <div class="card">
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-xs-12 col-lg-6">
+                        <div class="userAvatar">
+                            <img style="max-width: 30%" class="img-circle float-left img-responsive"
+                                 src="{% if owner_form.image.value %}{{ owner_form.image.value.url }}{% else %}{% static '/dist/img/empty.jpg' %}{% endif %}">
+                            <div>
+                                <label>{{ owner_form.avatar.label }}</label>
+                                {{ owner_form.image }}
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-lg-6">
+                        <div class="col-xs-12 col-md-12">
+                            <label class=" requiredField">
+                                Статус
+                            </label>
+                            <div class="input-group">
+                                {{ owner_form.status|add_class:"form-control" }}
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-md-12">
+                            <label class=" requiredField">
+                                ID
+                            </label>
+                            <div class="input-group">
+                                {{ owner_form.identify|add_class:"form-control" }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-xs-12 col-lg-6">
+                        <div class="col-xs-12 col-md-12">
+                            <label class=" requiredField">
+                                Фамилия
+                            </label>
+                            <div class="input-group">
+                                {{ user_form.last_name|add_class:"form-control" }}
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-md-12">
+                            <label class=" requiredField">
+                                Имя
+                            </label>
+                            <div class="input-group">
+                                {{ user_form.first_name|add_class:"form-control" }}
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-md-12">
+                            <label class=" requiredField">
+                                Отчество
+                            </label>
+                            <div class="input-group">
+                                {{ owner_form.patronymic|add_class:"form-control" }}
+                            </div>
+                        </div>
+
+                        <div class="col-xs-12 col-md-12">
+                            <label class=" requiredField">
+                                Дата рождения
+                            </label>
+                            <div class="form-group">
+                                <div class="input-group date" id="datetimepicker1" data-target-input="nearest">
+
+                                    {{ owner_form.birthday|add_class:"form-control datetimepicker-input" }}
+                                    <div class="input-group-append" data-target="#id_owner-birthday"
+                                         data-toggle="datetimepicker">
+                                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-lg-6">
+                        <div class="col-xs-12 col-md-12">
+                            <label class=" requiredField">
+                                О владельце (заметки)
+                            </label>
+                            <div class="input-group">
+                                {{ owner_form.info|add_class:"form-control" }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-xs-12 col-lg-6">
+                        <h2 class="page-header">Контактные данные</h2>
+                        <div class="col-xs-12 col-md-12">
+                            <label class=" requiredField">
+                                Телефон
+                            </label>
+                            <div class="input-group">
+                                {{ owner_form.phone|add_class:"form-control" }}
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-md-12">
+                            <label class=" requiredField">
+                                Вайбер
+                            </label>
+                            <div class="input-group">
+                                {{ owner_form.viber|add_class:"form-control" }}
+                            </div>
+                        </div>
+
+                        <div class="col-xs-12 col-md-12">
+                            <label class=" requiredField">
+                                E-Mail
+                            </label>
+                            <div class="input-group">
+                                {{ user_form.email|add_class:"form-control" }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-lg-6">
+                        <h2 class="page-header">Изменить пароль</h2>
+                        <div class="form-group field-useradminform-password">
+                            <label class="control-label">{{ user_form.password.label }}</label>
+                            <div class="input-group">
+                                {{ user_form.password|add_class:'form-control' }}
+                                <span class="input-group-btn">
+                                                        <button class="btn btn-default" type="button"
+                                                                onclick="generatePassword()">
+                                                            Сгенерировать
+                                                        </button>
+                                                        <button type="button" class="btn btn-primary" id="showPass">
+                                                            <i class="fa fa-eye" aria-hidden="true"></i>
+                                                        </button>
+                                                    </span>
+                            </div>
+                            <div class="help-block">{{ user_form.password.errors }}</div>
+                        </div>
+
+                        <label class=" requiredField">
+                            Подтвердить пароль
+                        </label>
+                        <div class="input-group">
+                            {{ user_form.confirm_password|add_class:"form-control" }}
+                        </div>
+
+
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group float-right">
+                            <a href="{% url 'owner_list' %}" class="btn btn-default">Отменить</a>
+                            <button type="submit" class="btn btn-success">Сохранить</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}
+{% block script %}
+<script src="{% static 'plugins/moment/moment.min.js' %}"></script>
+<script src="{% static 'plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js' %}"></script>
+<script>
+
+    $('.nav-link.active').removeClass('active');
+        $('.nav-link').find('p:contains("Владельцы квартир")').parents('.nav-link').addClass('active');
+
+    $('#id_owner-birthday').datetimepicker({
+        locale: 'ru',
+        format: 'YYYY-MM-DD',
+        maxDate: moment().format('YYYY-MM-DD'),
+    });
+
+        $('#showPass').on('click', function(){
+        let inputText = $('#id_password, #id_confirm_password');
+        let inputType = inputText.prop('type');
+        if (inputType === 'password') {
+            inputText.prop('type', 'text');
+            $(this).children().removeClass('fa-eye').addClass('fa-eye-slash');
+        } else {
+            inputText.prop('type', 'password');
+            $(this).children().removeClass('fa-eye-slash').addClass('fa-eye');
+        }
+    });
+    let generatePassword = function (){
+        let randomstring = Math.random().toString(36).slice(-8);
+        $('#id_password, #id_confirm_password').val(randomstring);
+    }
+
+
+
+
+
+
+
+</script>
+{% endblock %}

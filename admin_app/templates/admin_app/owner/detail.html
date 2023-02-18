@@ -1,0 +1,98 @@
+{% extends 'admin_app/base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% block content %}
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+              <div class="col-sm-6">
+                <h1>Профиль владельца</h1>
+              </div>
+              <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                  <li class="breadcrumb-item"><a href="/admin_app">Главная</a></li>
+                  <li class="breadcrumb-item"><a href="{% url 'owner_list' %}">Владельцы квартир</a></li>
+                    <li class="breadcrumb-item active">Профиль владельца</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+    </section>
+
+<section class="content">
+        <div class="row">
+            <div class="col-xs-12 col-md-12">
+                <div class="card">
+                <div class="card-header">
+                    <div class="card-tools">
+                        <a href="#" target="_blank" class="btn btn-default btn-sm"><i class="fas fa-external-link-alt"></i> Перейти в кабинет</a>
+                        <a href="{% url 'update_owner' owner.user.id %}" class="btn btn-primary btn-sm">
+                            <span class="hidden-xs">Редактировать профиль</span>
+                        </a>
+                </div>
+                </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                            <div class="userAvatar">
+                                <img class="img-circle img-responsive" src="{% if owner.image %}{{ owner.image.url }}{% else %}{% static '/dist/img/empty.jpg' %}{% endif %}" alt="">
+                            </div>
+                                <table class="table table-bordered table-striped table-view">
+                                    <tr>
+                                        <td>Статус</td>
+                                        <td>
+                                            <small class="label {% if owner.status == 'новый' %}bg-warning{% endif %}">{{ owner.status }}</small>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>ID</td>
+                                        <td>{{ owner.identify }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Фамилия</td>
+                                        <td>{{ owner.user.last_name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Имя</td>
+                                        <td>{{ owner.user.first_name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Отчество</td>
+                                        <td>{{ owner.patronymic }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Дата рождения</td>
+                                        <td>{{ owner.birthday }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>О владельце</td>
+                                        <td>{{ owner.info }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Телефон</td>
+                                        <td>{{ owner.phone }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Viber</td>
+                                        <td>{{ owner.viber }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Email</td>
+                                        <td>{{ owner.user.email }}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+</section>
+{% endblock %}
+{% block script %}
+    <script>
+
+    $('.nav-link.active').removeClass('active');
+        $('.nav-link').find('p:contains("Владельцы квартир")').parents('.nav-link').addClass('active');
+    </script>
+{% endblock %}
