@@ -1,9 +1,12 @@
 from django.db import models
+from django.db.models import Max, Min, Sum
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+import logging
+from account.models import Profile, Owner
 
-from account.models import Profile
-
+# Get an instance of a logger
+logger = logging.getLogger(__name__)
 
 # Create your models here.
 class House(models.Model):
@@ -169,3 +172,88 @@ class ContactPage(models.Model):
 class Invite(models.Model):
     phone = models.CharField('Телефон', max_length=15)
     mail = models.EmailField(max_length=30, null=True, blank=True)
+
+
+class Section(models.Model):
+    name = models.CharField("Название", max_length=150)
+    house = models.ForeignKey(House, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.name
+
+
+class Level(models.Model):
+    name = models.CharField("Название", max_length=150)
+    house = models.ForeignKey(House, on_delete=models.CASCADE, related_name='house_level')
+
+    def __str__(self):
+        return self.name
+
+
+class Flat(models.Model):
+    number = models.CharField("Номер квартиры", max_length=10)
+    area = models.FloatField("Площадь (кв.м.)")
+    house = models.ForeignKey(House, on_delete=models.CASCADE, verbose_name='Дом')
+    section = models.ForeignKey(Section, on_delete=models.SET_NULL, verbose_name="Секция", null=True, blank=True)
+    level = models.ForeignKey(Level, on_delete=models.SET_NULL, verbose_name="Этаж", null=True, blank=True)
+    owner = models.ForeignKey(Owner, on_delete=models.SET_NULL, verbose_name='Владелец', null=True, blank=True)
+    tariff = models.ForeignKey(Tariff, on_delete=models.SET_NULL, verbose_name="Тариф", null=True)
+
+    def balance(self):
+        if self.bankbook_set.first():
+            return self.bankbook_set.first().balance()
+        return '(нет счета)'
+
+    def avg_expenses(self):
+        sum_for_month = 0
+        max_date = Receipt.objects.filter(flat_id=self.id).aggregate(Max('date__month')).get('date__month__max')
+        min_date = Receipt.objects.filter(flat_id=self.id).aggregate(Min('date__month')).get('date__month__min')
+        month_count = 0
+        logger.info(str(min_date)+" "+str(max_date))
+        if not all([max_date, min_date]):
+            return '0.00'
+        for i in range(min_date, max_date+1):
+            receipts = Receipt.objects.filter(flat_id=self.id, date__month=i)
+            month_count += 1
+            for receipt in receipts:
+                sum_for_month += receipt.get_price()
+        try:
+            return sum_for_month/month_count
+        except ZeroDivisionError:
+            return sum_for_month
+
+    def __str__(self):
+        return str(self.number)
+
+
+class Receipt(models.Model):
+    id = models.CharField("№", primary_key=True, max_length=15)
+    date = models.DateField()
+    date_from = models.DateField("Период с")
+    date_to = models.DateField("Период по")
+    flat = models.ForeignKey(Flat, on_delete=models.SET_NULL, null=True, blank=True,
+                             verbose_name="Квартира")
+    is_checked = models.BooleanField("Проведена", default=True)
+    tariff = models.ForeignKey(Tariff, on_delete=models.SET_NULL, null=True,
+                               verbose_name='Тариф')
+
+    class Status(models.TextChoices):
+        paid = 'оплачена', _('оплачена')
+        part = 'частично оплачена', _('частично оплачена')
+        unpaid = 'не оплачена', _('не оплачена')
+        __empty__ = _('')
+
+    status = models.CharField("Статус", choices=Status.choices, max_length=20)
+    services = models.ManyToManyField(Service, through='ReceiptService')
+
+    def get_price(self):
+        return self.receiptservice_set.all().aggregate(Sum('price')).get('price__sum', 0.00)
+
+
+class ReceiptService(models.Model):
+    receipt = models.ForeignKey(Receipt, on_delete=models.CASCADE)
+    service = models.ForeignKey(Service, on_delete=models.RESTRICT)
+    amount = models.FloatField("Расход")
+    unit = models.ForeignKey(Unit, on_delete=models.SET_NULL, null=True, blank=True)
+    price_unit = models.FloatField("Цеа за 1 ед., грн.")
+    price = models.FloatField("Стоимость, грн.")

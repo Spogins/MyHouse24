@@ -1,0 +1,99 @@
+{% extends 'admin_app/base.html' %}
+{% block content %}
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+              <div class="col-sm-6">
+                <h1>Дома</h1>
+              </div>
+              <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                  <li class="breadcrumb-item"><a href="/admin_app">Главная</a></li>
+                  <li class="breadcrumb-item active">Дома</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+    </section>
+
+    <section class="content">
+        <div class="row">
+            <div class="col-xs-12 col-md-12">
+                <div class="float-right mb-2 mt-2">
+                    <a href="{% url 'create_house' %}" class="btn btn-success">Добавить дом</a>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12 col-md 12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-tools">
+                            <a href="{% url 'house_list' %}" class="btn btn-default btn-sm">
+                                <span class="hidden-xs">Очистить</span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <form method="get" id="filter-form">
+                        <table class="table table-bordered table-hover sorting-table">
+                            <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Название</th>
+                                <th>Адрес</th>
+                                <th></th>
+                            </tr>
+                            <tr id="w0-filters" class="filters">
+                                <td></td>
+                                <td>{{ form.name }}</td>
+                                <td>{{ form.address }}</td>
+                                <td></td>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                {% for house in house_list %}
+                                    <tr class="clickable-row" href="{% url 'detail_house' house.id %}">
+                                        <td>{{ house.id }}</td>
+                                    <td>{{ house.name }}</td>
+                                    <td>{{ house.address }}</td>
+                                    <td>
+                                    <div class="btn-group float-right">
+                                                <a class="btn btn-default btn-sm" href="{% url 'update_house' house.id %}" title="Редактировать" data-toggle="tooltip"><i class="fas fa-pencil-alt"></i></a>
+                                                <a class="btn btn-default btn-sm" href="{% url 'delete_house' house.id %}" title="Удалить" data-toggle="tooltip" data-pjax="0" data-method="post"><i class="fa fa-trash"></i></a>
+                                            </div>
+                                    </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+{% block script %}
+    <script>
+
+    $('.nav-link.active').removeClass('active');
+        $('.nav-link').find('p:contains("Дома")').parents('.nav-link').addClass('active');
+
+    $('#id_name, #id_address').on('change', function (){
+            console.log('change');
+            $('#filter-form').submit();
+        });
+        $(".sorting-table").DataTable({
+          "responsive": true, "lengthChange": false, "autoWidth": false, "searching": false, "paging": false,
+            "bInfo" : false, "bSortCellsTop": true,
+          "buttons": [],
+            rowReorder: true,
+            columnDefs: [
+                { orderable: true, className: 'reorder', targets: 1 },
+                { orderable: true, className: 'reorder', targets: 2 },
+            { orderable: false, targets: '_all' }
+        ]
+        });
+    </script>
+{% endblock %}

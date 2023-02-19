@@ -40,4 +40,11 @@ urlpatterns = [
     path('delete_owner/<int:owner_id>', delete_owner, name='delete_owner'),
     path('create_message', MessageCreate.as_view(), name='create_message'),
     path('invite/', InviteView.as_view(), name='invite'),
+
+    path('house_list', HouseList.as_view(), name='house_list'),
+    path('create_house', CreateHouse.as_view(), name='create_house'),
+    path('update_house/<int:pk>', UpdateHouse.as_view(), name='update_house'),
+    path('detail_house/<int:pk>', HouseDetail.as_view(), name='detail_house'),
+    path('delete_house/<int:house_id>', delete_house, name='delete_house'),
+
 ]

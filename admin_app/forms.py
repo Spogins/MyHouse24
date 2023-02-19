@@ -150,6 +150,53 @@ class InviteForm(forms.ModelForm):
         }
 
 
+class HouseFilterForm(forms.Form):
+    name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
+    address = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
+
+
+class SectionForm(forms.ModelForm):
+
+    class Meta:
+        model = Section
+        exclude = ['house']
+
+
+class LevelForm(forms.ModelForm):
+
+    class Meta:
+        model = Level
+        exclude = ['house']
+
+
+class HouseUserForm(forms.ModelForm):
+    profile = forms.ModelChoiceField(
+        label='ФИО',
+        queryset=Profile.objects.all(), empty_label='Выберите...',
+        widget=forms.Select(attrs={'class': 'form-control'}))
+
+    class Meta:
+        model = House.users.through
+        fields = ['profile']
+
+
+class HouseCreateForm(forms.ModelForm):
+    image1 = forms.ImageField(required=False, error_messages={'invalid': "Только изображения"}, widget=forms.FileInput,
+                              label="Изображение #1. Размер: (522x350)")
+    image2 = forms.ImageField(required=False, error_messages={'invalid': "Только изображения"}, widget=forms.FileInput,
+                              label="Изображение #2. Размер: (248x160)")
+    image3 = forms.ImageField(required=False, error_messages={'invalid': "Только изображения"}, widget=forms.FileInput,
+                              label="Изображение #3. Размер: (248x160)")
+    image4 = forms.ImageField(required=False, error_messages={'invalid': "Только изображения"}, widget=forms.FileInput,
+                              label="Изображение #4. Размер: (248x160)")
+    image5 = forms.ImageField(required=False, error_messages={'invalid': "Только изображения"}, widget=forms.FileInput,
+                              label="Изображение #5. Размер: (248x160)")
+
+    class Meta:
+        model = House
+        exclude = ['users']
+
+
 ServiceFormset = modelformset_factory(model=Service, form=ServiceForm, extra=0)
 UnitFormset = modelformset_factory(model=Unit, form=UnitForm, extra=0)
 TariffServiceFormSet = modelformset_factory(model=TariffService, form=TariffServiceForm, extra=0)
@@ -160,3 +207,6 @@ GalleryFormSet = modelformset_factory(model=Gallery, form=GalleryForm, extra=0)
 ExtraGalleryFormSet = modelformset_factory(model=Gallery, form=GalleryForm, extra=0)
 DocumentFormSet = modelformset_factory(model=Document, form=DocumentForm, extra=0)
 ServiceBlockFormSet = modelformset_factory(model=ServiceBlock, form=ServiceBlockForm, extra=0)
+SectionFormSet = inlineformset_factory(House, Section, form=SectionForm, extra=0)
+LevelFormSet = inlineformset_factory(House, Level, form=LevelForm, extra=0)
+HouseUserFormSet = inlineformset_factory(House, House.users.through, form=HouseUserForm, extra=0)

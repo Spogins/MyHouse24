@@ -1,5 +1,6 @@
 from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.models import User
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.views import View
 
@@ -7,6 +8,9 @@ from account.forms import *
 
 
 # Create your views here.
+def is_ajax(request):
+    return request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
+
 
 class LoginView(View):
 
@@ -49,3 +53,9 @@ class LoginOwnerView(View):
 def logout_user(request):
     logout(request)
     return redirect('/account/login_owner')
+
+
+def get_user_role(request):
+    if is_ajax(request):
+        user = Profile.objects.get(pk=request.POST.get('pk'))
+        return HttpResponse(user.role)

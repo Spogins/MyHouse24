@@ -1,13 +1,10 @@
-from django.contrib.auth.models import User
+
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
-from django.views import View
 from django.views.decorators.http import require_POST
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
-from django.views.generic.base import TemplateResponseMixin, TemplateView
-from django.views.generic.edit import FormMixin
-from django.views.generic.list import MultipleObjectMixin
+
 
 from account.forms import *
 from account.models import *
@@ -645,3 +642,112 @@ class InviteView(CreateView):
 
 class MessageCreate(CreateView):
     pass
+
+
+class HouseList(ListView):
+    model = House
+    form_class = HouseFilterForm
+    template_name = 'admin_app/house/index.html'
+
+
+class CreateHouse(CreateView):
+    template_name = 'admin_app/house/update.html'
+
+    def get_context_data(self, **kwargs):
+        form = HouseCreateForm()
+        section_formset = SectionFormSet(prefix='section')
+        level_formset = LevelFormSet(prefix='level')
+        user_formset = HouseUserFormSet(prefix='user')
+        context = {
+            "form": form,
+            "section_formset": section_formset,
+            "level_formset": level_formset,
+            "user_formset": user_formset
+        }
+        return context
+
+    def post(self, request, *args, **kwargs):
+        form = HouseCreateForm(request.POST, request.FILES)
+        if form.is_valid():
+            created = form.save(commit=False)
+            created.save()
+            section_formset = SectionFormSet(request.POST, instance=created, prefix='section')
+            level_formset = LevelFormSet(request.POST, instance=created, prefix='level')
+            user_formset = HouseUserFormSet(request.POST, instance=created, prefix='user')
+            if section_formset.is_valid() and level_formset.is_valid() and user_formset.is_valid():
+                section_formset.save()
+                level_formset.save()
+                user_formset.save()
+                return redirect('/admin_app/house_list')
+            else:
+                return self.form_invalid(form, section_formset, level_formset, user_formset)
+        else:
+            return self.render_to_response({'form': form.errors})
+
+    def form_invalid(self, form, section_formset, level_formset, user_formset):
+        context = {
+            "form": form.errors,
+            "section_formset": section_formset.errors,
+            "level_formset": level_formset.errors,
+            "user_formset": user_formset.errors
+        }
+        return self.render_to_response(context)
+
+
+class UpdateHouse(UpdateView):
+    model = House
+    template_name = 'admin_app/house/update.html'
+
+    def get_context_data(self, **kwargs):
+        instance = House.objects.get(id=self.kwargs['pk'])
+        form = HouseCreateForm(instance=instance)
+        section_formset = SectionFormSet(instance=instance, prefix='section')
+        level_formset = LevelFormSet(instance=instance, prefix='level')
+        user_formset = HouseUserFormSet(instance=instance, prefix='user')
+        context = {
+            "form": form,
+            "section_formset": section_formset,
+            "level_formset": level_formset,
+            "user_formset": user_formset
+        }
+        return context
+
+    def post(self, request, *args, **kwargs):
+        instance = House.objects.get(id=self.kwargs['pk'])
+        form = HouseCreateForm(request.POST, request.FILES, instance=instance)
+        if form.is_valid():
+            created = form.save(commit=False)
+            created.save()
+            section_formset = SectionFormSet(request.POST, instance=created, prefix='section')
+            level_formset = LevelFormSet(request.POST, instance=created, prefix='level')
+            user_formset = HouseUserFormSet(request.POST, instance=created, prefix='user')
+            if section_formset.is_valid() and level_formset.is_valid() and user_formset.is_valid():
+                section_formset.save()
+                level_formset.save()
+                user_formset.save()
+                return redirect('/admin_app/house_list')
+            else:
+                return self.form_invalid(form, section_formset, level_formset, user_formset)
+        else:
+            return self.render_to_response({'form': form.errors})
+
+    def form_invalid(self, form, section_formset, level_formset, user_formset):
+        context = {
+            "form": form.errors,
+            "section_formset": section_formset.errors,
+            "level_formset": level_formset.errors,
+            "user_formset": user_formset.errors
+        }
+        return self.render_to_response(context)
+
+
+class HouseDetail(DetailView):
+    model = House
+    template_name = 'admin_app/house/detail.html'
+
+
+
+def delete_house(request, house_id):
+    House.objects.get(id=house_id).delete()
+    return redirect('/admin_app/house_list')
+

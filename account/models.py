@@ -46,7 +46,8 @@ class Profile(models.Model):
     role = models.CharField("Роль", choices=Role.choices, max_length=20, default='Директор')
     status = models.CharField("Статус", choices=Status.choices, max_length=20, default='Новый')
 
-
+    def __str__(self):
+        return f'{self.role} - {self.user.first_name} {self.user.last_name}'
 
 
 
