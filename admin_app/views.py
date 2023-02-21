@@ -1,3 +1,4 @@
+import json
 
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect
@@ -746,8 +747,117 @@ class HouseDetail(DetailView):
     template_name = 'admin_app/house/detail.html'
 
 
-
 def delete_house(request, house_id):
     House.objects.get(id=house_id).delete()
     return redirect('/admin_app/house_list')
+
+
+class FlatList(ListView):
+    model = Flat
+    template_name = 'admin_app/flat/index.html'
+    form_class = FlatFilterForm
+
+
+def get_section_level(request):
+    if is_ajax(request):
+        house = request.GET.get('house')
+        sections = Section.objects.filter(house_id=house).values('name', 'id')
+        levels = Level.objects.filter(house_id=house).values('name', 'id')
+        return JsonResponse(json.dumps({'sections': list(sections), 'levels': list(levels)}), safe=False)
+
+
+class CreateFlat(CreateView):
+    model = Flat
+    template_name = 'admin_app/flat/update.html'
+
+    def get_context_data(self, **kwargs):
+        form = FlatCreateForm()
+        context = {
+            'form': form
+        }
+        return context
+
+    def post(self, request, *args, **kwargs):
+        form = FlatCreateForm(request.POST)
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+    def form_valid(self, form):
+        flat = form.save(commit=False)
+        if 'bank_book' in form.changed_data:
+            bankbook = BankBook.objects.get(id=form.cleaned_data['bank_book'])
+            flat.save()
+            bankbook.flat_id = flat.id
+            bankbook.save()
+        else:
+            flat.save()
+        return redirect('admin_app/flat_list')
+
+    def form_invalid(self, form):
+        context = {
+            'form': form.errors
+        }
+        return self.render_to_response(context)
+
+
+class UpdateFlat(UpdateView):
+    model = Flat
+    template_name = 'admin_app/flat/update.html'
+
+    def get_context_data(self, **kwargs):
+        form = FlatCreateForm(instance=Flat.objects.get(id=self.kwargs['pk']))
+        context = {
+            'form': form
+        }
+        return context
+
+    def post(self, request, *args, **kwargs):
+        form = FlatCreateForm(request.POST, instance=Flat.objects.get(id=self.kwargs['pk']))
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+    def form_valid(self, form):
+        flat = form.save(commit=False)
+        if 'bank_book' in form.changed_data:
+            bankbook = BankBook.objects.get(id=form.cleaned_data['bank_book'])
+            flat.save()
+            bankbook.flat_id = flat.id
+            bankbook.save()
+        else:
+            flat.save()
+        return redirect('/admin_app/flat_list')
+
+    def form_invalid(self, form):
+        context = {
+            'form': form.errors
+        }
+        return self.render_to_response(context)
+
+
+class FlatDetail(DetailView):
+    model = Flat
+    template_name = 'admin_app/flat/detail.html'
+
+
+def delete_flat(request, pk):
+    Flat.objects.get(pk=pk).delete()
+    return redirect('/admin_app/flat_list')
+
+
+class FlatCounterList(ListView):
+    pass
+
+
+class CashBoxList(ListView):
+    pass
+
+
+class ReceiptList(ListView):
+    pass
+
+
 

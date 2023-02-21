@@ -53,7 +53,7 @@
                             <td>
                                 {% for user in house.users.all %}
                                 <p class="no-margin"><strong>{{ user.role }}:</strong>
-                                    <a href="/admin/user-admin/1">{{ user.user.first_name }} {{ user.user.last_name }}</a>
+                                    <a href="{% url 'show_profile' user.user_id %}">{{ user.user.first_name }} {{ user.user.last_name }}</a>
                                 </p>
                                 {% endfor %}
                             </td>

@@ -1,0 +1,192 @@
+{% extends 'admin_app/base.html' %}
+{% load widget_tweaks %}
+{% block content %}
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Новая квартира</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="/admin_app">Главная</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'flat_list' %}">Квартиры</a></li>
+                    <li class="breadcrumb-item active">Новая квартира</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="content">
+    <div class="card">
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-xs-12 col-lg-6">
+                        <div class="col-xs-12 col-md-8">
+                            <label class=" requiredField">
+                                Номер квартиры
+                            </label>
+                            <div class="input-group">
+                                {{ form.number|add_class:'form-control' }}
+                            </div>
+
+                        </div>
+                        <div class="col-xs-12 col-md-8">
+                            <label class=" requiredField">
+                                Площадь (кв.м.)
+                            </label>
+                            <div class="input-group">
+                                {{ form.area|add_class:'form-control' }}
+                            </div>
+
+                        </div>
+                        <div class="col-xs-12 col-md-8">
+                            <label class=" requiredField">
+                                Дом
+                            </label>
+                            <div class="input-group">
+                                {{ form.house|add_class:'form-control' }}
+                            </div>
+
+                        </div>
+                        <div class="col-xs-12 col-md-8">
+                            <label class=" requiredField">
+                                Секция
+                            </label>
+                            <div class="input-group">
+                                {{ form.section|add_class:'form-control' }}
+                            </div>
+
+                        </div>
+                        <div class="col-xs-12 col-md-8">
+                            <label class=" requiredField">
+                                Этаж
+                            </label>
+                            <div class="input-group">
+                                {{ form.level|add_class:'form-control' }}
+                            </div>
+
+                        </div>
+                        <div class="col-xs-12 col-md-8">
+                            <label class=" requiredField">
+                                Владелец
+                            </label>
+                            <div class="input-group">
+                                {{ form.owner|add_class:'form-control' }}
+                            </div>
+
+                        </div>
+                        <div class="col-xs-12 col-md-8">
+                            <label class=" requiredField">
+                                Тариф
+                            </label>
+                            <div class="input-group">
+                                {{ form.tariff|add_class:'form-control' }}
+                            </div>
+
+                        </div>
+
+                    </div>
+                    <div class="col-xs-12 col-lg-6">
+                        <div class="col-xs-12 col-md-8">
+                            <label class=" requiredField">
+                                Лицевой счет
+                            </label>
+                            <div class="input-group">
+                                {{ form.bank_book|add_class:'form-control' }}
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group float-right">
+                            <a href="{% url 'flat_list' %}" class="btn btn-default">Отменить</a>
+                            <button type="submit" class="btn btn-success" name="save-action">Сохранить</button>
+                            <input type="submit" class="btn btn-success" name="save-action-add"
+                                   value="Сохранить и добавить новую">
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}
+{% block script %}
+<script>
+
+    $('.nav-link.active').removeClass('active');
+    $('.nav-link').find('p:contains("Квартиры")').parents('.nav-link').addClass('active');
+
+
+        let get_sections_levels = function (house, section=undefined, level=undefined){
+            $.ajax({
+                headers: { "X-CSRFToken": '{{ csrf_token }}' },
+                type: "GET",
+                url: '{% url 'get_section_level' %}',
+                data: {'house': house},
+                contentType: 'json/application',
+                success: function(response){
+                    let answer = JSON.parse(response);
+                    let sections = answer['sections'];
+                    $('#id_section').empty();
+                    $('#id_level').empty();
+                    $('#id_section').append($('<option>'));
+                    for(let i=0;i<sections.length;i++){
+                        console.log(sections[i]);
+                        if (sections[i]['id'] == section){
+                            $('#id_section').append($('<option>', { value : sections[i]['id'], selected : 'selected' }).text(sections[i]['name']));
+                        }
+                        else{
+                            $('#id_section').append($('<option>', { value : sections[i]['id'] }).text(sections[i]['name']));
+                        }
+                    }
+
+                    let levels = answer['levels'];
+                    $('#id_level').append($('<option>'));
+                    for(let i=0;i<levels.length;i++){
+                        console.log(levels[i]);
+                        if (levels[i]['id'] == level) {
+                            $('#id_level').append($('<option>', {value: levels[i]['id'], selected : 'selected'}).text(levels[i]['name']));
+                        }
+                        else{
+                            $('#id_level').append($('<option>', {value: levels[i]['id']}).text(levels[i]['name']));
+                        }
+                    }
+                },
+                error: function (responce){
+                    $('#id_section').empty();
+                    $('#id_level').empty();
+                }
+            });
+        }
+
+        $('#id_house').on('change', function(){
+           let house = $(this).val();
+           get_sections_levels(house);
+        });
+        {% if update is True %}
+            let section = $('#id_section').val();
+            let level = $('#id_level').val();
+            get_sections_levels($('#id_house').val(), section, level);
+        {% else %}
+            $('#id_section').empty().append($('<option>'));
+            $('#id_level').empty().append($('<option>'));
+        {% endif %}
+
+
+        $(document).ready(function(){
+            let house = $('#id_house')[0]
+            let house_val = house.options[house.selectedIndex].value;
+            get_sections_levels(house_val)
+
+        });
+
+</script>
+{% endblock %}

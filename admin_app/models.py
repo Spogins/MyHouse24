@@ -257,3 +257,30 @@ class ReceiptService(models.Model):
     unit = models.ForeignKey(Unit, on_delete=models.SET_NULL, null=True, blank=True)
     price_unit = models.FloatField("Цеа за 1 ед., грн.")
     price = models.FloatField("Стоимость, грн.")
+
+
+class BankBook(models.Model):
+    id = models.CharField('№', primary_key=True, max_length=15)
+    flat = models.ForeignKey(Flat, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='Квартира')
+
+    class Status(models.TextChoices):
+        active = 'Активен', _('Активен')
+        disabled = 'Неактивен', _('Неактивен')
+        __empty__ = _('')
+
+    status = models.CharField("Статус", choices=Status.choices, max_length=20)
+
+    def __str__(self):
+        return self.id
+
+    def balance(self):
+        incomes = self.cashbox_set.filter(type='приход').aggregate(Sum('amount_of_money'))\
+            .get('amount_of_money__sum', 0.00)
+        receipts = sum([receipt.get_price() for receipt in self.flat.receipt_set.all()])
+        logger.info(incomes)
+        if incomes:
+            return float(incomes)-receipts
+        if receipts:
+            return 0.00-receipts
+        else:
+            return 0.00

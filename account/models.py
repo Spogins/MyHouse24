@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.db import models
 from django.urls import reverse
+from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 # Create your models here.
 
@@ -23,8 +24,38 @@ class Owner(models.Model):
     status = models.CharField("Статус", choices=Status.choices, max_length=20, default='Новый')
 
     @property
+    def fullnamep(self):
+        return f"{self.user.last_name} {self.user.first_name} {self.patronymic}"
+
     def fullname(self):
         return f"{self.user.last_name} {self.user.first_name} {self.patronymic}"
+
+    def houses_str(self):
+        flats = self.flat_set.all().distinct('house_id')
+        houses = []
+        for flat in flats:
+            houses.append('<a href="' + reverse('detail_house', args=[flat.house.pk]) + '">' +
+                          flat.house.name + '</a>')
+        answer = '<br>'.join(houses)
+        return mark_safe(answer)
+
+    def flats_str(self):
+        flats = self.flat_set.all()
+        answer = []
+        for flat in flats:
+            answer.append('<a href="">№' + str(flat.number) + ' ' + flat.house.name + '</a>')
+        return mark_safe('<br>'.join(answer))
+
+    def __str__(self):
+        return self.fullname()
+
+    def has_debt(self):
+        flats = self.flat_set.all()
+        for flat in flats:
+            if isinstance(flat.balance(), float) and flat.balance() < 0:
+                return True
+            else:
+                return False
 
 
 class Profile(models.Model):

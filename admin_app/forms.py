@@ -197,6 +197,51 @@ class HouseCreateForm(forms.ModelForm):
         exclude = ['users']
 
 
+class FlatFilterForm(forms.Form):
+    number = forms.IntegerField(widget=forms.NumberInput(attrs={'class': 'form-control', 'data-number': '1'}))
+    house = forms.ModelChoiceField(queryset=House.objects.all(), empty_label='',
+                                   widget=forms.Select(attrs={'class': 'form-control', 'data-number': '2'}))
+    section = forms.ChoiceField(widget=forms.Select(attrs={'class': 'form-control', 'data-number': '3'}))
+    level = forms.ChoiceField(widget=forms.Select(attrs={'class': 'form-control', 'data-number': '4'}))
+    owner = forms.ModelChoiceField(queryset=Owner.objects.all(), empty_label='',
+                                   widget=forms.Select(attrs={'class': 'form-control', 'data-number': '5'}))
+
+
+class FlatCreateForm(forms.ModelForm):
+    house = forms.ModelChoiceField(
+        label='Дом',
+        queryset=House.objects.all(), empty_label='Выберите...',
+        widget=forms.Select(attrs={'class': 'form-control'}))
+    section = forms.ModelChoiceField(
+        required=False,
+        queryset=Section.objects.all(),
+        label='Секция',
+        empty_label='Выберите...',
+        widget=forms.Select(attrs={'class': 'form-control'}))
+    level = forms.ModelChoiceField(
+        required=False,
+        queryset=Level.objects.all(),
+        label='Этаж',
+        empty_label='Выберите...',
+        widget=forms.Select(attrs={'class': 'form-control'}))
+    owner = forms.ModelChoiceField(
+        required=False,
+        queryset=Owner.objects.all(),
+        label='Владелец',
+        empty_label='Выберите...',
+        widget=forms.Select(attrs={'class': 'form-control'}))
+    bank_book = forms.ModelChoiceField(
+        required=False,
+        queryset=BankBook.objects.filter(flat_id=None, status='Активен'),
+        label='Лицевой счет',
+        empty_label='Выберите...',
+        widget=forms.Select(attrs={'class': 'form-control'}))
+
+    class Meta:
+        model = Flat
+        fields = '__all__'
+
+
 ServiceFormset = modelformset_factory(model=Service, form=ServiceForm, extra=0)
 UnitFormset = modelformset_factory(model=Unit, form=UnitForm, extra=0)
 TariffServiceFormSet = modelformset_factory(model=TariffService, form=TariffServiceForm, extra=0)

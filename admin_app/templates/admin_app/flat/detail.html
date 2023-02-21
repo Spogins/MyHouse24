@@ -1,0 +1,91 @@
+{% extends 'admin_app/base.html' %}
+{% block content %}
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+              <div class="col-sm-6">
+                <h1>Квартира №{{ flat.number }}, {{ flat.house.name }}</h1>
+              </div>
+              <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                  <li class="breadcrumb-item"><a href="/admin_app">Главная</a></li>
+                  <li class="breadcrumb-item"><a href="{% url 'flat_list' %}">Квартиры</a></li>
+                    <li class="breadcrumb-item active">Квартира №{{ flat.number }}, {{ flat.house.name }}</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+    </section>
+
+    <section class="content">
+        <div class="row">
+            <div class="col-xs-12 col-md-12">
+                <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Просмотр квартиры</h3>
+                    <div class="card-tools">
+                        <a {% if flat.bankbook_set.first %}href="{% url 'create_income' %}?bankbook_id={{ flat.bankbook_set.first.id }}"{% endif %} class="btn btn-default btn-sm {% if not flat.bankbook_set.first %}disabled{% endif %}" data-confirm="Лицевой счет неактивен"><i class="fa fa-dollar"></i>Принять платеж</a>
+                        <a {% if flat.bankbook_set.first %}href="{% url 'create_receipt' %}?flat_id={{ flat.id }}"{% endif %} class="btn btn-default btn-sm {% if not flat.bankbook_set.first %}disabled{% endif %}" data-confirm="Лицевой счет неактивен"><i class="fa fa-files-o"></i> Оформить квитанцию</a>
+                        <a href="{% url 'update_flat' flat.id %}" class="btn btn-primary btn-sm">
+                            <span class="hidden-xs">Редактировать квартиру</span>
+                        </a>
+                </div>
+                </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <table class="table table-bordered table-striped table-view">
+                                    <tr>
+                                        <td>Лицевой счет</td>
+                                        <td>{% if flat.bankbook_set.first %}{{ flat.bankbook_set.first }}{% else %}Не указано{% endif %}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Номер квартиры</td>
+                                        <td>{{ flat.number }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Площадь</td>
+                                        <td>{{ flat.area }}м<sup>2</sup></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Дом</td>
+                                        <td>{{ flat.house }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Секция</td>
+                                        <td>{{ flat.section }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Этаж</td>
+                                        <td>{{ flat.level }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Владелец</td>
+                                        <td>{{ flat.owner }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Тариф</td>
+                                        <td>{{ flat.tariff }}</td>
+                                    </tr>
+                                </table>
+
+                            <div>
+                                <p><a href="{% url 'flat_counter_list' flat.pk %}">Посмотреть показания счетчиков</a></p>
+                                <p><a href="{% url 'cashbox_list' %}?incomes_expenses=приход{% if flat.bankbook_set.first %}&bankbook_id={{ flat.bankbook_set.first }}{% endif %}">Посмотреть приходы</a></p>
+                                <p><a href="{% url 'receipt_list' %}?flat_id={{ flat.pk }}">Посмотреть квитанции</a></p>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+{% block script %}
+    <script>
+
+    $('.nav-link.active').removeClass('active');
+        $('.nav-link').find('p:contains("Квартиры")').parents('.nav-link').addClass('active');
+    </script>
+{% endblock %}

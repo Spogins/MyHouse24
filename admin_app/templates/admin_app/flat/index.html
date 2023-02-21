@@ -1,0 +1,156 @@
+{% extends 'admin_app/base.html' %}
+{% load static %}
+{% block content %}
+        <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+              <div class="col-sm-6">
+                <h1>Квартиры</h1>
+              </div>
+              <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                  <li class="breadcrumb-item"><a href="/admin_app">Главная</a></li>
+                  <li class="breadcrumb-item active">Квартиры</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+    </section>
+
+     <section class="content">
+        <div class="row">
+            <div class="col-xs-12 col-md-12">
+                <div class="float-right mb-2 mt-2">
+                    <a href="{% url 'create_flat' %}" class="btn btn-success">Добавить квартиру</a>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12 col-md-12">
+                <div class="card">
+                <div class="card-header">
+                    <div class="card-tools">
+                    <a href="{% url 'flat_list' %}" class="btn btn-default btn-sm">
+                        <span class="hidden-sm">Очистить</span>
+                    </a>
+                </div>
+                </div>
+                    <div class="card-body">
+                        <table class="table table-bordered table-hover sorting-table" data-filter-control="true" >
+                            <thead>
+                                <tr>
+                                    <th>№ квартиры</th>
+                                    <th>Дом</th>
+                                    <th>Секция</th>
+                                    <th>Этаж</th>
+                                    <th>Владелец</th>
+                                    <th>Остаток (грн)</th>
+                                    <th style="width: 114px; min-width: 114px">&nbsp;</th>
+                                </tr>
+                            <tr id="w0-filters" class="filters">
+                                <td>{{ form.number }}</td>
+                                <td>{{ form.house }}</td>
+                                <td>{{ form.section }}</td>
+                                <td>{{ form.level }}</td>
+                                <td>{{ form.owner }}</td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for flat in flat_list %}
+                                <tr class="clickable-row" href="{% url 'detail_flat' flat.id %}">
+                                    <td data-number="1">{{ flat.number }}</td>
+                                    <td data-number="2">{{ flat.house }}</td>
+                                    <td data-number="3">{% if flat.section %}{{ flat.section }}{% else %}не задано{% endif %}</td>
+                                    <td data-number="4">{% if flat.level %}{{ flat.level }}{% else %}не задано{% endif %}</td>
+                                    <td data-number="5">{% if flat.owner %}{{ flat.owner }}{% else %}не задано{% endif %}</td>
+                                    <td class="{% if flat.balance > 0 %}text-green{% elif flat.balance < 0 %}text-red{% endif %}">{{ flat.balance|floatformat:2 }}</td>
+                                    <td>
+                                        <div class="btn-group float-right">
+                                            <a class="btn btn-default btn-sm" href="{% url 'update_flat' flat.id %}" title="Редактировать" data-toggle="tooltip"><i class="fas fa-pencil-alt"></i></a>
+                                            <a class="btn btn-default btn-sm" href="{% url 'delete_flat' flat.id %}" title="Удалить" data-toggle="tooltip" data-pjax="0" data-method="post"><i class="fa fa-trash"></i></a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+     </section>
+{% endblock %}
+{% block script %}
+    <script>
+
+    $('.nav-link.active').removeClass('active');
+        $('.nav-link').find('p:contains("Квартиры")').parents('.nav-link').addClass('active');
+
+        $(".sorting-table").DataTable({
+          "responsive": true, "lengthChange": false, "autoWidth": false, "searching": false, "paging": false,
+            "bInfo" : false,
+            "bSortCellsTop": true,
+          "buttons": []
+        }).buttons().container().appendTo('.sorting-table_wrapper .col-md-6:eq(0)');
+
+    $(function() {
+        $.expr[':'].icontains = function(a, i, m) {
+          return $(a).text().toLowerCase()
+              .indexOf(m[3].toLowerCase()) >= 0;
+        };
+
+        $('#id_number').on('keyup', function() {
+            let value = $(this).val().toLowerCase();
+            let number = $(this).data('number');
+            console.log(number);
+            console.log($(".table td[data-number='"+number+"']:icontains('" + value + "')"));
+            $(".table td[data-number='"+number+"']:icontains('" + value + "')").parent().show();
+            $(".table td[data-number='"+number+"']:not(:icontains('" + value + "'))").parent().hide();
+        });
+        $('#id_house, #id_section, #id_level, #id_owner').on('change', function (){
+            let value = $(this).find('option:selected').text().toLowerCase();
+            let number = $(this).data('number');
+            console.log(value);
+            console.log($(".table td[data-number='"+number+"']:icontains('" + value + "')"));
+            $(".table td[data-number='"+number+"']:icontains('" + value + "')").parent().show();
+            $(".table td[data-number='"+number+"']:not(:icontains('" + value + "'))").parent().hide();
+        });
+
+        $('#id_house').on('change', function (){
+            let house = $(this).val();
+            $.ajax({
+                headers: { "X-CSRFToken": '{{ csrf_token }}' },
+                type: "GET",
+                url: '{% url 'get_section_level' %}',
+                data: {'house': house},
+                contentType: 'json/application',
+                success: function(response){
+                    let answer = JSON.parse(response);
+                    let sections = answer['sections'];
+                    $('#id_section').empty();
+                    $('#id_level').empty();
+                    $('#id_section').append($('<option>').text(''));
+                    for(let i=0;i<sections.length;i++){
+                        console.log(sections[i]);
+                        $('#id_section').append($('<option>').text(sections[i]['name']));
+                    }
+
+                    let levels = answer['levels'];
+                    $('#id_level').append($('<option>').text(''));
+                    for(let i=0;i<levels.length;i++){
+                        console.log(levels[i]);
+                        $('#id_level').append($('<option>').text(levels[i]['name']));
+                    }
+                },
+                error: function (responce){
+                    $('#id_section').empty();
+                    $('#id_level').empty();
+                }
+            });
+        });
+
+    });
+    </script>
+{% endblock %}

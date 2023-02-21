@@ -47,4 +47,14 @@ urlpatterns = [
     path('detail_house/<int:pk>', HouseDetail.as_view(), name='detail_house'),
     path('delete_house/<int:house_id>', delete_house, name='delete_house'),
 
+    path('flat_list', FlatList.as_view(), name='flat_list'),
+    path('get_section_level', get_section_level, name='get_section_level'),
+    path('create_flat', CreateFlat.as_view(), name='create_flat'),
+    path('update_flat/<int:pk>', UpdateFlat.as_view(), name='update_flat'),
+    path('detail_flat/<int:pk>', FlatDetail.as_view(), name='detail_flat'),
+    path('delete_flat/<int:pk>', delete_flat, name='delete_flat'),
+
+    path('flat_counter_list/<int:pk>', FlatCounterList.as_view(), name='flat_counter_list'),
+    path('cashbox_list', CashBoxList.as_view(), name='cashbox_list'),
+    path('receipt_list', ReceiptList.as_view(), name='receipt_list'),
 ]
