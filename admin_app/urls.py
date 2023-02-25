@@ -54,7 +54,14 @@ urlpatterns = [
     path('detail_flat/<int:pk>', FlatDetail.as_view(), name='detail_flat'),
     path('delete_flat/<int:pk>', delete_flat, name='delete_flat'),
 
+    path('counter_list', CounterView.as_view(), name='counter_list'),
+    path('create_counter', CreateCounter.as_view(), name='create_counter'),
     path('flat_counter_list/<int:pk>', FlatCounterList.as_view(), name='flat_counter_list'),
+    path('detail_counter/<str:pk>', CounterDetail.as_view(), name='counter_detail'),
+    path('update_counter/<str:pk>', UpdateCounter.as_view(), name='update_counter'),
+    path('get_section_flat', get_section_flat, name='get_section_flat'),
+    path('get_flats', get_flats, name='get_flats'),
+    path('get_flats_by_owner', get_flats_by_owner, name='get_flats_by_owner'),
     path('cashbox_list', CashBoxList.as_view(), name='cashbox_list'),
     path('receipt_list', ReceiptList.as_view(), name='receipt_list'),
 ]

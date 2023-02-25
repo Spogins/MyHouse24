@@ -284,3 +284,20 @@ class BankBook(models.Model):
             return 0.00-receipts
         else:
             return 0.00
+
+
+class Counter(models.Model):
+    id = models.CharField("№", primary_key=True, max_length=15)
+    flat = models.ForeignKey(Flat, on_delete=models.CASCADE, verbose_name='Квартира')
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, verbose_name='Услуга')
+    indication = models.FloatField("Текущие показания")
+    date = models.DateField()
+
+    class TypesCounter(models.TextChoices):
+        new = 'новое', _('новое')
+        taken_into_account = 'учтено', _('учтено')
+        paid = 'учтено и оплачено', _('учтено и оплачено')
+        zero = 'нулевое', _('нулевое')
+        __empty__ = _('')
+
+    status = models.CharField("Статус", choices=TypesCounter.choices, max_length=20)

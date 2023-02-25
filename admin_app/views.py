@@ -848,7 +848,136 @@ def delete_flat(request, pk):
     return redirect('/admin_app/flat_list')
 
 
+class CounterView(ListView):
+    model = Counter
+    template_name = 'admin_app/counter/index.html'
+    form_class = CounterFilterForm
+
+
+def filter_flat_counter(flat, params):
+    counters = Counter.objects.filter(
+        flat=flat
+    )
+    if 'date' in params and params['date'] != '':
+        date_range = params['date'].split(' - ')
+        counters = counters.filter(date__range=date_range)
+    params.pop('date', None)
+    for param, value in params.items():
+        if param != 'q' and value != '':
+            counters = counters.filter(**{param: value})
+    return counters
+
+
 class FlatCounterList(ListView):
+    model = Flat
+    template_name = 'admin_app/counter/flat_counter.html'
+    form_class = FlatCounterFilterForm
+
+    def get_context_data(self, **kwargs):
+        context_data = super().get_context_data()
+        get_params = self.request.GET.dict()
+        if any(get_params):
+            context_data['counter_list'] = filter_flat_counter(self.kwargs['pk'], get_params)
+        else:
+            context_data['counter_list'] = self.object.counter_set.all()
+
+        context_data['flat'] = self.kwargs['pk']
+        return context_data
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        if self.request.method == 'GET':
+            kwargs.update({
+                'data': self.request.GET,
+            })
+        return kwargs
+
+
+class CreateCounter(CreateView):
+    model = Counter
+    template_name = 'admin_app/counter/update.html'
+
+    def get_context_data(self, **kwargs):
+        form = CounterCreateForm()
+        context = {
+            'form': form
+        }
+        return context
+
+    def post(self, request, *args, **kwargs):
+        form = CounterCreateForm(request.POST)
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+    def form_valid(self, form):
+        form.save()
+        return redirect('/admin_app/counter_list')
+
+    def form_invalid(self, form):
+        context = {
+            'form': form.errors
+        }
+        return self.render_to_response(context)
+
+
+def get_section_flat(request):
+    if is_ajax(request):
+        house = request.GET.get('house')
+        sections = Section.objects.filter(house_id=house).values('name', 'id')
+        flats = Flat.objects.filter(house_id=house).values('number', 'id')
+        return JsonResponse(json.dumps({'sections': list(sections), 'flats': list(flats)}), safe=False)
+
+
+def get_flats(request):
+    if is_ajax(request):
+        if 'section' in request.GET.dict():
+            section = request.GET.get('section')
+            flats = Flat.objects.filter(section_id=section).values('number', 'id')
+        else:
+            level = request.GET.get('level')
+            flats = Flat.objects.filter(level_id=level).values('number', 'id')
+        return JsonResponse(json.dumps({'flats': list(flats)}), safe=False)
+
+
+def get_flats_by_owner(request):
+    if is_ajax(request):
+        owner = request.GET.get('owner')
+        flats = Flat.objects.filter(owner_id=owner).values('number', 'id', 'house__name')
+        return JsonResponse(json.dumps({'flats': list(flats)}), safe=False)
+
+
+class UpdateCounter(UpdateView):
+    model = Counter
+    template_name = 'admin_app/counter/update.html'
+
+    def get_context_data(self, **kwargs):
+        form = CounterCreateForm(instance=Counter.objects.get(id=self.kwargs['pk']))
+        context = {
+            'form': form
+        }
+        return context
+
+    def post(self, request, *args, **kwargs):
+        form = CounterCreateForm(request.POST, instance=Counter.objects.get(id=self.kwargs['pk']))
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+    def form_valid(self, form):
+        form.save()
+        return redirect('/admin_app/counter_list')
+
+    def form_invalid(self, form):
+        context = {
+            'form': form.errors
+        }
+        return self.render_to_response(context)
+
+
+class CounterDetail(DetailView):
     pass
 
 

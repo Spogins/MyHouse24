@@ -242,6 +242,39 @@ class FlatCreateForm(forms.ModelForm):
         fields = '__all__'
 
 
+class CounterFilterForm(forms.Form):
+    flat__house_id = forms.ModelChoiceField(queryset=House.objects.all(), empty_label='',
+                                            widget=forms.Select(attrs={'class': 'form-control', 'data-number': '1'}))
+    section = forms.ChoiceField(widget=forms.Select(attrs={'class': 'form-control', 'data-number': '2'}))
+    flat__number = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'data-number': '3'}))
+    service = forms.ModelChoiceField(queryset=Service.objects.all(), empty_label='',
+                                     widget=forms.Select(attrs={'class': 'form-control', 'data-number': '4'}))
+
+
+class CounterCreateForm(forms.ModelForm):
+    house = forms.ModelChoiceField(
+        label='Дом',
+        queryset=House.objects.all(), empty_label='Выберите...',
+        widget=forms.Select(attrs={'class': 'form-control'}))
+    section = forms.ModelChoiceField(
+        required=False,
+        queryset=Section.objects.all(),
+        label='Секция',
+        empty_label='Выберите...',
+        widget=forms.Select(attrs={'class': 'form-control'}))
+
+    class Meta:
+        model = Counter
+        fields = '__all__'
+
+
+class FlatCounterFilterForm(CounterFilterForm):
+    id = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'data-number': '5'}))
+    status = forms.ChoiceField(choices=Counter.TypesCounter.choices, widget=forms.Select(
+        attrs={'class': 'form-control', 'data-number': '6'}))
+    date = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'data-number': '7'}))
+
+
 ServiceFormset = modelformset_factory(model=Service, form=ServiceForm, extra=0)
 UnitFormset = modelformset_factory(model=Unit, form=UnitForm, extra=0)
 TariffServiceFormSet = modelformset_factory(model=TariffService, form=TariffServiceForm, extra=0)
