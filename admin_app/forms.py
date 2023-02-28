@@ -1,3 +1,5 @@
+import math
+
 from django import forms
 from django.forms import modelformset_factory, inlineformset_factory
 from admin_app.models import *
@@ -273,6 +275,90 @@ class FlatCounterFilterForm(CounterFilterForm):
     status = forms.ChoiceField(choices=Counter.TypesCounter.choices, widget=forms.Select(
         attrs={'class': 'form-control', 'data-number': '6'}))
     date = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'data-number': '7'}))
+
+
+class CashBoxFilterForm(forms.Form):
+    id = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
+    date_range = forms.CharField(max_length=20, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    status = forms.ChoiceField(choices=(('', ''), (True, 'Проведен'), (False, 'Не проведен')),
+                               widget=forms.Select(attrs={'class': 'form-control'}))
+    payment_type_id = forms.ModelChoiceField(queryset=PaymentItems.objects.all(), empty_label='',
+                                             widget=forms.Select(attrs={'class': 'form-control'}))
+    bankbook__flat__owner_id = forms.ModelChoiceField(queryset=Owner.objects.all(), empty_label='',
+                                                      widget=forms.Select(attrs={'class': 'form-control'}))
+    bankbook_id = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
+    type = forms.ChoiceField(choices=CashBox.Types.choices, widget=forms.Select(attrs={'class': 'form-control'}))
+
+
+class CashBoxIncomeCreateForm(forms.ModelForm):
+    owner = forms.ModelChoiceField(
+        required=False,
+        label='Владелец',
+        queryset=Owner.objects.all(), empty_label='Выберите...',
+        widget=forms.Select(attrs={'class': 'form-control'}))
+    payment_type = forms.ModelChoiceField(
+        label='Тип платежа', queryset=PaymentItems.objects.filter(status='Приход'),
+        required=False, empty_label='Выберите...',
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+
+    class Meta:
+        model = CashBox
+        fields = '__all__'
+        widgets = {
+            "type": forms.HiddenInput(attrs={
+                'value': 'приход'
+            })
+        }
+
+
+class CashBoxExpenseCreateForm(forms.ModelForm):
+    payment_type = forms.ModelChoiceField(
+        label='Тип платежа', queryset=PaymentItems.objects.filter(status='Расход'),
+        required=False, empty_label='Выберите...',
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+
+    class Meta:
+        model = CashBox
+        exclude = ['bankbook']
+        widgets = {
+            "type": forms.HiddenInput(attrs={
+                'value': 'расход'
+            })
+        }
+
+    def clean_amount_of_money(self):
+        return math.fabs(self.cleaned_data['amount_of_money'])
+
+
+class BankBookFilterForm(forms.Form):
+    id = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
+    status = forms.ChoiceField(choices=BankBook.Status.choices, widget=forms.Select(attrs={'class': 'form-control',
+                                                                                           'data-number': '2'}))
+    flat__house_id = forms.ModelChoiceField(queryset=House.objects.all(), empty_label='',
+                                            widget=forms.Select(attrs={'class': 'form-control'}))
+    section = forms.ChoiceField(widget=forms.Select(attrs={'class': 'form-control'}))
+    flat__number = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
+    flat__owner_id = forms.ModelChoiceField(queryset=Owner.objects.all(), empty_label='',
+                                            widget=forms.Select(attrs={'class': 'form-control'}))
+
+
+class BankbookCreateForm(forms.ModelForm):
+    house = forms.ModelChoiceField(
+        label='Дом', required=False,
+        queryset=House.objects.all(), empty_label='Выберите...',
+        widget=forms.Select(attrs={'class': 'form-control'}))
+    section = forms.ModelChoiceField(
+        required=False,
+        queryset=Section.objects.all(),
+        label='Секция',
+        empty_label='Выберите...',
+        widget=forms.Select(attrs={'class': 'form-control'}))
+
+    class Meta:
+        model = BankBook
+        fields = '__all__'
 
 
 ServiceFormset = modelformset_factory(model=Service, form=ServiceForm, extra=0)

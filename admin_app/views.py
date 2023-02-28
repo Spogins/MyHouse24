@@ -5,7 +5,8 @@ from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views.decorators.http import require_POST
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
-
+from django.views.generic.edit import FormMixin
+from django.views.generic.list import MultipleObjectMixin
 
 from account.forms import *
 from account.models import *
@@ -283,8 +284,8 @@ class UpdateUser(UpdateView):
     def form_invalid(self, form_user, form_profile):
         """If the form is invalid, render the invalid form."""
         context = {
-            'profile_form': form_profile,
-            'register_form': form_user
+            'profile_form': form_profile.errors,
+            'register_form': form_user.errors
         }
         return self.render_to_response(context)
 
@@ -953,22 +954,22 @@ class UpdateCounter(UpdateView):
     template_name = 'admin_app/counter/update.html'
 
     def get_context_data(self, **kwargs):
-        form = CounterCreateForm(instance=Counter.objects.get(id=self.kwargs['pk']))
-        context = {
-            'form': form
-        }
+        instance = Counter.objects.get(id=self.kwargs['pk'])
+        form = CounterCreateForm(instance=instance)
+        flat = Flat.objects.get(id=instance.flat_id)
+        context = {"form": form,
+                   "update": True,
+                   "house": flat.house_id
+                   }
         return context
 
     def post(self, request, *args, **kwargs):
         form = CounterCreateForm(request.POST, instance=Counter.objects.get(id=self.kwargs['pk']))
         if form.is_valid():
-            return self.form_valid(form)
+            form.save()
+            return redirect('/admin_app/counter_list')
         else:
             return self.form_invalid(form)
-
-    def form_valid(self, form):
-        form.save()
-        return redirect('/admin_app/counter_list')
 
     def form_invalid(self, form):
         context = {
@@ -978,15 +979,183 @@ class UpdateCounter(UpdateView):
 
 
 class CounterDetail(DetailView):
-    pass
+    model = Counter
+    template_name = 'admin_app/counter/detail.html'
+
+
+def delete_counter(request, counter_id):
+    Counter.objects.get(id=counter_id).delete()
+    return redirect('/admin_app/counter_list')
 
 
 class CashBoxList(ListView):
+    model = CashBox
+    template_name = 'admin_app/cash_box/index.html'
+    form_class = CashBoxFilterForm
+
+
+class CashBoxDetail(DetailView):
+    model = CashBox
+    template_name = 'admin_app/cash_box/detail.html'
+
+
+class CreateIncome(CreateView):
+    model = CashBox
+    template_name = 'admin_app/cash_box/update_income.html'
+
+    def get_context_data(self, **kwargs):
+        form = CashBoxIncomeCreateForm()
+        context = {'form': form}
+        return context
+
+    def post(self, request, *args, **kwargs):
+        form = CashBoxIncomeCreateForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('/admin_app/cashbox_list')
+
+
+class UpdateIncome(UpdateView):
+    model = CashBox
+    template_name = 'admin_app/cash_box/update_income.html'
+
+    def get_context_data(self, **kwargs):
+        instance = CashBox.objects.get(id=self.kwargs['pk'])
+        form = CashBoxIncomeCreateForm(instance=instance)
+        context = {'form': form, 'update': True}
+        return context
+
+    def post(self, request, *args, **kwargs):
+        instance = CashBox.objects.get(id=self.kwargs['pk'])
+        form = CashBoxIncomeCreateForm(request.POST, instance=instance)
+        if form.is_valid():
+            form.save()
+            return redirect('/admin_app/cashbox_list')
+
+
+class CreateExpense(CreateView):
+    model = CashBox
+    template_name = 'admin_app/cash_box/update_expense.html'
+
+    def get_context_data(self, **kwargs):
+        form = CashBoxExpenseCreateForm()
+        context = {'form': form}
+        return context
+
+    def post(self, request, *args, **kwargs):
+        form = CashBoxExpenseCreateForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('/admin_app/cashbox_list')
+        else:
+            print(form.errors)
+            return self.render_to_response({'form': form.errors})
+
+
+class UpdateExpense(UpdateView):
+    model = CashBox
+    template_name = 'admin_app/cash_box/update_expense.html'
+
+    def get_context_data(self, **kwargs):
+        instance = CashBox.objects.get(id=self.kwargs['pk'])
+        form = CashBoxExpenseCreateForm(instance=instance)
+        context = {'form': form, 'update': True}
+        return context
+
+    def post(self, request, *args, **kwargs):
+        instance = CashBox.objects.get(id=self.kwargs['pk'])
+        form = CashBoxExpenseCreateForm(request.POST, instance=instance)
+        if form.is_valid():
+            form.save()
+            return redirect('/admin_app/cashbox_list')
+
+
+
+def export_cashbox(request):
     pass
+
+
+def delete_cash_box(request, cash_box_id):
+    CashBox.objects.get(id=cash_box_id).delete()
+    return redirect('/admin_app/cashbox_list')
+
+
+class BankBookList(ListView):
+    model = BankBook
+    template_name = 'admin_app/bank_book/index.html'
+    form_class = BankBookFilterForm
+
+
+class CreateBankBook(CreateView):
+    model = BankBook
+    template_name = 'admin_app/bank_book/update.html'
+
+    def get_context_data(self, **kwargs):
+        form = BankbookCreateForm()
+        context = {'form': form}
+        return context
+
+    def post(self, request, *args, **kwargs):
+        form = BankbookCreateForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('/admin_app/bankbook_list')
+
+
+class UpdateBankBook(UpdateView):
+    model = BankBook
+    template_name = 'admin_app/bank_book/update.html'
+
+    def get_context_data(self, **kwargs):
+        instance = BankBook.objects.get(id=self.kwargs['pk'])
+        form = BankbookCreateForm(instance=instance)
+        context = {'form': form, 'update': True, 'bankbook': Flat.objects.get(id=instance.flat_id)}
+        return context
+
+    def post(self, request, *args, **kwargs):
+        instance = BankBook.objects.get(id=self.kwargs['pk'])
+        form = BankbookCreateForm(request.POST, instance=instance)
+        if form.is_valid():
+            form.save()
+            return redirect('/admin_app/bankbook_list')
+
+
+def delete_bankbook(request, bankbook_id):
+    BankBook.objects.get(id=bankbook_id).delete()
+    return redirect('/admin_app/bankbook_list')
+
+
+class BankbookDetail(DetailView):
+    model = BankBook
+    template_name = 'admin_app/bank_book/detail.html'
+
+
+def get_owner(request):
+    if is_ajax(request):
+        flat = Flat.objects.get(id=request.GET.get('flat'))
+        bankbook = flat.bankbook_set.first()
+        owner = Owner.objects.get(user_id=flat.owner_id)
+        try:
+            response = {'id': owner.user_id, 'fullname': owner.fullname(), 'phone': owner.phone,
+                        'bankbook': bankbook.id, 'tariff': flat.tariff_id}
+        except AttributeError:
+            response = {'id': owner.user_id, 'fullname': owner.fullname(), 'phone': owner.phone}
+        return JsonResponse(json.dumps({'owner': response}), safe=False)
+
+def export_bankbook(request):
+    pass
+def get_bankbooks(request):
+    if is_ajax(request):
+        bankbooks = BankBook.objects.filter(flat__owner_id=request.GET.get('owner')).values('id')
+        return JsonResponse(json.dumps({'bankbooks': list(bankbooks)}), safe=False)
 
 
 class ReceiptList(ListView):
     pass
 
+
+
+class CreateReceipt(CreateView):
+    pass
 
 

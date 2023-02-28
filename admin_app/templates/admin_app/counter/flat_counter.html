@@ -86,7 +86,7 @@
                                     <td>
                                         <div class="btn-group float-right">
                                             <a class="btn btn-default btn-sm" href="{% url 'update_counter' counter.id %}" title="Редактировать" data-toggle="tooltip"><i class="fas fa-pencil-alt"></i></a>
-                                            <a class="btn btn-default btn-sm" href="" title="Удалить" data-toggle="tooltip" data-pjax="0" data-method="post"><i class="fa fa-trash"></i></a>
+                                            <a class="btn btn-default btn-sm" href="{% url 'delete_counter' counter.id %}" title="Удалить" data-toggle="tooltip" data-pjax="0" data-method="post"><i class="fa fa-trash"></i></a>
                                         </div>
                                     </td>
                                 </tr>

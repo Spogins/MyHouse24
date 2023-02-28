@@ -1,0 +1,110 @@
+{% extends 'admin_app/base.html' %}
+
+{% block content %}
+        <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+              <div class="col-sm-6">
+                <h1>{% if cashbox.type == 'расход' %}Расходная ведомость{% else %}Приходная ведомость{% endif %}</h1>
+              </div>
+              <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                  <li class="breadcrumb-item"><a href="/admin_app">Главная</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'cashbox_list' %}">платежи</a></li>
+                    <li class="breadcrumb-item active">№{{ cashbox.id }}</li>
+                </ol>
+              </div>
+            </div>
+
+            <div class="row">
+                        <div class="col-xs-12 col-md-7 col-lg-6 mt-2">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="input-group">
+                                  <div class="input-group-prepend">
+                                    <span class="input-group-text">№</span>
+                                  </div>
+                                  <div class="form-control">{{ cashbox.id }}</div>
+                                </div>
+                                <div class="label-mid ml-1 mr-1">от</div>
+                                <div class="input-group date">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text"><i class="fa fa-calendar-alt"></i></div>
+                                    </div>
+                                    <div class="form-control">{{ cashbox.date }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+          </div>
+    </section>
+
+    <section class="content">
+
+        <div class="row">
+            <div class="col-xs-12 col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-tools">
+                            <a href="" class="btn btn-default btn-sm">
+                                <span>Копировать</span>
+                            </a>
+                            <a href="{% url 'delete_cashbox' cashbox.id%}" class="btn btn-default btn-sm">
+                                <span>Удалить</span>
+                            </a>
+                            <a href="{% if cashbox.type == 'расход' %}{% url 'update_expense' cashbox.id %}{% else %}{% url 'update_income' cashbox.id %}{% endif %}" class="btn btn-primary btn-sm">
+                                <span class="hidden-xs">Редактировать ведомость</span>
+                            </a>
+                            <a href="" class="btn btn-default btn-sm">
+                                <span>Выгрузить в Excel</span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="row">
+                    <div class="card-body col-lg-12">
+                         <table class="table table-bordered table-striped table-view">
+                             {% if cashbox.type == 'приход' %}
+                             <tr>
+                                 <td>Владелец квартиры</td>
+                                 <td>
+                                     <a href="{% url 'detail_owner' cashbox.bankbook.flat.owner_id %}">{{ cashbox.bankbook.flat.owner }}</a>
+                                 </td>
+                             </tr>
+                             <tr>
+                                 <td>Лицевой счет</td>
+                                 <td><a href="{% url 'detail_bankbook' cashbox.bankbook_id %}">{{ cashbox.bankbook_id }}</a></td>
+                             </tr>
+                             {% endif %}
+                             <tr>
+                                 <td>Статья</td>
+                                 <td>{{ cashbox.payment_type }}</td>
+                             </tr>
+                             <tr>
+                                 <td>Квитанция</td>
+                                 <td>Не задано</td>
+                             </tr>
+                             <tr>
+                                 <td>Менеджер</td>
+                                 <td>{{ cashbox.manager }}</td>
+                             </tr>
+                             <tr>
+                                 <td>Сумма</td>
+                                 <td>{{ cashbox.amount_of_money }}</td>
+                             </tr>
+                             <tr>
+                                 <td>Комментарий</td>
+                                 <td>{{ cashbox.comment }}</td>
+                             </tr>
+                         </table>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+{% block script %}
+    <script>
+    $('.nav-link.active').removeClass('active');
+        $('.nav-link').find('p:contains("Касса")').parents('.nav-link').addClass('active');
+    </script>
+{% endblock %}

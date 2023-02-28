@@ -1,0 +1,161 @@
+{% extends 'admin_app/base.html' %}
+{% load widget_tweaks %}
+{% block content %}
+        <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+              <div class="col-sm-6">
+                <h1>Касса</h1>
+              </div>
+              <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                  <li class="breadcrumb-item"><a href="/admin_app">Главная</a></li>
+                  <li class="breadcrumb-item active">Касса</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+        </section>
+
+    <section class="content">
+        <div class="row mt-2">
+            <div class="col-xs-12 col-md-9">
+                <div class="row">
+                    <div class="col-xs-12 col-md-4">
+                        <div class="small-box bg-green overflow-hidden">
+                            <div class="inner">
+                                <h3>{{ state_cashbox }} грн</h3>
+                                <p>Состояние кассы</p>
+                            </div>
+                            <div class="icon">
+                                <i class="fa fa-dollar"></i>
+                            </div>
+                            <!--<span class="small-box-footer">&nbsp;</span>-->
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-md-4">
+                        <div class="small-box bg-blue overflow-hidden">
+                            <div class="inner">
+                                <h3>{{ account_balance|floatformat:2 }} грн</h3>
+                                <p>Баланс по счетам</p>
+                            </div>
+                            <div class="icon">
+                                <i class="fa fa-dollar"></i>
+                            </div>
+                            <!--<span class="small-box-footer">&nbsp;</span>-->
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-md-4">
+                        <div class="small-box bg-red overflow-hidden">
+                            <div class="inner">
+                                <h3>{{ account_debts|floatformat:2 }} грн</h3>
+                                <p>Задолженность по счетам</p>
+                            </div>
+                            <div class="icon">
+                                <i class="fa fa-dollar"></i>
+                            </div>
+                            <!--<span class="small-box-footer">&nbsp;</span>-->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-md-3">
+                <div class="btn-group float-right margin-bottom mt-2 mr-5 mb-2">
+                    <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Выберите действие <span class="caret"></span>
+                    </button>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="{% url 'create_income' %}">Создать приход</a>
+                        <a class="dropdown-item" href="{% url 'create_expense' %}">Создать расход</a>
+                        <a class="dropdown-item" href="{% url 'export_cashbox' %}">Выгрузить в Excel</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-xs-12 col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-tools">
+                            <a href="{% url 'cashbox_list' %}" class="btn btn-default btn-sm">
+                                <span class="hidden-sm">Очистить</span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-bordered table-hover sorting-table" data-filter-control="true" >
+                            <thead>
+                                <tr>
+                                    <th>№</th>
+                                    <th>Дата</th>
+                                    <th>Статус</th>
+                                    <th>Тип платежа</th>
+                                    <th>Владелец</th>
+                                    <th>Лицевой счет</th>
+                                    <th>Приход/расход</th>
+                                    <th>Сумма (грн.)</th>
+                                    <th style="width: 114px; min-width: 114px">&nbsp;</th>
+                                </tr>
+                            <tr id="w0-filters" class="filters">
+                                <form method="get" id="filter-form">
+                                    <td>{{ form.id }}</td>
+                                    <td>{{ form.date_range }}</td>
+                                    <td>{{ form.status }}</td>
+                                <td>{{ form.payment_type_id }}</td>
+                                <td>{{ form.bankbook__flat__owner_id }}</td>
+                                <td>{{ form.bankbook_id }}</td>
+                                <td>{{ form.type }}</td>
+                                <td></td>
+                                    <td></td>
+                                </form>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for cashbox in cashbox_list %}
+                                <tr class="clickable-row" href="{% url 'detail_cashbox' cashbox.id %}">
+                                    <td>{{ cashbox.id }}</td>
+                                    <td>{{ cashbox.date }}</td>
+                                    <td>{% if cashbox.status is True %}Проведен{% else %}Не проведен{% endif %}</td>
+                                    <td>{{ cashbox.payment_type }}</td>
+                                    <td>{{ cashbox.bankbook.flat.owner }}</td>
+                                    <td>{{ cashbox.bankbook }}</td>
+                                    <td><span class="{% if cashbox.type == 'приход' %}text-green{% else %}text-red{% endif %}">{{ cashbox.type }}</span></td>
+                                    <td><span class="{% if cashbox.type == 'приход' %}text-green{% else %}text-red{% endif %}">{% if cashbox.type == 'расход' %}-{% endif %}{{ cashbox.amount_of_money }}</span></td>
+                                    <td>
+                                        <div class="btn-group float-right">
+                                            <a class="btn btn-default btn-sm" href="{% if cashbox.type == 'приход' %}{% url 'update_income' cashbox.id %}{% else %}{% url 'update_expense' cashbox.id %}{% endif %}" title="Редактировать" data-toggle="tooltip"><i class="fas fa-pencil-alt"></i></a>
+                                            <a class="btn btn-default btn-sm" href="{% url 'delete_cashbox' cashbox.id %}" title="Удалить" data-toggle="tooltip" data-pjax="0" data-method="post"><i class="fa fa-trash"></i></a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="card-footer">
+                        <div>Проведен приход: <span class="text-bold">{{ total_income }} грн</span></div>
+                        <div>Проведен расход: <span class="text-bold">{{ total_expenses }} грн</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+{% block script %}
+    <script>
+
+    $('.nav-link.active').removeClass('active');
+        $('.nav-link').find('p:contains("Касса")').parents('.nav-link').addClass('active');
+
+        $('#id_id, #id_flat__house_id, #id_section, #id_flat__number').on('change', function (){
+            console.log('change');
+            $('#filter-form').submit();
+        });
+
+        $('#id_id, #id_status, #id_date_range, #id_payment_type_id, #id_bankbook__flat__owner_id, #id_bankbook_id, #id_type').on('change', function (){
+            console.log('change');
+            $('#filter-form').submit();
+        });
+    </script>
+{% endblock %}

@@ -109,6 +109,10 @@ class PaymentItems(models.Model):
 
     status = models.CharField(choices=Status.choices, max_length=20, default='Приход')
 
+    def __str__(self):
+        return self.name
+
+
 
 class MainPage(models.Model):
     title = models.CharField(max_length=100, null=True, blank=True)
@@ -301,3 +305,23 @@ class Counter(models.Model):
         __empty__ = _('')
 
     status = models.CharField("Статус", choices=TypesCounter.choices, max_length=20)
+
+
+class CashBox(models.Model):
+    id = models.CharField('№', primary_key=True, max_length=15)
+    date = models.DateField()
+    status = models.BooleanField('Проведен', default=True)
+    payment_type = models.ForeignKey(PaymentItems, on_delete=models.RESTRICT, verbose_name='Тип платежа',
+                                     null=True, blank=True)
+    bankbook = models.ForeignKey(BankBook, on_delete=models.SET_NULL,
+                                 null=True, blank=True, verbose_name='Лицевой счет')
+
+    class Types(models.TextChoices):
+        income = 'приход', _('приход')
+        expense = 'расход', _('расход')
+        __empty__ = _('')
+
+    type = models.CharField('Приход/Расход', choices=Types.choices, max_length=10)
+    amount_of_money = models.DecimalField('Сумма(грн)', decimal_places=2, max_digits=10)
+    manager = models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True, blank=True)
+    comment = models.TextField("Комментарий", null=True, blank=True)

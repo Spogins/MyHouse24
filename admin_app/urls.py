@@ -59,9 +59,30 @@ urlpatterns = [
     path('flat_counter_list/<int:pk>', FlatCounterList.as_view(), name='flat_counter_list'),
     path('detail_counter/<str:pk>', CounterDetail.as_view(), name='counter_detail'),
     path('update_counter/<str:pk>', UpdateCounter.as_view(), name='update_counter'),
+    path('delete_counter/<str:counter_id>', delete_counter, name='delete_counter'),
     path('get_section_flat', get_section_flat, name='get_section_flat'),
     path('get_flats', get_flats, name='get_flats'),
     path('get_flats_by_owner', get_flats_by_owner, name='get_flats_by_owner'),
+
     path('cashbox_list', CashBoxList.as_view(), name='cashbox_list'),
+    path('create_income', CreateIncome.as_view(), name='create_income'),
+    path('update_income/<int:pk>', UpdateIncome.as_view(), name='update_income'),
+    path('create_expense', CreateExpense.as_view(), name='create_expense'),
+    path('update_expense/<int:pk>', UpdateExpense.as_view(), name='update_expense'),
+    path('export_cashbox', export_cashbox, name='export_cashbox'),
+    path('detail_cashbox/<str:pk>', CashBoxDetail.as_view(), name='detail_cashbox'),
+    path('delete_cashbox/<str:cash_box_id>', delete_cash_box, name='delete_cashbox'),
+
     path('receipt_list', ReceiptList.as_view(), name='receipt_list'),
+
+    path('bankbook_list', BankBookList.as_view(), name='bankbook_list'),
+    path('get_bankbooks', get_bankbooks, name='get_bankbooks'),
+    path('create_bankbook', CreateBankBook.as_view(), name='create_bankbook'),
+    path('update_bankbook/<str:pk>', UpdateBankBook.as_view(), name='update_bankbook'),
+    path('detail_bankbook/<str:pk>', BankbookDetail.as_view(), name='detail_bankbook'),
+    path('delete_bankbook/<str:bankbook_id>', delete_bankbook, name='delete_bankbook'),
+    path('export_bankbook', export_bankbook, name='export_bankbook'),
+
+    path('get_owner', get_owner, name='get_owner'),
+    path('create_receipt', CreateReceipt.as_view(), name='create_receipt'),
 ]

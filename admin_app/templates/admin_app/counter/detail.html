@@ -1,6 +1,5 @@
-{% extends 'admin/base.html' %}
-{% load crispy_forms_tags %}
-{% load filters %}
+{% extends 'admin_app/base.html' %}
+
 {% block content %}
         <section class="content-header">
         <div class="container-fluid">
@@ -10,9 +9,9 @@
               </div>
               <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
-                  <li class="breadcrumb-item"><a href="/admin">Главная</a></li>
-                    <li class="breadcrumb-item"><a href="{% url 'admin:counter_list' %}">Счетчики</a></li>
-                    <li class="breadcrumb-item"><a href="{% url 'admin:flat_counter_list' counter.flat_id %}">Показания счетчиков, кв. {{ counter.flat.number }}</a></li>
+                  <li class="breadcrumb-item"><a href="/admin_app">Главная</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'counter_list' %}">Счетчики</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'flat_counter_list' counter.flat_id %}">Показания счетчиков, кв. {{ counter.flat.number }}</a></li>
                     <li class="breadcrumb-item active">счетчик №{{ counter.id }}</li>
                 </ol>
               </div>
@@ -32,7 +31,7 @@
                                     <div class="input-group-prepend">
                                         <div class="input-group-text"><i class="fa fa-calendar-alt"></i></div>
                                     </div>
-                                    <div class="form-control">{{ counter.date|ru_strftime:"dd.MM.YYYY" }}</div>
+                                    <div class="form-control">{{ counter.date }}</div>
                                 </div>
                             </div>
                         </div>
@@ -47,7 +46,7 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="card-tools">
-                            <a href="{% url 'admin:update_counter' counter.id %}" class="btn btn-primary btn-sm">
+                            <a href="{% url 'update_counter' counter.id %}" class="btn btn-primary btn-sm">
                                 <span class="hidden-xs">Редактировать показания</span>
                             </a>
                         </div>
@@ -61,7 +60,7 @@
                              </tr>
                              <tr>
                                  <td>Дом</td>
-                                 <td><a href="{% url 'admin:detail_house' counter.flat.house_id %}">{{ counter.flat.house }}</a></td>
+                                 <td><a href="{% url 'detail_house' counter.flat.house_id %}">{{ counter.flat.house }}</a></td>
                              </tr>
                              <tr>
                                  <td>Секция</td>
@@ -69,11 +68,11 @@
                              </tr>
                              <tr>
                                  <td>Квартира</td>
-                                 <td><a href="{% url 'admin:detail_flat' counter.flat_id %}">{{ counter.flat.number }}</a></td>
+                                 <td><a href="{% url 'detail_flat' counter.flat_id %}">{{ counter.flat.number }}</a></td>
                              </tr>
                              <tr>
                                  <td>Пользователь</td>
-                                 <td>{% if counter.flat.owner_id %}<a href="{% url 'admin:detail_owner' counter.flat.owner_id %}">{{ counter.flat.owner }}</a>{% else %}Не задано{% endif %}</td>
+                                 <td>{% if counter.flat.owner_id %}<a href="{% url 'detail_owner' counter.flat.owner_id %}">{{ counter.flat.owner }}</a>{% else %}Не задано{% endif %}</td>
                              </tr>
                              <tr>
                                  <td>Текущие показания</td>
