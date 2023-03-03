@@ -1,0 +1,507 @@
+{% extends 'admin_app/base.html' %}
+{% load widget_tweaks %}
+{% load static %}
+{% block header %}
+<link rel="stylesheet" href="{% static 'plugins/daterangepicker/daterangepicker.css'%}">
+{% endblock %}
+{% block content %}
+<form method="post" enctype="multipart/form-data">
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1>Квитанция</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="/admin_app">Главная</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'receipt_list' %}">Квитанции</a></li>
+                        <li class="breadcrumb-item active">Квитанция</li>
+                    </ol>
+                </div>
+            </div>
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-xs-12 col-md-7 col-lg-6">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">№</span>
+                            </div>
+                            {{ form.id|add_class:"form-control" }}
+                        </div>
+                        <div class="label-mid ml-1 mr-1">от</div>
+                        <div class="input-group date">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text"><i class="fa fa-calendar-alt"></i></div>
+                            </div>
+                            {{ form.date|add_class:"form-control" }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="content">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-xs-12 col-sm-6">
+                        <div class="col-xs-12 col-sm-8">
+                            <label class=" requiredField">
+                                Дом
+                            </label>
+                            <div class="input-group">
+                                {{ form.house|add_class:'form-control' }}
+                            </div>
+
+                        </div>
+                        <div class="col-xs-12 col-sm-8">
+                            <label class=" requiredField">
+                                Секция
+                            </label>
+                            <div class="input-group">
+                                {{ form.section|add_class:'form-control' }}
+                            </div>
+
+                        </div>
+                        <div class="col-xs-12 col-sm-8">
+                            <label class=" requiredField">
+                                Квартира
+                            </label>
+                            <div class="input-group">
+                                {{ form.flat|add_class:'form-control' }}
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-sm-6">
+                        <div class="col-xs-12 col-sm-10">
+                            <label class=" requiredField">
+                                {{ form.is_checked }}Проведена
+                            </label>
+                            <div class="input-group">
+
+                            </div>
+
+                        </div>
+                        <div class="col-xs-12 col-sm-10">
+                            <label class=" requiredField">
+                                Статус
+                            </label>
+                            <div class="input-group">
+                                {{ form.status|add_class:'form-control' }}
+                            </div>
+
+                        </div>
+                        <div class="col-xs-12 col-sm-10">
+                            <label class=" requiredField">
+                                Тариф
+                            </label>
+                            <div class="input-group">
+                                {{ form.tariff|add_class:'form-control' }}
+                            </div>
+
+                        </div>
+                        {% if update %}
+                        <p><b>Тариф:</b>
+                            <a id="tariff-url" href="{% url 'update_tariff' form.tariff.value %}"></a>
+                        </p>
+                        {% endif %}
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <label class=" requiredField">
+                                    Период с
+                                </label>
+                                <div class="input-group">
+                                    {{ form.date_from|add_class:'form-control' }}
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+
+                                <label class=" requiredField">
+                                    Период по
+                                </label>
+                                <div class="input-group">
+                                    {{ form.date_to|add_class:'form-control' }}
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-xs-12 col-sm-6" style="margin-top:3rem;">
+                        <div class="col-xs-12 col-sm-10">
+                            <label class=" requiredField">
+                                Лицевой счет
+                            </label>
+                            <div class="input-group">
+                                {{ form.bankbook|add_class:'form-control' }}
+                            </div>
+
+                        </div>
+
+                        <p><b>Владелец:</b> <span id="user-fullname"></span></p>
+                        <p><b>Телефон:</b> <span id="user-phone"></span></p>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="table-responsive no-padding">
+                            {{ formset.management_form }}
+                            <table class="table table-bordered table-hover">
+                                <thead>
+                                <tr>
+                                    <th style="min-width: 200px;">Услуга</th>
+                                    <!--<th style="min-width: 180px;">Показания</th>-->
+                                    <th style="min-width: 180px;">Расход</th>
+                                    <th style="min-width: 120px;">Ед. изм.</th>
+                                    <th style="min-width: 180px;">Цена за ед., грн.</th>
+                                    <th style="min-width: 180px;">Стоимость, грн.</th>
+                                    <th style="width: 40px; min-width: 40px;"></th>
+                                </tr>
+                                </thead>
+                                <tbody id="form-invoiceservice-rows">
+                                {% for form in formset %}
+                                <tr class="receipt-service-item">
+                                    <td>
+                                        {{ form.id }}
+                                        {{ form.service|add_class:'form-control service-select' }}
+                                    </td>
+                                    <td>
+                                        {{ form.amount|add_class:'form-control data-amount' }}
+                                    </td>
+                                    <td>
+                                        {{ form.unit|add_class:'form-control data-unit' }}
+                                    </td>
+                                    <td>
+                                        {{ form.price_unit|add_class:'form-control data-price-unit' }}
+                                    </td>
+                                    <td>
+                                        {{ form.price|add_class:'form-control data-price' }}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group float-right">
+                                            <a class="btn btn-default btn-sm delete-service" href=""
+                                               data-toggle="tooltip">
+                                                <div class="delete-block" style="display: none">{{ form.DELETE }}</div>
+                                                <i class="fa fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                </tbody>
+                                <tfoot>
+                                <tr>
+                                    <td colspan="4" valing="middle">
+                                        <button type="button"
+                                                class="btn btn-default btn-hover-change form-row-add-invoiceservice-btn">
+                                            Добавить услугу
+                                        </button>
+                                        <button type="button" class="btn btn-default set-tariff-services">
+                                            Установить все услуги согласно тарифу
+                                        </button>
+                                        <button type="button" class="btn btn-default add-counters">
+                                            Добавить показания счетчиков
+                                        </button>
+                                    </td>
+                                    <td style="min-width: 180px;">
+                                        <div class="h4">
+                                            Итого: <b><span id="price-total">0.00</span></b> грн
+                                        </div>
+                                    </td>
+                                    <td style="width: 40px; min-width: 40px;"></td>
+                                </tr>
+                                </tfoot>
+                            </table>
+                            <div class="empty-form-formset">
+                                <table>
+                                    <tr class="receipt-service-item">
+                                        <td>
+                                            {{ formset.empty_form.id }}
+                                            {{ formset.empty_form.service|add_class:'form-control service-select' }}
+                                        </td>
+                                        <td>
+                                            {{ formset.empty_form.amount|add_class:'form-control data-amount' }}
+                                        </td>
+                                        <td>
+                                            {{ formset.empty_form.unit|add_class:'form-control data-unit' }}
+                                        </td>
+                                        <td>
+                                            {{ formset.empty_form.price_unit|add_class:'form-control data-price-unit' }}
+                                        </td>
+                                        <td>
+                                            {{ formset.empty_form.price|add_class:'form-control data-price' }}
+                                        </td>
+                                        <td>
+                                            <div class="btn-group float-right">
+                                                <a class="btn btn-default btn-sm delete-service" href=""
+                                                   data-toggle="tooltip">
+                                                    <div class="delete-block" style="display: none">
+                                                        {{ formset.empty_form.DELETE }}
+                                                    </div>
+                                                    <i class="fa fa-trash"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group float-right">
+                            <a href="{% url 'receipt_list' %}" class="btn btn-default">Отменить</a>
+                            <button type="submit" class="btn btn-success" name="save-action">Сохранить</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+
+        <div class="card">
+            <div class="card-header with-border">
+                <h3 class="card-title">Показания счетчиков</h3>
+            </div>
+            <div class="card-body table-responsive no-padding">
+                <table class="table table-bordered table-hover table-striped table-nowrap">
+                    <thead>
+                    <tr>
+                        <th style="width: 125px; min-width: 125px">№</th>
+                        <th>Статус</th>
+                        <th style="width: 125px; min-width: 125px">Дата</th>
+                        <th style="width: 125px; min-width: 125px">Месяц</th>
+                        <th style="min-width: 200px">Дом</th>
+                        <th style="min-width: 160px">Секция</th>
+                        <th style="width: 110px; min-width: 110px">№ квартиры</th>
+                        <th>Счетчик</th>
+                        <th style="width: 90px; min-width: 90px">Показания</th>
+                        <th style="width: 90px; min-width: 90px">Ед. изм.</th>
+                    </tr>
+                    </thead>
+                    <tbody class="counters">
+                    {% for counter in counters %}
+                    <tr>
+                        <td>{{ counter.id }}</td>
+                        <td>{{ counter.status }}</td>
+                        <td>{{ counter.date }}</td>
+                        <td>{{ counter.date }}</td>
+                        <td>{{ counter.flat.house }}</td>
+                        <td>{{ counter.flat.section }}</td>
+                        <td>{{ counter.flat.number }}</td>
+                        <td>{{ counter.service }}</td>
+                        <td>{{ counter.indication }}</td>
+                        <td>{{ counter.service.unit }}</td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+</form>
+{% endblock %}
+{% block script %}
+<script src="{% static 'plugins/moment/moment-with-locales.min.js' %}"></script>
+<script src="{% static 'plugins/daterangepicker/daterangepicker.js' %}"></script>
+<script src="{% static 'dist/js/section_flat.js' %}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hogan.js/3.0.2/hogan.min.js"
+        integrity="sha512-F6j8lc1UBrmZHqUGreg4gNVVMCehTbf/LU0s/nnsQJYVeFSdpci+fcL48gsTd1Fbf08sD/kL+is2QiEssvJ70g=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<script>
+    $('.nav-link.active').removeClass('active');
+        $('.nav-link').find('p:contains("Квитанции на оплату")').parents('.nav-link').addClass('active');
+    let date = $('#id_date').daterangepicker({
+    "singleDatePicker": true,
+    "showDropdowns": true,
+        "startDate": parseInt(moment().format('YYYY-MM-DD'),10),
+    "opens": "center",
+        locale: {
+      format: 'YYYY-MM-DD'
+    }
+}, function(start, end, label) {
+  console.log('New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')');
+});
+    let date_from = $('#id_date_from').daterangepicker({
+    "singleDatePicker": true,
+    "showDropdowns": true,
+        "startDate": parseInt(moment().format('YYYY-MM-DD'),10),
+    "opens": "center",
+        locale: {
+      format: 'YYYY-MM-DD'
+    }
+}, function(start, end, label) {
+  console.log('New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')');
+});
+    let date_to = $('#id_date_to').daterangepicker({
+    "singleDatePicker": true,
+    "showDropdowns": true,
+        "startDate": parseInt(moment().format('YYYY-MM-DD'),10),
+    "opens": "center",
+        locale: {
+      format: 'YYYY-MM-DD'
+    }
+}, function(start, end, label) {
+  console.log('New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')');
+});
+    $('#id_house').on('change', function(){
+           let house = $(this).val();
+           get_sections_flats(house);
+        });
+        $('#id_section').on('change', function(){
+           let section = $(this).val();
+           get_flats(section);
+        });
+        $('#id_flat').on('change', function (){
+            get_owner($(this).val());
+            get_counters($(this).val());
+        });
+    let get_total_price = function (){
+        let prices = $('.data-price');
+        let total = 0.0;
+        prices.each(function( i ) {
+            if ($(this).val() != ''){
+                total += parseFloat($(this).val());
+            }
+        });
+        console.log(total);
+        return total;
+    }
+
+    let new_form = function (){
+            let total_forms = $('#id_receiptservice_set-TOTAL_FORMS').val();
+            $('#id_receiptservice_set-TOTAL_FORMS').val(parseInt(total_forms)+1);
+            let new_form = $(".empty-form-formset .receipt-service-item").first().clone();
+            let new_form_id = new_form.find('#id_receiptservice_set-__prefix__-id');
+            new_form_id.attr('name', new_form_id.attr('name').replace('__prefix__', total_forms));
+            new_form_id.attr('id', new_form_id.attr('id').replace('__prefix__', total_forms));
+
+            let new_form_service = new_form.find('#id_receiptservice_set-__prefix__-service');
+            new_form_service.attr('name', new_form_service.attr('name').replace('__prefix__', total_forms));
+            new_form_service.attr('id', new_form_service.attr('id').replace('__prefix__', total_forms));
+
+            let new_form_amount = new_form.find('#id_receiptservice_set-__prefix__-amount');
+            new_form_amount.attr('name', new_form_amount.attr('name').replace('__prefix__', total_forms));
+            new_form_amount.attr('id', new_form_amount.attr('id').replace('__prefix__', total_forms));
+
+            let new_form_unit = new_form.find('#id_receiptservice_set-__prefix__-unit');
+            new_form_unit.attr('name', new_form_unit.attr('name').replace('__prefix__', total_forms));
+            new_form_unit.attr('id', new_form_unit.attr('id').replace('__prefix__', total_forms));
+
+            let new_form_price_unit = new_form.find('#id_receiptservice_set-__prefix__-price_unit');
+            new_form_price_unit.attr('name', new_form_price_unit.attr('name').replace('__prefix__', total_forms));
+            new_form_price_unit.attr('id', new_form_price_unit.attr('id').replace('__prefix__', total_forms));
+
+            let new_form_price = new_form.find('#id_receiptservice_set-__prefix__-price');
+            new_form_price.attr('name', new_form_price.attr('name').replace('__prefix__', total_forms));
+            new_form_price.attr('id', new_form_price.attr('id').replace('__prefix__', total_forms));
+            
+            let new_form_delete = new_form.find('#id_receiptservice_set-__prefix__-DELETE');
+            console.log(new_form_delete)
+            new_form_delete.attr('name', new_form_delete.attr('name').replace('__prefix__', total_forms));
+            new_form_delete.attr('id', new_form_delete.attr('id').replace('__prefix__', total_forms));
+
+            $('#form-invoiceservice-rows').append(new_form);
+        }
+    $('.form-row-add-invoiceservice-btn').on('click', function (e){
+        e.preventDefault();
+        if($('#id_tariff').val()==''){
+            alert("Выберите тариф");
+        }else{
+            new_form();
+        }
+    });
+    $('.set-tariff-services').on('click', function (e){
+        e.preventDefault();
+        if($('#id_tariff').val()==''){
+            alert("Выберите тариф");
+            return
+        }
+        let services = $('#id_receiptservice_set-__prefix__-service option');
+        for(let i=1;i<services.length;i++){
+
+
+            new_form();
+            let service_value = $(services[i]).attr('value');
+            let service_select = $('#form-invoiceservice-rows .receipt-service-item').last().find('.service-select');
+            $(service_select).val(service_value).trigger('change');
+        }
+
+    });
+
+    $('#form-invoiceservice-rows').on('change', '.service-select', function (){
+        let service = $(this).val();
+        let tariff = $('#id_tariff').val();
+        let parent = $(this).parents('tr');
+        $.ajax({
+            headers: { "X-CSRFToken": '{{ csrf_token }}' },
+                type: "GET",
+                url: '/admin_app/get_service',
+                data: {'service': service, 'tariff': tariff},
+                contentType: 'json/application',
+                success: function(response){
+                    let answer = JSON.parse(response);
+                    console.log(answer);
+                    parent.find('.data-unit').val(answer['service']['unit']);
+                    parent.find('.data-price-unit').val(answer['service']['unit_price'])
+                },
+                error: function (responce){
+                    console.log('error get_service');
+                    console.log(parent.find('.delete-service')[0].click())
+                }
+        });
+    });
+    $('#form-invoiceservice-rows').on('keyup', '.data-amount', function (){
+        let amount = parseFloat($(this).val());
+        let parent = $(this).parents('tr');
+        let price_unit = parseFloat(parent.find('.data-price-unit').val());
+        let price = amount*price_unit;
+        console.log(price);
+        if(price != NaN){
+            parent.find('.data-price').val(price.toFixed(2));
+        }else{
+            parent.find('.data-price').val('0');
+        }
+        $('#price-total').text(get_total_price());
+    });
+
+    $('#form-invoiceservice-rows').on('click', '.delete-service', function (e) {
+        e.preventDefault();
+        console.log($(this).find('.delete-block'));
+        $(this).find('.delete-block input[type=checkbox]').attr("checked", "checked");
+        $(this).parents('.receipt-service-item').css("display", "none");
+        $(this).parents('.receipt-service-item').addClass('deleted');
+    });
+
+
+    {% if update is True %}
+            let section = $('#id_section').val();
+            let flat = $('#id_flat').val();
+            get_sections_flats($('#id_house').val(), section, flat);
+             get_owner(flat);
+             $('#tariff-url').text($('#id_tariff option:selected').text());
+             $('#id_tariff').parent().parent().css('display', 'none');
+
+        {% elif flat_id %}
+            $('#id_flat').trigger('change');
+        {% else %}
+            $('#id_section').empty().append($('<option>'));
+            $('#id_flat').empty().append($('<option>'));
+            let num = parseInt(moment().format('DD/MM/YYYY HH:mm').toString().replace(/\D+/g,""));
+            console.log(num);
+            $('#id_id').val(num);
+        {% endif %}
+
+
+</script>
+{% endblock %}

@@ -207,9 +207,8 @@
             let section = $('#id_section').val();
             let flat = $('#id_flat').val();
             get_sections_flats({{bankbook.house_id}}, {{bankbook.section_id}}, {{bankbook.id}});
+            $('#id_house').append($('<option>', { value : {{house.id}}, selected : 'selected' }).text('{{house.name}}'));
             get_owner({{bankbook.id}})
-
-
         {% else %}
             $('#id_section').empty().append($('<option>'));
             $('#id_flat').empty().append($('<option>'));

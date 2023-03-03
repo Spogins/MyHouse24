@@ -24,6 +24,32 @@ def index(request):
     return render(request, 'admin_app/statistic.html')
 
 
+class FilterMixin(MultipleObjectMixin):
+    def get_queryset(self, *args, **kwargs):
+        qs = super().get_queryset(*args, **kwargs)
+        get_params = self.request.GET.dict()
+        logger.info(get_params)
+        if any(get_params):
+            if 'date_range' in get_params and get_params['date_range'] != '':
+                date_range = get_params['date_range'].split(' - ')
+                qs = qs.filter(date__range=date_range)
+            get_params.pop('date_range', None)
+            for param, value in get_params.items():
+                if param != 'q' and value != '':
+                    logger.info(param)
+                    qs = qs.filter(**{param: value})
+        return qs
+
+    def get_form_kwargs(self, *args, **kwargs):
+        # use GET parameters as the data
+        kwargs = super().get_form_kwargs(*args, **kwargs)
+        if self.request.method == 'GET':
+            kwargs.update({
+                'data': self.request.GET,
+            })
+        return kwargs
+
+
 class CreateService(CreateView):
     template_name = 'admin_app/settings/services.html'
 
@@ -540,10 +566,19 @@ class ContactPageView(CreateView):
         return self.render_to_response(context)
 
 
-class OwnerList(ListView):
+class OwnerList(FormMixin, ListView):
     model = Owner
     form_class = OwnerFilterForm
     template_name = 'admin_app/owner/index.html'
+
+    def get_form_kwargs(self, *args, **kwargs):
+        # use GET parameters as the data
+        kwargs = super().get_form_kwargs(*args, **kwargs)
+        if self.request.method == 'GET':
+            kwargs.update({
+                'data': self.request.GET,
+            })
+        return kwargs
 
 
 class CreateOwner(CreateView):
@@ -646,7 +681,7 @@ class MessageCreate(CreateView):
     pass
 
 
-class HouseList(ListView):
+class HouseList(FormMixin, FilterMixin, ListView):
     model = House
     form_class = HouseFilterForm
     template_name = 'admin_app/house/index.html'
@@ -753,7 +788,7 @@ def delete_house(request, house_id):
     return redirect('/admin_app/house_list')
 
 
-class FlatList(ListView):
+class FlatList(FormMixin, ListView):
     model = Flat
     template_name = 'admin_app/flat/index.html'
     form_class = FlatFilterForm
@@ -794,7 +829,7 @@ class CreateFlat(CreateView):
             bankbook.save()
         else:
             flat.save()
-        return redirect('admin_app/flat_list')
+        return redirect('/admin_app/flat_list')
 
     def form_invalid(self, form):
         context = {
@@ -810,7 +845,9 @@ class UpdateFlat(UpdateView):
     def get_context_data(self, **kwargs):
         form = FlatCreateForm(instance=Flat.objects.get(id=self.kwargs['pk']))
         context = {
-            'form': form
+            'form': form,
+            'bankbook': BankBook.objects.get(flat_id=self.kwargs['pk']),
+            "update": True,
         }
         return context
 
@@ -849,7 +886,43 @@ def delete_flat(request, pk):
     return redirect('/admin_app/flat_list')
 
 
-class CounterView(ListView):
+def get_account_debts():
+    balances = []
+    for bankbook in BankBook.objects.filter(status='Активен'):
+        if bankbook.balance() < 0:
+            balances.append(math.fabs(bankbook.balance()))
+    return balances
+
+
+def get_account_balance():
+    balances = []
+    for bankbook in BankBook.objects.filter(status='Активен'):
+        if bankbook.balance() > 0:
+            balances.append(math.fabs(bankbook.balance()))
+    return balances
+
+
+def get_state_cashbox():
+    expenses = str(CashBox.objects.filter(type='расход').aggregate(Sum('amount_of_money')).get('amount_of_money__sum'))
+    incomes = str(CashBox.objects.filter(type='приход').aggregate(Sum('amount_of_money')).get('amount_of_money__sum'))
+    print('incomes: ' + incomes, ' expenses: ' + expenses)
+    try:
+        return float(incomes) - float(expenses)
+    except ValueError:
+        return None
+
+
+class StatisticMixin(MultipleObjectMixin):
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super(StatisticMixin, self).get_context_data(**kwargs)
+        context['account_debts'] = sum(get_account_debts())
+        context['account_balance'] = sum(get_account_balance())
+        context['state_cashbox'] = get_state_cashbox()
+        return context
+
+
+class CounterView(FilterMixin, FormMixin, ListView):
     model = Counter
     template_name = 'admin_app/counter/index.html'
     form_class = CounterFilterForm
@@ -869,7 +942,7 @@ def filter_flat_counter(flat, params):
     return counters
 
 
-class FlatCounterList(ListView):
+class FlatCounterList(FormMixin, ListView):
     model = Flat
     template_name = 'admin_app/counter/flat_counter.html'
     form_class = FlatCounterFilterForm
@@ -959,7 +1032,7 @@ class UpdateCounter(UpdateView):
         flat = Flat.objects.get(id=instance.flat_id)
         context = {"form": form,
                    "update": True,
-                   "house": flat.house_id
+                   "house": House.objects.get(id=flat.house_id)
                    }
         return context
 
@@ -988,10 +1061,32 @@ def delete_counter(request, counter_id):
     return redirect('/admin_app/counter_list')
 
 
-class CashBoxList(ListView):
+class CashBoxMixin(MultipleObjectMixin):
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        total_income = CashBox.objects.filter(status=True, type='приход').\
+            aggregate(Sum('amount_of_money')).get('amount_of_money__sum', 0.00)
+        total_expenses = CashBox.objects.filter(status=True, type='расход').\
+            aggregate(Sum('amount_of_money')).get('amount_of_money__sum', 0.00)
+        context['total_income'] = total_income if total_income else 0
+        context['total_expenses'] = total_expenses if total_expenses else 0
+        return context
+
+
+class CashBoxList(StatisticMixin, FormMixin, FilterMixin, CashBoxMixin, ListView):
     model = CashBox
     template_name = 'admin_app/cash_box/index.html'
     form_class = CashBoxFilterForm
+
+    def get_form_kwargs(self):
+        # use GET parameters as the data
+        kwargs = super().get_form_kwargs()
+        if self.request.method == 'GET':
+            kwargs.update({
+                'data': self.request.GET,
+            })
+        return kwargs
 
 
 class CashBoxDetail(DetailView):
@@ -1080,10 +1175,35 @@ def delete_cash_box(request, cash_box_id):
     return redirect('/admin_app/cashbox_list')
 
 
-class BankBookList(ListView):
+class BankBookList(StatisticMixin, FormMixin, ListView):
     model = BankBook
     template_name = 'admin_app/bank_book/index.html'
     form_class = BankBookFilterForm
+
+    def get_queryset(self):
+        qs = super(BankBookList, self).get_queryset()
+        get_params = self.request.GET.dict()
+        logger.info(get_params)
+        if any(get_params):
+            if get_params['id'] != '':
+                qs = qs.filter(id__icontains=get_params['id'])
+                del get_params['id']
+                logger.info(get_params)
+            for param, value in get_params.items():
+                if param != 'q' and value != '':
+                    logger.info(param)
+                    qs = qs.filter(**{param: value})
+        return qs
+
+    def get_form_kwargs(self):
+        # use GET parameters as the data
+        kwargs = super().get_form_kwargs()
+        if self.request.method == 'GET':
+            kwargs.update({
+                'data': self.request.GET,
+            })
+        return kwargs
+
 
 
 class CreateBankBook(CreateView):
@@ -1109,7 +1229,8 @@ class UpdateBankBook(UpdateView):
     def get_context_data(self, **kwargs):
         instance = BankBook.objects.get(id=self.kwargs['pk'])
         form = BankbookCreateForm(instance=instance)
-        context = {'form': form, 'update': True, 'bankbook': Flat.objects.get(id=instance.flat_id)}
+        flat = Flat.objects.get(id=instance.flat_id)
+        context = {'form': form, 'update': True, 'bankbook': flat, "house": House.objects.get(id=flat.house_id)}
         return context
 
     def post(self, request, *args, **kwargs):
@@ -1142,20 +1263,133 @@ def get_owner(request):
             response = {'id': owner.user_id, 'fullname': owner.fullname(), 'phone': owner.phone}
         return JsonResponse(json.dumps({'owner': response}), safe=False)
 
+
 def export_bankbook(request):
     pass
+
+
 def get_bankbooks(request):
     if is_ajax(request):
         bankbooks = BankBook.objects.filter(flat__owner_id=request.GET.get('owner')).values('id')
         return JsonResponse(json.dumps({'bankbooks': list(bankbooks)}), safe=False)
 
 
-class ReceiptList(ListView):
-    pass
+def get_receipt_service_data(service: Service, tariff: Tariff):
+    unit = service.unit_id
+    try:
+        unit_price = service.tariffservice_set.get(tariff_id=tariff.id).price
+    except TariffService.DoesNotExist:
+        unit_price = None
+    return {'unit': unit, 'unit_price': unit_price}
 
+
+def get_service(request):
+    if is_ajax(request):
+        if TariffService.objects.get(service_id=request.GET.get('service'), tariff_id=request.GET.get('tariff')):
+            service = Service.objects.get(id=request.GET.get('service'))
+            tariff = Tariff.objects.get(id=request.GET.get('tariff'))
+            response = get_receipt_service_data(service, tariff)
+            return JsonResponse(json.dumps({'service': response}), safe=False)
+
+
+def get_counters(request):
+    if is_ajax(request):
+        print(request.GET.get('flat'), '55555555555')
+        counters = Counter.objects.filter(flat_id=request.GET.get('flat')).\
+            values('id', 'status', 'date', 'flat__house__name', 'flat__section__name', 'flat__number',
+                   'service', 'indication', 'service__unit')
+        return JsonResponse({'counters': list(counters)}, safe=False)
+
+
+class ReceiptList(FormMixin, FilterMixin, StatisticMixin, ListView):
+    model = Receipt
+    form_class = ReceiptFilterForm
+    template_name = 'admin_app/receipt/index.html'
+
+    def get_form_kwargs(self, *args, **kwargs):
+        # use GET parameters as the data
+        kwargs = super().get_form_kwargs(*args, **kwargs)
+        if self.request.method == 'GET':
+            kwargs.update({
+                'data': self.request.GET,
+            })
+        return kwargs
 
 
 class CreateReceipt(CreateView):
-    pass
+    model = Receipt
+    template_name = 'admin_app/receipt/update.html'
+
+    def get_context_data(self, **kwargs):
+        form = ReceiptCreateForm()
+        formset = ReceiptServiceFormSet(prefix='receiptservice_set')
+        counters = Counter.objects.all()
+
+        context = {
+            'form': form,
+            'formset': formset,
+            'counters': counters,
+
+        }
+        return context
+
+    def post(self, request, *args, **kwargs):
+        created = ReceiptCreateForm(request.POST)
+        if created.is_valid():
+            created.save(commit=False)
+            formset = ReceiptServiceFormSet(request.POST, instance=created.instance)
+            if formset.is_valid():
+                created.save()
+                formset.save()
+                return redirect('/admin_app/receipt_list')
 
 
+class UpdateReceipt(UpdateView):
+    model = Receipt
+    template_name = 'admin_app/receipt/update.html'
+
+    def get_context_data(self, **kwargs):
+        instance = Receipt.objects.get(id=self.kwargs['pk'])
+        form = ReceiptCreateForm(instance=instance)
+        formset = ReceiptServiceFormSet(instance=instance, prefix='receiptservice_set')
+        counters = Counter.objects.filter(flat_id=instance.flat_id)
+
+        context = {
+            'form': form,
+            'formset': formset,
+            'counters': counters,
+            'update': True
+        }
+        return context
+
+    def post(self, request, *args, **kwargs):
+        instance = Receipt.objects.get(id=self.kwargs['pk'])
+        created = ReceiptCreateForm(request.POST, instance=instance)
+        if created.is_valid():
+            created.save(commit=False)
+            formset = ReceiptServiceFormSet(request.POST, instance=created.instance)
+            if formset.is_valid():
+                created.save()
+                formset.save()
+                return redirect('/admin_app/receipt_list')
+
+
+class ReceiptDetail(DetailView):
+    model = Receipt
+    template_name = 'admin_app/receipt/detail.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(ReceiptDetail, self).get_context_data(**kwargs)
+        receipt = self.get_object()
+        context['total'] = receipt.receiptservice_set.all(). \
+            aggregate(Sum('price')).get('price__sum', 0.00)
+        return context
+
+
+def delete_receipt(request, receipt_id=None):
+    if receipt_id:
+        Receipt.objects.get(id=receipt_id).delete()
+    else:
+        logger.info(request.POST)
+        Receipt.objects.filter(id__in=request.POST.getlist('ids[]')).delete()
+    return redirect('/admin_app/receipt_list')

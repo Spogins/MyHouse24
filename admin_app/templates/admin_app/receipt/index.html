@@ -1,0 +1,189 @@
+{% extends 'admin_app/base.html' %}
+{% load widget_tweaks %}
+{% load static %}
+{% block header %}
+      <link rel="stylesheet" href="{% static 'plugins/daterangepicker/daterangepicker.css'%}">
+{% endblock %}
+{% block content %}
+        <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+              <div class="col-sm-6">
+                <h1>Квитанции на оплату</h1>
+              </div>
+              <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                  <li class="breadcrumb-item"><a href="/admin_app">Главная</a></li>
+                  <li class="breadcrumb-item active">Квитанции</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+        </section>
+
+    <section class="content">
+        <div class="row mt-2">
+            <div class="col-xs-12 col-md-9">
+                <div class="row">
+                    <div class="col-xs-12 col-md-4">
+                        <div class="small-box bg-green overflow-hidden">
+                            <div class="inner">
+                                <h3>{{ state_cashbox }} грн</h3>
+                                <p>Состояние кассы</p>
+                            </div>
+                            <div class="icon">
+                                <i class="fa fa-dollar"></i>
+                            </div>
+                            <!--<span class="small-box-footer">&nbsp;</span>-->
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-md-4">
+                        <div class="small-box bg-blue overflow-hidden">
+                            <div class="inner">
+                                <h3>{{ account_balance|floatformat:2 }} грн</h3>
+                                <p>Баланс по счетам</p>
+                            </div>
+                            <div class="icon">
+                                <i class="fa fa-dollar"></i>
+                            </div>
+                            <!--<span class="small-box-footer">&nbsp;</span>-->
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-md-4">
+                        <div class="small-box bg-red overflow-hidden">
+                            <div class="inner">
+                                <h3>{{ account_debts|floatformat:2 }} грн</h3>
+                                <p>Задолженность по счетам</p>
+                            </div>
+                            <div class="icon">
+                                <i class="fa fa-dollar"></i>
+                            </div>
+                            <!--<span class="small-box-footer">&nbsp;</span>-->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-md-3">
+                <div class="btn-group float-right margin-bottom mt-2 mr-5 mb-2">
+                    <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Выберите действие <span class="caret"></span>
+                    </button>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="{% url 'create_receipt' %}">Создать общую квитанцию</a>
+                        <a class="dropdown-item delete-receipts" href="">Удалить</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-xs-12 col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-tools">
+                            <a href="{% url 'receipt_list' %}" class="btn btn-default btn-sm">
+                                <span class="hidden-sm">Очистить</span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-bordered table-hover sorting-table" data-filter-control="true" >
+                            <thead>
+                                <tr>
+                                    <th><input type="checkbox" class="select-on-check-all"></th>
+                                    <th>№ квитанции</th>
+                                    <th>Статус</th>
+                                    <th>Дата</th>
+                                    <th>Месяц</th>
+                                    <th>Квартира</th>
+                                    <th>Владелец</th>
+                                    <th>Проведена</th>
+                                    <th>Сумма (грн.)</th>
+                                    <th style="width: 114px; min-width: 114px">&nbsp;</th>
+                                </tr>
+                            <tr id="w0-filters" class="filters">
+                                <form method="get" id="filter-form">
+                                    <td></td>
+                                    <td>{{ form.id }}</td>
+                                    <td>{{ form.status }}</td>
+                                    <td>{{ form.date_range }}</td>
+                                    <td></td>
+                                    <td>{{ form.flat__number }}</td>
+                                    <td>{{ form.flat__owner_id }}</td>
+                                    <td>{{ form.is_checked }}</td>
+                                    <td></td>
+                                    <td></td>
+                                </form>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <form id="delete-form" action="{% url 'delete_receipts' %}" method="post">
+                            {% csrf_token %}
+                            {% for receipt in receipt_list %}
+                                <tr class="clickable-row" href="{% url 'detail_receipt' receipt.id %}">
+                                <td><input type="checkbox"name="ids[]" class="checkbox-item" value="{{ receipt.id }}"></td>
+                                    <td>{{ receipt.id }}</td>
+                                <td>{{ receipt.status }}</td>
+                                    <td>{{ receipt.date }}</td>
+                                    <td>{{ receipt.date }}</td>
+                                    <td>{{ receipt.flat }}</td>
+                                    <td>{{ receipt.flat.owner }}</td>
+                                    <td>{% if receipt.is_checked is True %}Проведена{% else %}Не проведена{% endif %}</td>
+                                    <td>{{ receipt.get_price }}</td>
+                                    <td>
+                                        <div class="btn-group float-right">
+                                            <a class="btn btn-default btn-sm" href="{% url 'update_receipt' receipt.id %}" title="Редактировать" data-toggle="tooltip"><i class="fas fa-pencil-alt"></i></a>
+                                            <a class="btn btn-default btn-sm" href="{% url 'delete_receipt' receipt.id %}" title="Удалить" data-toggle="tooltip" data-pjax="0" data-method="post"><i class="fa fa-trash"></i></a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </form>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+{% block script %}
+    <script src="{% static 'plugins/moment/moment-with-locales.min.js' %}"></script>
+    <script src="{% static 'plugins/daterangepicker/daterangepicker.js' %}"></script>
+    <script>
+
+    $('.nav-link.active').removeClass('active');
+        $('.nav-link').find('p:contains("Квитанции на оплату")').parents('.nav-link').addClass('active');
+
+        $('#id_id, #id_status, #id_date_range, #id_flat__number, #id_flat__owner_id, #id_is_checked').on('change', function (){
+            console.log('change');
+            $('#filter-form').submit();
+        });
+
+        $('.delete-receipts').on('click', function (e){
+            e.preventDefault();
+            $('#delete-form').submit();
+        });
+
+        let date = $('#id_date_range').daterangepicker({
+            "autoUpdateInput": false,
+    "showDropdowns": true,
+    "opens": "center",
+        locale: {
+      format: 'YYYY-MM-DD'
+    }
+}, function(start, end, label) {
+  console.log('New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')');
+});
+        $('#id_date_range').on('apply.daterangepicker', function(ev, picker) {
+      $(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format('YYYY-MM-DD'));
+      $(this).trigger('change');
+  });
+
+        $('#id_date_range').on('cancel.daterangepicker', function(ev, picker) {
+  //do something, like clearing an input
+  $('#id_date_range').val('');
+  $(this).trigger('change');
+});
+    </script>
+{% endblock %}

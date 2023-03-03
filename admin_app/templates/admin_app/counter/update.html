@@ -161,7 +161,7 @@
                             $('#id_section').append($('<option>', { value : sections[i]['id'], selected : 'selected' }).text(sections[i]['name']));
                         }
                         else{
-                            $('#id_section').append($('<option>', { value : sections[i]['id'] }).text(sections[i]['name']));
+                            $('#id_section').append($('<option>', { value : sections[i]['id'], selected : 'selected' }).text(sections[i]['name']));
                         }
                     }
 
@@ -215,7 +215,8 @@
         {% if update is True %}
             let section = $('#id_section').val();
             let flat = $('#id_flat').val();
-            get_sections_flats({{house}}, section, flat);
+            $('#id_house').append($('<option>', { value : {{house.id}}, selected : 'selected' }).text('{{house.name}}'));
+            get_sections_flats({{house.id}}, section, flat);
         {% else %}
             {% if get_params %}
                 $('#id_house').val('{{ get_params.house }}');

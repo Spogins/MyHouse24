@@ -73,8 +73,6 @@ urlpatterns = [
     path('detail_cashbox/<str:pk>', CashBoxDetail.as_view(), name='detail_cashbox'),
     path('delete_cashbox/<str:cash_box_id>', delete_cash_box, name='delete_cashbox'),
 
-    path('receipt_list', ReceiptList.as_view(), name='receipt_list'),
-
     path('bankbook_list', BankBookList.as_view(), name='bankbook_list'),
     path('get_bankbooks', get_bankbooks, name='get_bankbooks'),
     path('create_bankbook', CreateBankBook.as_view(), name='create_bankbook'),
@@ -82,7 +80,14 @@ urlpatterns = [
     path('detail_bankbook/<str:pk>', BankbookDetail.as_view(), name='detail_bankbook'),
     path('delete_bankbook/<str:bankbook_id>', delete_bankbook, name='delete_bankbook'),
     path('export_bankbook', export_bankbook, name='export_bankbook'),
-
+    path('get_service', get_service, name='get_service'),
     path('get_owner', get_owner, name='get_owner'),
+
+    path('receipt_list', ReceiptList.as_view(), name='receipt_list'),
+    path('delete_receipts', delete_receipt, name='delete_receipts'),
+    path('delete_receipt/<str:receipt_id>', delete_receipt, name='delete_receipt'),
     path('create_receipt', CreateReceipt.as_view(), name='create_receipt'),
+    path('update_receipt/<str:pk>', UpdateReceipt.as_view(), name='update_receipt'),
+    path('detail_receipt/<str:pk>', ReceiptDetail.as_view(), name='detail_receipt'),
+    path('get_counters', get_counters, name='get_counters'),
 ]

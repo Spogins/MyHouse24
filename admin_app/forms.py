@@ -234,7 +234,7 @@ class FlatCreateForm(forms.ModelForm):
         widget=forms.Select(attrs={'class': 'form-control'}))
     bank_book = forms.ModelChoiceField(
         required=False,
-        queryset=BankBook.objects.filter(flat_id=None, status='Активен'),
+        queryset=BankBook.objects.filter(status='Активен'),
         label='Лицевой счет',
         empty_label='Выберите...',
         widget=forms.Select(attrs={'class': 'form-control'}))
@@ -361,6 +361,49 @@ class BankbookCreateForm(forms.ModelForm):
         fields = '__all__'
 
 
+class ReceiptFilterForm(forms.Form):
+    id = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
+    status = forms.ChoiceField(choices=Receipt.Status.choices,
+                               widget=forms.Select(attrs={'class': 'form-control'}))
+    date_range = forms.CharField(max_length=20, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    flat__number = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
+    flat__owner_id = forms.ModelChoiceField(queryset=Owner.objects.all(), empty_label='',
+                                            widget=forms.Select(attrs={'class': 'form-control'}))
+    is_checked = forms.ChoiceField(choices=(('', ''), (True, 'Проведена'), (False, 'Не проведена')),
+                                   widget=forms.Select(attrs={'class': 'form-control'}))
+
+
+class ReceiptCreateForm(forms.ModelForm):
+    house = forms.ModelChoiceField(
+        label='Дом',
+        queryset=House.objects.all(), empty_label='Выберите...',
+        widget=forms.Select(attrs={'class': 'form-control'}))
+    section = forms.ModelChoiceField(
+        required=False,
+        queryset=Section.objects.all(),
+        label='Секция',
+        empty_label='Выберите...',
+        widget=forms.Select(attrs={'class': 'form-control'}))
+    bankbook = forms.CharField(label='Лицевой счет', required=False, widget=forms.TextInput(attrs={'class': 'form-control'}))
+
+    class Meta:
+        model = Receipt
+        exclude = ['services']
+
+
+class ReceiptServiceForm(forms.ModelForm):
+    service = forms.ModelChoiceField(
+        required=False,
+        queryset=Service.objects.all(),
+        label='Услуга',
+        empty_label='Выберите...',
+        widget=forms.Select(attrs={'class': 'form-control'}))
+
+    class Meta:
+        model = ReceiptService
+        fields = '__all__'
+
+
 ServiceFormset = modelformset_factory(model=Service, form=ServiceForm, extra=0)
 UnitFormset = modelformset_factory(model=Unit, form=UnitForm, extra=0)
 TariffServiceFormSet = modelformset_factory(model=TariffService, form=TariffServiceForm, extra=0)
@@ -374,3 +417,4 @@ ServiceBlockFormSet = modelformset_factory(model=ServiceBlock, form=ServiceBlock
 SectionFormSet = inlineformset_factory(House, Section, form=SectionForm, extra=0)
 LevelFormSet = inlineformset_factory(House, Level, form=LevelForm, extra=0)
 HouseUserFormSet = inlineformset_factory(House, House.users.through, form=HouseUserForm, extra=0)
+ReceiptServiceFormSet = inlineformset_factory(Receipt, ReceiptService, form=ReceiptServiceForm, extra=0, can_delete=True)

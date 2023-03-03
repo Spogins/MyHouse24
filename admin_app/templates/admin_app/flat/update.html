@@ -5,13 +5,13 @@
     <div class="container-fluid">
         <div class="row mb-2">
             <div class="col-sm-6">
-                <h1>Новая квартира</h1>
+                <h1>{%if update%}Редактирование квартиры{%else%}Новая квартира{%endif%}</h1>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                     <li class="breadcrumb-item"><a href="/admin_app">Главная</a></li>
                     <li class="breadcrumb-item"><a href="{% url 'flat_list' %}">Квартиры</a></li>
-                    <li class="breadcrumb-item active">Новая квартира</li>
+                    <li class="breadcrumb-item active">{%if update %}Редактирование квартиры{%else%}Новая квартира{%endif%}</li>
                 </ol>
             </div>
         </div>
@@ -144,7 +144,7 @@
                             $('#id_section').append($('<option>', { value : sections[i]['id'], selected : 'selected' }).text(sections[i]['name']));
                         }
                         else{
-                            $('#id_section').append($('<option>', { value : sections[i]['id'] }).text(sections[i]['name']));
+                            $('#id_section').append($('<option>', { value : sections[i]['id'], selected : 'selected' }).text(sections[i]['name']));
                         }
                     }
 
@@ -156,7 +156,7 @@
                             $('#id_level').append($('<option>', {value: levels[i]['id'], selected : 'selected'}).text(levels[i]['name']));
                         }
                         else{
-                            $('#id_level').append($('<option>', {value: levels[i]['id']}).text(levels[i]['name']));
+                            $('#id_level').append($('<option>', {value: levels[i]['id'], selected : 'selected'}).text(levels[i]['name']));
                         }
                     }
                 },
@@ -175,6 +175,7 @@
             let section = $('#id_section').val();
             let level = $('#id_level').val();
             get_sections_levels($('#id_house').val(), section, level);
+            $('#id_bank_book').append($('<option>', {value: {{bankbook.id}}, selected : 'selected'}).text({{bankbook.id}}));
         {% else %}
             $('#id_section').empty().append($('<option>'));
             $('#id_level').empty().append($('<option>'));

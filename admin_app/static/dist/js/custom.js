@@ -34,7 +34,7 @@ function get_counters(flat){
     $.ajax({
         headers: { "X-CSRFToken": '{{ csrf_token }}' },
         type: "GET",
-        url: '/admin/get_counters',
+        url: '/admin_app/get_counters',
         data: {'flat': flat},
         contentType: 'json/application',
         success: function(response){

@@ -2,7 +2,7 @@ let get_sections_flats = function(house, section=undefined, flat=undefined){
         $.ajax({
             headers: { "X-CSRFToken": '{{ csrf_token }}' },
                 type: "GET",
-                url: '/admin/get_section_flat',
+                url: '/admin_app/get_section_flat',
                 data: {'house': house},
                 contentType: 'json/application',
                 success: function(response){
@@ -40,7 +40,7 @@ let get_sections_flats = function(house, section=undefined, flat=undefined){
             $.ajax({
                 headers: { "X-CSRFToken": '{{ csrf_token }}' },
                 type: "GET",
-                url: '/admin/get_flats',
+                url: '/admin_app/get_flats',
                 data: {'section': section},
                 contentType: 'json/application',
                 success: function(response){
@@ -63,7 +63,7 @@ let get_sections_flats = function(house, section=undefined, flat=undefined){
         $.ajax({
             headers: { "X-CSRFToken": '{{ csrf_token }}' },
                 type: "GET",
-                url: '/admin/get_owner',
+                url: '/admin_app/get_owner',
                 data: {'flat': flat},
                 contentType: 'json/application',
                 success: function(response){
@@ -85,7 +85,7 @@ let get_sections_flats = function(house, section=undefined, flat=undefined){
             $.ajax({
                 headers: { "X-CSRFToken": '{{ csrf_token }}' },
                 type: "GET",
-                url: '/admin/get_flats_by_owner',
+                url: '/admin_app/get_flats_by_owner',
                 data: {'owner': owner},
                 contentType: 'json/application',
                 success: function(response){
@@ -109,7 +109,7 @@ let get_sections_flats = function(house, section=undefined, flat=undefined){
             $.ajax({
                 headers: { "X-CSRFToken": '{{ csrf_token }}' },
                 type: "GET",
-                url: '/admin/get_flats',
+                url: '/admin_app/get_flats',
                 data: {'level': level},
                 contentType: 'json/application',
                 success: function(response){
@@ -133,7 +133,7 @@ let get_sections_flats = function(house, section=undefined, flat=undefined){
             $.ajax({
                 headers: { "X-CSRFToken": '{{ csrf_token }}' },
                 type: "GET",
-                url: '/admin/get_section_level',
+                url: '/admin_app/get_section_level',
                 data: {'house': house},
                 contentType: 'json/application',
                 success: function(response){

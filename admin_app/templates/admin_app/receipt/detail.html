@@ -1,0 +1,184 @@
+{% extends 'admin_app/base.html' %}
+{% load widget_tweaks %}
+{% load static %}
+{% block content %}
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+              <div class="col-sm-6">
+                <h1>Квитанция</h1>
+              </div>
+              <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                  <li class="breadcrumb-item"><a href="/admin_app">Главная</a></li>
+                  <li class="breadcrumb-item"><a href="{% url 'receipt_list' %}">Квитанции</a></li>
+                    <li class="breadcrumb-item active">Квитанция, №{{ receipt.id }}</li>
+                </ol>
+              </div>
+            </div>
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-xs-12 col-md-7 col-lg-6">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="input-group">
+                                  <div class="input-group-prepend">
+                                    <span class="input-group-text">№</span>
+                                  </div>
+                                  <div class="form-control">{{ receipt.id }}</div>
+                                </div>
+                                <div class="label-mid ml-1 mr-1">от</div>
+                                <div class="input-group date">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text"><i class="fa fa-calendar-alt"></i></div>
+                                    </div>
+                                    <div class="form-control">{{ receipt.date }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+          </div>
+    </section>
+    <section class="content">
+        <div class="card">
+            <div class="card-header">
+            <div class="card-tools">
+                <a href="" class="btn btn-default btn-sm">
+                    <span>Печать</span>
+                </a>
+                <a href="" class="btn btn-default btn-sm">
+                    <span>Отправить на e-mail</span>
+                </a>
+                <a href="{% url 'update_receipt' receipt.id %}" class="btn btn-primary btn-sm">
+                    <span class="hidden-xs">Редактировать квитанцию</span>
+                </a>
+            </div>
+        </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12">
+                        <table class="table table-bordered table-striped table-view">
+                            <tbody>
+                                <tr>
+                                    <td>Проведена</td>
+                                    <td>
+                                        <small class="">{% if receipt.is_checked %}Проведена{% else %}Не проведена{% endif %}</small>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Статус</td>
+                                    <td>
+                                        <small class="">{{ receipt.status }}</small>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Период</td>
+                                    <td>
+                                        {{ receipt.date_from }} - {{receipt.date_to}}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Владелец</td>
+                                    <td>
+                                        {% if receipt.flat and receipt.flat.owner %}
+                                        <a href="{% url 'detail_owner' receipt.flat.owner_id %}">
+                                            {{ receipt.flat.owner }}
+                                        </a>
+                                        {% else %}
+                                            Не задано
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Лицевой счет</td>
+                                    <td>
+                                        {% if receipt.flat and receipt.flat.bankbook_set.first %}
+                                        <a href="{% url 'detail_bankbook' receipt.flat.bankbook_set.first.id %}">
+                                                {{ receipt.flat.bankbook_set.first }}
+                                        </a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Телефон</td>
+                                    <td>{{ receipt.flat.owner.phone }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Дом</td>
+                                    <td>
+                                        {% if receipt.flat and receipt.flat.house %}
+                                        <a href="{% url 'detail_house' receipt.flat.house_id %}">
+                                            {{ receipt.flat.house }}
+                                        </a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Квартира</td>
+                                    <td>
+                                        {% if receipt.flat %}
+                                        <a href="{% url 'detail_flat' receipt.flat_id %}">
+                                            {{ receipt.flat.number }}
+                                        </a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Секция</td>
+                                    <td>{{ receipt.flat.section }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Тариф</td>
+                                    <td>
+                                        {% if receipt.flat and receipt.flat.tariff %}
+                                        <a href="{% url 'update_tariff' receipt.flat.tariff_id %}">
+                                            {{ receipt.flat.tariff }}
+                                        </a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    <div class="table-responsive no-padding margin-top-15">
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th style="width: 40px; min-width: 40px;">#</th>
+                                    <th>Услуга</th>
+                                    <th>Количество потребления (расход)</th>
+                                    <th style="width: 80px; min-width: 80px;">Ед. изм.</th>
+                                    <th>Цена за ед., грн</th>
+                                    <th>Стоимость, грн</th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="5"></td>
+                                    <td colspan="2"><b>Итого: {{ total }}</b></td>
+                                </tr>
+                            </tfoot>
+                <tbody>
+                {% for service in receipt.receiptservice_set.all %}
+                    <tr role="row">
+                            <td>{{ service.id }}</td>
+                            <td>{{ service.service }}</td>
+                            <td>{{ service.amount }}</td>
+                            <td>{{ service.unit }}</td>
+                            <td>{{ service.price_unit }}</td>
+                            <td>{{ service.price }}</td>
+                        </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+{% block script %}
+    <script>
+    $('.nav-link.active').removeClass('active');
+        $('.nav-link').find('p:contains("Квитанции на оплату")').parents('.nav-link').addClass('active');
+    </script>
+{% endblock %}
