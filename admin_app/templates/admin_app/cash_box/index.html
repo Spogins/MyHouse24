@@ -84,7 +84,7 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <table class="table table-bordered table-hover sorting-table" data-filter-control="true" >
+                        <table id='notoriety-table' class="table table-bordered table-hover sorting-table" data-filter-control="true" >
                             <thead>
                                 <tr>
                                     <th>№</th>
@@ -98,28 +98,33 @@
                                     <th style="width: 114px; min-width: 114px">&nbsp;</th>
                                 </tr>
                             <tr id="w0-filters" class="filters">
-                                <form method="get" id="filter-form">
-                                    <td>{{ form.id }}</td>
+
+                                    <td >{{ form.id }}</td>
                                     <td>{{ form.date_range }}</td>
-                                    <td>{{ form.status }}</td>
+                                    <td id="status">{{ form.status }}</td>
                                 <td>{{ form.payment_type_id }}</td>
                                 <td>{{ form.bankbook__flat__owner_id }}</td>
                                 <td>{{ form.bankbook_id }}</td>
                                 <td>{{ form.type }}</td>
                                 <td></td>
                                     <td></td>
-                                </form>
+
                             </tr>
                             </thead>
                             <tbody>
-                            {% for cashbox in cashbox_list %}
+                            {% for cashbox in page_obj %}
                                 <tr class="clickable-row" href="{% url 'detail_cashbox' cashbox.id %}">
                                     <td>{{ cashbox.id }}</td>
                                     <td>{{ cashbox.date }}</td>
                                     <td>{% if cashbox.status is True %}Проведен{% else %}Не проведен{% endif %}</td>
                                     <td>{{ cashbox.payment_type }}</td>
+                                    {% if cashbox.type == 'приход' %}
                                     <td>{{ cashbox.bankbook.flat.owner }}</td>
                                     <td>{{ cashbox.bankbook }}</td>
+                                    {% else %}
+                                    <td>(не задано)</td>
+                                    <td>(не задано)</td>
+                                    {% endif %}
                                     <td><span class="{% if cashbox.type == 'приход' %}text-green{% else %}text-red{% endif %}">{{ cashbox.type }}</span></td>
                                     <td><span class="{% if cashbox.type == 'приход' %}text-green{% else %}text-red{% endif %}">{% if cashbox.type == 'расход' %}-{% endif %}{{ cashbox.amount_of_money }}</span></td>
                                     <td>
@@ -133,6 +138,10 @@
                             </tbody>
                         </table>
                     </div>
+
+
+
+
                     <div class="card-footer">
                         <div>Проведен приход: <span class="text-bold">{{ total_income }} грн</span></div>
                         <div>Проведен расход: <span class="text-bold">{{ total_expenses }} грн</span></div>
@@ -148,14 +157,43 @@
     $('.nav-link.active').removeClass('active');
         $('.nav-link').find('p:contains("Касса")').parents('.nav-link').addClass('active');
 
-        $('#id_id, #id_flat__house_id, #id_section, #id_flat__number').on('change', function (){
-            console.log('change');
-            $('#filter-form').submit();
-        });
+    $(document).ready(function () {
+        $('#notoriety-table').DataTable({
+            ordering: true,
+            dom: 'rtp',
+            language: {
+                paginate: {
+                    "previous": "<<",
+                    "next": ">>"
+                }
+            },
 
-        $('#id_id, #id_status, #id_date_range, #id_payment_type_id, #id_bankbook__flat__owner_id, #id_bankbook_id, #id_type').on('change', function (){
-            console.log('change');
-            $('#filter-form').submit();
+            columnDefs: [
+                {orderable: false, targets: 0},
+                {orderable: true, targets: 1},
+                {orderable: false, targets: 2},
+                {orderable: false, targets: 3},
+                {orderable: false, targets: 4},
+                {orderable: false, targets: 5},
+                {orderable: false, targets: 6},
+                {orderable: false, targets: 7},
+                {orderable: false, targets: 8},
+            ],
+            initComplete: function () {
+                this.api()
+                    .columns()
+                    .every(function () {
+                        let that = this;
+                            console.log(12123)
+                        $('#id_id, #id_status, #id_date_range, #id_payment_type_id, #id_bankbook__flat__owner_id, #id_bankbook_id, #id_type', this.header()).on('keyup change clear', function () {
+
+                            if (that.search() !== this.value) {
+                                that.search(this.value).draw();
+                            }
+                        });
+                    });
+            },
         });
+    })
     </script>
 {% endblock %}

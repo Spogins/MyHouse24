@@ -83,7 +83,7 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <table class="table table-bordered table-hover sorting-table" data-filter-control="true" >
+                        <table id="receipt-table" class="table table-bordered table-hover sorting-table" data-filter-control="true" >
                             <thead>
                                 <tr>
                                     <th>№</th>
@@ -96,7 +96,7 @@
                                     <th style="width: 114px; min-width: 114px">&nbsp;</th>
                                 </tr>
                             <tr id="w0-filters" class="filters">
-                                <form method="get" id="filter-form">
+
                                     <td>{{ form.id }}</td>
                                     <td>{{ form.status }}</td>
                                     <td>{{ form.flat__number }}</td>
@@ -105,11 +105,11 @@
                                 <td>{{ form.flat__owner_id }}</td>
                                 <td></td>
                                 <td></td>
-                                </form>
+
                             </tr>
                             </thead>
                             <tbody>
-                            {% for bankbook in bankbook_list %}
+                            {% for bankbook in page_obj %}
                                 <tr class="clickable-row" href="{% url 'detail_bankbook' bankbook.id %}">
                                     <td>{{ bankbook.id }}</td>
 
@@ -134,7 +134,9 @@
                             {% endfor %}
                             </tbody>
                         </table>
+
                     </div>
+
                 </div>
             </div>
         </div>
@@ -146,9 +148,32 @@
     $('.nav-link.active').removeClass('active');
         $('.nav-link').find('p:contains("Лицевые счета")').parents('.nav-link').addClass('active');
 
-        $('#id_id, #id_flat__house_id, #id_section, #id_flat__number, #id_status, #id_flat__owner_id').on('change', function (){
-            console.log('change');
-            $('#filter-form').submit();
+
+            $(document).ready(function () {
+        $('#receipt-table').DataTable({
+            ordering: false,
+            dom: 'rtp',
+            language: {
+                paginate: {
+                    "previous": "<<",
+                    "next": ">>"
+                }
+            },
+
+            initComplete: function () {
+                this.api()
+                    .columns()
+                    .every(function () {
+                        let that = this;
+
+                        $('#id_id, #id_flat__house_id, #id_section, #id_flat__number, #id_status, #id_flat__owner_id', this.header()).on('keyup change clear', function () {
+                            if (that.search() !== this.value) {
+                                that.search(this.value).draw();
+                            }
+                        });
+                    });
+            },
         });
+    })
     </script>
 {% endblock %}

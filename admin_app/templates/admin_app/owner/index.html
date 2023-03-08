@@ -102,6 +102,16 @@
                             {% endfor %}
                             </tbody>
                         </table>
+                           <div class="row" style="display: flex; justify-content: flex-end;">
+                   <ul class="pagination">
+                              <li class="page-item"><a class="page-link" href="?page=1"> << </a></li>
+                              {%for p in page_obj.paginator.page_range%}
+                            <li class="page-item"><a class="page-link" href="?page={{p}}">{{p}}</a></li>
+                            {%endfor%}
+                         <li class="page-item"> <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}"> >> </a></li>
+                        </ul>
+                    </div>
+                    </div>
                     </div>
                 </div>
             </div>

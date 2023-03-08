@@ -324,3 +324,28 @@ class CashBox(models.Model):
     amount_of_money = models.DecimalField('Сумма(грн)', decimal_places=2, max_digits=10)
     manager = models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True, blank=True)
     comment = models.TextField("Комментарий", null=True, blank=True)
+
+
+class MasterRequest(models.Model):
+    date = models.DateField()
+    time = models.TimeField()
+    flat = models.ForeignKey(Flat, on_delete=models.CASCADE, verbose_name="Квартира")
+
+    class TypeMaster(models.TextChoices):
+        anyone = 'Любой специалист', _('Любой специалист')
+        plumber = 'Сантехник', _('Сантехник')
+        electrician = 'Электрик', _('Электрик')
+        locksmith = 'Слесарь', _('Слесарь')
+        __empty__ = _('')
+
+    class Status(models.TextChoices):
+        new = 'новое', _('новое')
+        process = 'в процессе', _('в процессе')
+        complete = 'выполнено', _('выполнено')
+        __empty__ = _('')
+
+    type = models.CharField("Тип мастера", choices=TypeMaster.choices, max_length=30)
+    status = models.CharField("Статус", choices=Status.choices, max_length=30, default='новое', blank=True)
+    master = models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='Мастер')
+    description = models.TextField("Описание")
+    comment = models.TextField("Комментарий", null=True, blank=True)

@@ -1,0 +1,165 @@
+{% extends 'admin_app/base.html' %}
+{% load static %}
+{% block header %}
+      <link rel="stylesheet" href="{% static 'plugins/daterangepicker/daterangepicker.css'%}">
+{% endblock %}
+{% block content %}
+        <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+              <div class="col-sm-6">
+                <h1>Заявки вызова мастера</h1>
+              </div>
+              <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                  <li class="breadcrumb-item"><a href="/admin_app">Главная</a></li>
+                  <li class="breadcrumb-item active">Заявки вызова мастера</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+    </section>
+
+     <section class="content">
+        <div class="row">
+            <div class="col-xs-12 col-md-12">
+                <div class="float-right mb-2 mt-2">
+                    <a href="{% url 'create_master_request' %}" class="btn btn-success">Добавить заявку</a>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12 col-md-12">
+                <div class="card">
+                <div class="card-header">
+                    <div class="card-tools">
+                    <a href="{% url 'master_request_list' %}" class="btn btn-default btn-sm">
+                        <span class="hidden-sm">Очистить</span>
+                    </a>
+                </div>
+                </div>
+                    <div class="card-body">
+                    <form method="get" id="filter-form">
+                        <table class="table table-bordered table-hover sorting-table" data-filter-control="true" >
+                            <thead>
+                                <tr>
+                                    <th>№ заявки</th>
+                                    <th>Удобное время</th>
+                                    <th>Тип мастера</th>
+                                    <th>Описание</th>
+                                    <th>Квартира</th>
+                                    <th>Владелец</th>
+                                    <th>Телефон</th>
+                                    <th>Мастер</th>
+                                    <th>Статус</th>
+                                    <th style="width: 114px; min-width: 114px">&nbsp;</th>
+                                </tr>
+                            <tr id="w0-filters" class="filters">
+
+                                <td>{{ form.id }}</td>
+                                <td>{{ form.date_range }}</td>
+                                <td>{{ form.type }}</td>
+                                <td>{{ form.description }}</td>
+                                <td>{{ form.flat__number }}</td>
+                                <td>{{ form.flat__owner_id }}</td>
+                                <td>{{ form.flat__owner_phone }}</td>
+                                <td>{{ form.master_id }}</td>
+                                <td>{{ form.status }}</td>
+                                <td></td>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for masterrequest in masterrequest_list %}
+                                <tr class="clickable-row" href="{% url 'detail_master_request' masterrequest.id %}">
+                                    <td>{{ masterrequest.id }}</td>
+                                    <td>{{ masterrequest.date }} - {{ masterrequest.time }}</td>
+                                    <td>{{ masterrequest.type }}</td>
+                                    <td>{{ masterrequest.description }}</td>
+                                    <td>{{ masterrequest.flat }}</td>
+                                    <td>{{ masterrequest.flat.owner }}</td>
+                                    <td>{{ masterrequest.flat.owner.phone }}</td>
+                                    <td>{{ masterrequest.master }}</td>
+                                    <td>
+                                        {% if masterrequest.status == 'новое' %}
+                                            <small class="badge badge-primary">{{ masterrequest.status }}</small>
+                                        {% elif masterrequest.status == 'в процессе' %}
+                                            <small class="badge badge-warning">{{ masterrequest.status }}</small>
+                                        {% else %}
+                                            <small class="badge badge-success">{{ masterrequest.status }}</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group float-right">
+                                            <a class="btn btn-default btn-sm" href="{% url 'update_master_request' masterrequest.id %}" title="Редактировать" data-toggle="tooltip"><i class="fas fa-pencil-alt"></i></a>
+                                            <a class="btn btn-default btn-sm" href="{% url 'delete_master_request' masterrequest.id %}" title="Удалить"><i class="fa fa-trash"></i></a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                              <div class="row" style="display: flex; justify-content: flex-end;">
+                   <ul class="pagination">
+                              <li class="page-item"><a class="page-link" href="?page=1"> << </a></li>
+                              {%for p in page_obj.paginator.page_range%}
+                            <li class="page-item"><a class="page-link" href="?page={{p}}">{{p}}</a></li>
+                            {%endfor%}
+                         <li class="page-item"> <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}"> >> </a></li>
+                        </ul>
+                    </div>
+                    </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+     </section>
+{% endblock %}
+{% block script %}
+       <script src="{% static 'plugins/moment/moment-with-locales.min.js' %}"></script>
+    <script src="{% static 'plugins/daterangepicker/daterangepicker.js' %}"></script>
+    <script>
+
+    $('.nav-link.active').removeClass('active');
+        $('.nav-link').find('p:contains("Заявки вызова мастера")').parents('.nav-link').addClass('active');
+
+        $('#id_id, #id_date_range, #id_type, #id_description, #id_flat__number, #id_flat__owner_id, #id_flat__owner_phone, #id_master_id, #id_status').on('change', function (){
+            console.log('change');
+            $('#filter-form').submit();
+        });
+
+        let date = $('#id_date_range').daterangepicker({
+            "autoUpdateInput": false,
+    "showDropdowns": true,
+    "opens": "center",
+        locale: {
+      format: 'YYYY-MM-DD'
+    }
+}, function(start, end, label) {
+  console.log('New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')');
+});
+        $('#id_date_range').on('apply.daterangepicker', function(ev, picker) {
+      $(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format('YYYY-MM-DD'));
+      $(this).trigger('change');
+  });
+
+        $('#id_date_range').on('cancel.daterangepicker', function(ev, picker) {
+  //do something, like clearing an input
+  $('#id_date_range').val('');
+  $(this).trigger('change');
+});
+
+                $(".sorting-table").DataTable({
+          "responsive": true, "lengthChange": false, "autoWidth": false, "searching": false, "paging": false,
+            "bInfo" : false, "bSortCellsTop": true,
+          "buttons": [],
+            rowReorder: true,
+            columnDefs: [
+            { orderable: true, className: 'reorder', targets: 0 },
+                { orderable: true, className: 'reorder', targets: 1 },
+                { orderable: true, className: 'reorder', targets: 2 },
+            { orderable: false, targets: '_all' }
+        ]
+        }).buttons().container().appendTo('.sorting-table_wrapper .col-md-6:eq(0)');
+
+    </script>
+{% endblock %}

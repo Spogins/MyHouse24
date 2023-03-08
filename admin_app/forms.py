@@ -245,12 +245,16 @@ class FlatCreateForm(forms.ModelForm):
 
 
 class CounterFilterForm(forms.Form):
-    flat__house_id = forms.ModelChoiceField(queryset=House.objects.all(), empty_label='',
-                                            widget=forms.Select(attrs={'class': 'form-control', 'data-number': '1'}))
-    section = forms.ChoiceField(widget=forms.Select(attrs={'class': 'form-control', 'data-number': '2'}))
+    flat__house = [(f'{x.name}', f'{x.name}') for x in House.objects.all()]
+    flat__house.insert(0, ('', ''))
+    services = [(f'{x.name}', f'{x.name}') for x in Service.objects.all()]
+    services.insert(0, ('', ''))
+    sections = [(f'{x.name}', f'{x.name}') for x in Section.objects.all()]
+    sections.insert(0, ('', ''))
+    flat__house_id = forms.ChoiceField(choices=flat__house, widget=forms.Select(attrs={'class': 'form-control', 'data-number': '1'}))
+    section = forms.ChoiceField(choices=sections, widget=forms.Select(attrs={'class': 'form-control', 'data-number': '2'}))
     flat__number = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'data-number': '3'}))
-    service = forms.ModelChoiceField(queryset=Service.objects.all(), empty_label='',
-                                     widget=forms.Select(attrs={'class': 'form-control', 'data-number': '4'}))
+    service = forms.ChoiceField(choices=services, widget=forms.Select(attrs={'class': 'form-control', 'data-number': '4'}))
 
 
 class CounterCreateForm(forms.ModelForm):
@@ -278,14 +282,21 @@ class FlatCounterFilterForm(CounterFilterForm):
 
 
 class CashBoxFilterForm(forms.Form):
+    payment_type = [(f'{x.name}', f'{x.name}') for x in PaymentItems.objects.all()]
+    payment_type.insert(0, ('', ''))
+    bankbook__flat__owner = [(f'{x}', f'{x}') for x in Owner.objects.all()]
+    bankbook__flat__owner.insert(0, ('', ''))
+    bankbook__flat__owner.insert(1, ('(не задано)', '(не задано)'))
+
+
     id = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
     date_range = forms.CharField(max_length=20, widget=forms.TextInput(attrs={'class': 'form-control'}))
-    status = forms.ChoiceField(choices=(('', ''), (True, 'Проведен'), (False, 'Не проведен')),
+    status = forms.ChoiceField(choices=(('', ''), ('Проведен', 'Проведен'), ('Не проведен', 'Не проведен')),
                                widget=forms.Select(attrs={'class': 'form-control'}))
-    payment_type_id = forms.ModelChoiceField(queryset=PaymentItems.objects.all(), empty_label='',
-                                             widget=forms.Select(attrs={'class': 'form-control'}))
-    bankbook__flat__owner_id = forms.ModelChoiceField(queryset=Owner.objects.all(), empty_label='',
-                                                      widget=forms.Select(attrs={'class': 'form-control'}))
+    payment_type_id =forms.ChoiceField(choices=payment_type, widget=forms.Select(attrs={'class': 'form-control'}))
+
+    bankbook__flat__owner_id = forms.ChoiceField(choices=bankbook__flat__owner, widget=forms.Select(attrs={'class': 'form-control'}))
+
     bankbook_id = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
     type = forms.ChoiceField(choices=CashBox.Types.choices, widget=forms.Select(attrs={'class': 'form-control'}))
 
@@ -333,15 +344,18 @@ class CashBoxExpenseCreateForm(forms.ModelForm):
 
 
 class BankBookFilterForm(forms.Form):
+    flat__house = [(f'{x.name}', f'{x.name}') for x in House.objects.all()]
+    flat__house.insert(0, ('', ''))
+    flat__owner = [(f'{x}', f'{x}') for x in Owner.objects.all()]
+    flat__owner.insert(0, ('', ''))
     id = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
     status = forms.ChoiceField(choices=BankBook.Status.choices, widget=forms.Select(attrs={'class': 'form-control',
                                                                                            'data-number': '2'}))
-    flat__house_id = forms.ModelChoiceField(queryset=House.objects.all(), empty_label='',
-                                            widget=forms.Select(attrs={'class': 'form-control'}))
+    flat__house_id = forms.ChoiceField(choices=flat__house, widget=forms.Select(attrs={'class': 'form-control'}))
     section = forms.ChoiceField(widget=forms.Select(attrs={'class': 'form-control'}))
     flat__number = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
-    flat__owner_id = forms.ModelChoiceField(queryset=Owner.objects.all(), empty_label='',
-                                            widget=forms.Select(attrs={'class': 'form-control'}))
+
+    flat__owner_id = forms.ChoiceField(choices=flat__owner, widget=forms.Select(attrs={'class': 'form-control'}))
 
 
 class BankbookCreateForm(forms.ModelForm):
@@ -362,13 +376,14 @@ class BankbookCreateForm(forms.ModelForm):
 
 
 class ReceiptFilterForm(forms.Form):
+    flat__owner = [(f'{x}', f'{x}') for x in Owner.objects.all()]
+    flat__owner.insert(0, ('', ''))
     id = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
     status = forms.ChoiceField(choices=Receipt.Status.choices,
                                widget=forms.Select(attrs={'class': 'form-control'}))
     date_range = forms.CharField(max_length=20, widget=forms.TextInput(attrs={'class': 'form-control'}))
     flat__number = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
-    flat__owner_id = forms.ModelChoiceField(queryset=Owner.objects.all(), empty_label='',
-                                            widget=forms.Select(attrs={'class': 'form-control'}))
+    flat__owner_id = forms.ChoiceField(choices=flat__owner, widget=forms.Select(attrs={'class': 'form-control'}))
     is_checked = forms.ChoiceField(choices=(('', ''), (True, 'Проведена'), (False, 'Не проведена')),
                                    widget=forms.Select(attrs={'class': 'form-control'}))
 
@@ -401,6 +416,44 @@ class ReceiptServiceForm(forms.ModelForm):
 
     class Meta:
         model = ReceiptService
+        fields = '__all__'
+
+
+class MasterRequestFilterForm(forms.Form):
+    id = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
+    date_range = forms.CharField(max_length=20, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    type = forms.ChoiceField(choices=MasterRequest.TypeMaster.choices,
+                             widget=forms.Select(attrs={'class': 'form-control'}))
+    description = forms.CharField(max_length=20, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    flat__number = forms.CharField(max_length=20, widget=forms.NumberInput(attrs={'class': 'form-control'}))
+    flat__owner_id = forms.ModelChoiceField(queryset=Owner.objects.all(), empty_label='',
+                                            widget=forms.Select(attrs={'class': 'form-control'}))
+    flat__owner_phone = forms.CharField(max_length=20, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    master_id = forms.ModelChoiceField(queryset=Profile.objects.all(), empty_label='',
+                                       widget=forms.Select(attrs={'class': 'form-control'}))
+    status = forms.ChoiceField(choices=MasterRequest.Status.choices,
+                               widget=forms.Select(attrs={'class': 'form-control'}))
+
+
+class FlatModelChoiceField(forms.ModelChoiceField):
+    def label_from_instance(self, obj):
+        return obj.number + ', ' + obj.house.name
+
+
+class MasterRequestForm(forms.ModelForm):
+    owner = forms.ModelChoiceField(
+        required=False,
+        label='Владелец',
+        queryset=Owner.objects.all(), empty_label='Выберите...',
+        widget=forms.Select(attrs={'class': 'form-control'}))
+    flat = FlatModelChoiceField(
+        label='Квартира',
+        queryset=Flat.objects.all(), empty_label='Выберите...',
+        widget=forms.Select(attrs={'class': 'form-control'}),
+    )
+
+    class Meta:
+        model = MasterRequest
         fields = '__all__'
 
 

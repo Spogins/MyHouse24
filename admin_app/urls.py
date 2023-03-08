@@ -90,4 +90,10 @@ urlpatterns = [
     path('update_receipt/<str:pk>', UpdateReceipt.as_view(), name='update_receipt'),
     path('detail_receipt/<str:pk>', ReceiptDetail.as_view(), name='detail_receipt'),
     path('get_counters', get_counters, name='get_counters'),
+
+    path('master_request_list', MasterRequestList.as_view(), name='master_request_list'),
+    path('create_master_request', MasterRequestCreate.as_view(), name='create_master_request'),
+    path('update_master_request/<int:pk>', MasterRequestUpdate.as_view(), name='update_master_request'),
+    path('detail_master_request/<int:pk>', MasterRequestDetail.as_view(), name='detail_master_request'),
+    path('delete_master_request/<str:pk>', delete_master_request, name='delete_master_request'),
 ]

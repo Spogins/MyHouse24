@@ -491,9 +491,26 @@
              get_owner(flat);
              $('#tariff-url').text($('#id_tariff option:selected').text());
              $('#id_tariff').parent().parent().css('display', 'none');
-
-        {% elif flat_id %}
+            $('#id_house').append($('<option>', { value : {{house.id}}, selected : 'selected' }).text('{{house.name}}'));
+            $('#id_section').append($('<option>', { value : {{section.id}}, selected : 'selected' }).text('{{section.name}}'));
+        {% elif update_flat %}
             $('#id_flat').trigger('change');
+            $('#id_flat').append($('<option>', { value : {{flat.id}}, selected : 'selected' }).text('{{flat.number}}'));
+            let section = {{flat.section_id}};
+            let flat = {{flat.id}};
+            get_sections_flats($('#id_house').val(), section, flat);
+             get_owner(flat);
+             $('#tariff-url').text($('#id_tariff option:selected').text());
+         
+
+            $('#id_house').append($('<option>', { value : {{house.id}}, selected : 'selected' }).text('{{house.name}}'));
+            $('#id_section').append($('<option>', { value : {{section.id}}, selected : 'selected' }).text('{{section.name}}'));
+
+             $('#id_flat').trigger('change');
+              let num = parseInt(moment().format('DD/MM/YYYY HH:mm').toString().replace(/\D+/g,""));
+            console.log(num);
+            $('#id_id').val(num);
+
         {% else %}
             $('#id_section').empty().append($('<option>'));
             $('#id_flat').empty().append($('<option>'));

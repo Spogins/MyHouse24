@@ -188,10 +188,18 @@
            get_bankbooks(owner);
     });
         {% if update is True %}
+            $('#id_owner').append($('<option>', {value: {{owner.user_id}}, selected : 'selected'}).text('{{owner}}'));
+
         {% else %}
             let num = parseInt(moment().format('DD/MM/YYYY HH:mm').toString().replace(/\D+/g,""));
             $('#id_id').val(num);
         {% endif %}
+
+        {% if flat_create is True %}
+            $('#id_owner').append($('<option>', {value: {{owner.user_id}}, selected : 'selected'}).text('{{owner}}'));
+            $('#id_bankbook').append($('<option>', {value: {{bankbook.id}}, selected : 'selected'}).text({{bankbook.id}}));
+        {% endif %}
+
 
 </script>
 {% endblock %}

@@ -1,0 +1,95 @@
+{% extends 'admin_app/base.html' %}
+{% load widget_tweaks %}
+{% block content %}
+        <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+              <div class="col-sm-6">
+                <h1>Заявка №{{ masterrequest.id }}</h1>
+              </div>
+              <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                  <li class="breadcrumb-item"><a href="/admin_app">Главная</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'master_request_list' %}">Заявки мастера</a></li>
+                    <li class="breadcrumb-item active">заявка №{{ masterrequest.id }}</li>
+                </ol>
+              </div>
+            </div>
+
+            <div class="row">
+                        <div class="col-xs-12 col-md-7 col-lg-6">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="input-group date">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text"><i class="fa fa-calendar-alt"></i></div>
+                                    </div>
+                                    <div class="form-control">{{ masterrequest.date }}</div>
+                                </div>
+                                <div class="label-mid ml-1 mr-1">от</div>
+                                <div class="input-group time">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text"><i class="far fa-clock"></i></div>
+                                    </div>
+                                    <div class="form-control">{{ masterrequest.time }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+          </div>
+    </section>
+
+    <section class="content">
+
+        <div class="row">
+            <div class="col-xs-12 col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-tools">
+                            <a href="{% url 'update_master_request' masterrequest.id %}" class="btn btn-primary btn-sm">
+                                <span class="hidden-xs">Редактировать заявку</span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="row">
+                    <div class="card-body col-lg-5">
+                         <table class="table table-bordered table-striped table-view">
+                             <tr>
+                                 <td>Статус</td>
+                                 <td>{{ masterrequest.status }}</td>
+                             </tr>
+                             <tr>
+                                 <td>Владелец</td>
+                                 <td><a href="{% if masterrequest.flat.owner %}{% url 'detail_owner' masterrequest.flat.owner_id %}{% endif %}">{{ masterrequest.flat.owner.user.email }}</a></td>
+                             </tr>
+                             <tr>
+                                 <td>Телефон</td>
+                                 <td>{{ masterrequest.flat.owner.phone }}</td>
+                             </tr>
+                             <tr>
+                                 <td>Квартира</td>
+                                 <td><a href="{% url 'detail_flat' masterrequest.flat_id %}">{{ masterrequest.flat.number }}, {{ masterrequest.flat.house.name }}</a></td>
+                             </tr>
+                             <tr>
+                                 <td>Тип мастерп</td>
+                                 <td>{{ masterrequest.type }}</td>
+                             </tr>
+                             <tr>
+                                 <td>Описание</td>
+                                 <td>{{ masterrequest.description }}</td>
+                             </tr>
+                         </table>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+{% block script %}
+
+    <script>
+
+    $('.nav-link.active').removeClass('active');
+        $('.nav-link').find('p:contains("Заявки вызова мастера")').parents('.nav-link').addClass('active');
+    </script>
+{% endblock %}

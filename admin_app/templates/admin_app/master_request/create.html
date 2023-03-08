@@ -1,0 +1,174 @@
+{% extends 'admin_app/base.html' %}
+{% load widget_tweaks %}
+{% load static %}
+{% block header %}
+      <link rel="stylesheet" href="{% static 'plugins/daterangepicker/daterangepicker.css'%}">
+    <link rel="stylesheet" href="{% static 'dist/css/timepicker.min.css' %}">
+{% endblock %}
+{% block content %}
+    <form method="post" enctype="multipart/form-data">
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+              <div class="col-sm-6">
+                <h1>Новая заявка</h1>
+              </div>
+              <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                  <li class="breadcrumb-item"><a href="/admin_app">Главная</a></li>
+                  <li class="breadcrumb-item"><a href="{% url 'master_request_list' %}">Заявки</a></li>
+                    <li class="breadcrumb-item active">Новая заявка</li>
+                </ol>
+              </div>
+            </div>
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-xs-12 col-md-7 col-lg-6">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="input-group date">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text"><i class="fa fa-calendar-alt"></i></div>
+                                    </div>
+                                    {{ form.date|add_class:"form-control" }}
+                                </div>
+                                <div class="label-mid ml-1 mr-1">от</div>
+                                <div class="input-group time">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text"><i class="far fa-clock"></i></div>
+                                    </div>
+                                    {{ form.time|add_class:"form-control" }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+          </div>
+    </section>
+    <section class="content">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-xs-12 col-md-6">
+                        <div class="col-xs-12 col-md-8">
+                            <label class=" requiredField">
+                                Владелец квартиры
+                            </label>
+                            <div class="input-group">
+                                {{ form.owner|add_class:"form-control" }}
+                            </div>
+
+                        </div>
+
+                    </div>
+                    <div class="col-xs-12 col-md-6"></div>
+                    <div class="col-xs-12 col-md-6">
+                        <div class="col-xs-12 col-md-8">
+                            <label class=" requiredField">
+                                Описание
+                            </label>
+                            <div class="input-group">
+                               {{ form.description|add_class:"form-control" }}
+                            </div>
+
+                        </div>
+
+                    </div>
+                    <div class="col-xs-12 col-md-6">
+                        <div class="col-xs-12 col-md-8">
+                            <label class=" requiredField">
+                                Квартира
+                            </label>
+                            <div class="input-group">
+                                {{ form.flat|add_class:"form-control" }}
+                            </div>
+
+                        </div>
+                        <div class="col-xs-12 col-md-8">
+                            <label class=" requiredField">
+                                Тип
+                            </label>
+                            <div class="input-group">
+                                {{ form.type|add_class:"form-control" }}
+                            </div>
+
+                        </div>
+                        <div class="col-xs-12 col-md-8">
+                            <label class=" requiredField">
+                                Статаус
+                            </label>
+                            <div class="input-group">
+                                {{ form.status|add_class:"form-control" }}
+                            </div>
+
+                        </div>
+                        <div class="col-xs-12 col-md-8">
+                            <label class=" requiredField">
+                                Мастер
+                            </label>
+                            <div class="input-group">
+                                {{ form.master|add_class:"form-control" }}
+                            </div>
+
+                        </div>
+
+
+
+
+                    </div>
+                    <div class="col-xs-12 col-md-12">
+                        <div class="col-xs-12 col-md-8">
+                            <label class=" requiredField">
+                                Коментарий
+                            </label>
+                            <div class="input-group">
+                                {{ form.comment|add_class:"form-control" }}
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group float-right">
+                            <a href="{% url 'master_request_list' %}" class="btn btn-default">Отменить</a>
+                            <button type="submit" class="btn btn-success" name="save-action">Сохранить</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    </form>
+{% endblock %}
+{% block script %}
+    <script src="{% static 'plugins/moment/moment-with-locales.min.js' %}"></script>
+    <script src="{% static 'plugins/daterangepicker/daterangepicker.js' %}"></script>
+    <script src="{% static 'dist/js/timepicker.min.js'%}"></script>
+    <script src="{% static 'dist/js/section_flat.js' %}"></script>
+
+    <script>
+
+    $('.nav-link.active').removeClass('active');
+        $('.nav-link').find('p:contains("Заявки вызова мастера")').parents('.nav-link').addClass('active');
+
+    let date = $('#id_date').daterangepicker({
+    "singleDatePicker": true,
+    "showDropdowns": true,
+        "startDate": parseInt(moment().format('DD.MM.YYYY'),10),
+    "opens": "center",
+        locale: {
+      format: 'DD.MM.YYYY'
+    }
+}, function(start, end, label) {
+  console.log('New date range selected: ' + start.format('DD.MM.YYYY') + ' to ' + end.format('DD.MM.YYYY') + ' (predefined range: ' + label + ')');
+});
+    $('#id_time').val(moment().format('HH:mm'),10);
+    $('#id_time').timepicker();
+
+    $('#id_owner').on('change', function (){
+        get_flats_by_owner($(this).val());
+    });
+
+    </script>
+{% endblock %}

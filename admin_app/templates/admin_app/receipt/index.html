@@ -87,7 +87,7 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <table class="table table-bordered table-hover sorting-table" data-filter-control="true" >
+                        <table id="receipt-table" class="table table-bordered table-hover sorting-table" data-filter-control="true" >
                             <thead>
                                 <tr>
                                     <th><input type="checkbox" class="select-on-check-all"></th>
@@ -102,7 +102,7 @@
                                     <th style="width: 114px; min-width: 114px">&nbsp;</th>
                                 </tr>
                             <tr id="w0-filters" class="filters">
-                                <form method="get" id="filter-form">
+
                                     <td></td>
                                     <td>{{ form.id }}</td>
                                     <td>{{ form.status }}</td>
@@ -113,7 +113,7 @@
                                     <td>{{ form.is_checked }}</td>
                                     <td></td>
                                     <td></td>
-                                </form>
+
                             </tr>
                             </thead>
                             <tbody>
@@ -123,7 +123,15 @@
                                 <tr class="clickable-row" href="{% url 'detail_receipt' receipt.id %}">
                                 <td><input type="checkbox"name="ids[]" class="checkbox-item" value="{{ receipt.id }}"></td>
                                     <td>{{ receipt.id }}</td>
-                                <td>{{ receipt.status }}</td>
+                                    <td>
+
+                                        {% if receipt.status == 'оплачена' %}
+                                        <small class="badge badge-success">{{ receipt.status }}</small>
+                                        {% else %}
+                                        <small class="badge badge-danger">{{ receipt.status }}</small>
+                                        {% endif %}
+
+                                    </td>
                                     <td>{{ receipt.date }}</td>
                                     <td>{{ receipt.date }}</td>
                                     <td>{{ receipt.flat }}</td>
@@ -141,6 +149,7 @@
                             </form>
                             </tbody>
                         </table>
+
                     </div>
                 </div>
             </div>
@@ -155,10 +164,6 @@
     $('.nav-link.active').removeClass('active');
         $('.nav-link').find('p:contains("Квитанции на оплату")').parents('.nav-link').addClass('active');
 
-        $('#id_id, #id_status, #id_date_range, #id_flat__number, #id_flat__owner_id, #id_is_checked').on('change', function (){
-            console.log('change');
-            $('#filter-form').submit();
-        });
 
         $('.delete-receipts').on('click', function (e){
             e.preventDefault();
@@ -184,6 +189,44 @@
   //do something, like clearing an input
   $('#id_date_range').val('');
   $(this).trigger('change');
+
 });
+
+  $(document).ready(function () {
+        $('#receipt-table').DataTable({
+            ordering: true,
+            dom: 'rtp',
+            language: {
+                paginate: {
+                    "previous": "<<",
+                    "next": ">>"
+                }
+            },
+            columnDefs: [
+                {orderable: false, targets: 1},
+                {orderable: false, targets: 2},
+                {orderable: true, targets: 3},
+                {orderable: true, targets: 4},
+                {orderable: false, targets: 5},
+                {orderable: false, targets: 6},
+                {orderable: false, targets: 7},
+                {orderable: false, targets: 8},
+            ],
+            initComplete: function () {
+                this.api()
+                    .columns()
+                    .every(function () {
+                        let that = this;
+
+                        $('#id_id, #id_status, #id_date_range, #id_flat__number, #id_flat__owner_id, #id_is_checked', this.header()).on('keyup change clear', function () {
+                            if (that.search() !== this.value) {
+                                that.search(this.value).draw();
+                            }
+                        });
+                    });
+            },
+        });
+    })
+
     </script>
 {% endblock %}

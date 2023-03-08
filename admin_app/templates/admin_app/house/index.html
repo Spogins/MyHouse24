@@ -36,7 +36,7 @@
                     </div>
                     <div class="card-body">
                         <form method="get" id="filter-form">
-                        <table class="table table-bordered table-hover sorting-table">
+                        <table id="house-table" class="table table-bordered table-hover sorting-table">
                             <thead>
                             <tr>
                                 <th>#</th>
@@ -80,20 +80,32 @@
     $('.nav-link.active').removeClass('active');
         $('.nav-link').find('p:contains("Дома")').parents('.nav-link').addClass('active');
 
-    $('#id_name, #id_address').on('change', function (){
-            console.log('change');
-            $('#filter-form').submit();
+
+
+         $(document).ready(function () {
+        $('#house-table').DataTable({
+            ordering: false,
+            dom: 'rtp',
+            language: {
+                paginate: {
+                    "previous": "<<",
+                    "next": ">>"
+                }
+            },
+            initComplete: function () {
+                this.api()
+                    .columns()
+                    .every(function () {
+                        let that = this;
+
+                        $('#id_name, #id_address', this.header()).on('keyup change clear', function () {
+                            if (that.search() !== this.value) {
+                                that.search(this.value).draw();
+                            }
+                        });
+                    });
+            },
         });
-        $(".sorting-table").DataTable({
-          "responsive": true, "lengthChange": false, "autoWidth": false, "searching": false, "paging": false,
-            "bInfo" : false, "bSortCellsTop": true,
-          "buttons": [],
-            rowReorder: true,
-            columnDefs: [
-                { orderable: true, className: 'reorder', targets: 1 },
-                { orderable: true, className: 'reorder', targets: 2 },
-            { orderable: false, targets: '_all' }
-        ]
-        });
+    })
     </script>
 {% endblock %}

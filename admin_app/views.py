@@ -37,7 +37,8 @@ class FilterMixin(MultipleObjectMixin):
             for param, value in get_params.items():
                 if param != 'q' and value != '':
                     logger.info(param)
-                    qs = qs.filter(**{param: value})
+                    if not param == 'page':
+                        qs = qs.filter(**{param: value})
         return qs
 
     def get_form_kwargs(self, *args, **kwargs):
@@ -172,7 +173,7 @@ class CloneTariff(UpdateView):
         return context
 
     def post(self, request, *args, **kwargs):
-        formset = TariffServiceFormSet(request.POST, queryset=None, prefix='tariffservice_set')
+        formset = TariffServiceFormSet(request.POST, queryset=TariffService.objects.none(), prefix='tariffservice_set')
         form = TariffCreateForm(request.POST)
         if form.is_valid():
             return self.form_valid(formset, form)
@@ -182,7 +183,10 @@ class CloneTariff(UpdateView):
         for form in formset:
             if form.is_valid():
                 if form.cleaned_data:
-                    pass
+                    full_form = form.save()
+                    full_form.tariff = tariff
+                    full_form.unit = full_form.service.unit
+                    full_form.save()
         return redirect('/admin_app/tariff_list/')
 
 
@@ -567,6 +571,7 @@ class ContactPageView(CreateView):
 
 
 class OwnerList(FormMixin, ListView):
+    paginate_by = 10
     model = Owner
     form_class = OwnerFilterForm
     template_name = 'admin_app/owner/index.html'
@@ -789,6 +794,7 @@ def delete_house(request, house_id):
 
 
 class FlatList(FormMixin, ListView):
+    paginate_by = 10
     model = Flat
     template_name = 'admin_app/flat/index.html'
     form_class = FlatFilterForm
@@ -923,6 +929,7 @@ class StatisticMixin(MultipleObjectMixin):
 
 
 class CounterView(FilterMixin, FormMixin, ListView):
+    paginate_by = 10
     model = Counter
     template_name = 'admin_app/counter/index.html'
     form_class = CounterFilterForm
@@ -1065,16 +1072,15 @@ class CashBoxMixin(MultipleObjectMixin):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        total_income = CashBox.objects.filter(status=True, type='приход').\
-            aggregate(Sum('amount_of_money')).get('amount_of_money__sum', 0.00)
-        total_expenses = CashBox.objects.filter(status=True, type='расход').\
-            aggregate(Sum('amount_of_money')).get('amount_of_money__sum', 0.00)
+        total_income = CashBox.objects.filter(status=True, type='приход').aggregate(Sum('amount_of_money')).get('amount_of_money__sum', 0.00)
+        total_expenses = CashBox.objects.filter(status=True, type='расход').aggregate(Sum('amount_of_money')).get('amount_of_money__sum', 0.00)
         context['total_income'] = total_income if total_income else 0
         context['total_expenses'] = total_expenses if total_expenses else 0
         return context
 
 
 class CashBoxList(StatisticMixin, FormMixin, FilterMixin, CashBoxMixin, ListView):
+    paginate_by = 10
     model = CashBox
     template_name = 'admin_app/cash_box/index.html'
     form_class = CashBoxFilterForm
@@ -1098,9 +1104,21 @@ class CreateIncome(CreateView):
     model = CashBox
     template_name = 'admin_app/cash_box/update_income.html'
 
-    def get_context_data(self, **kwargs):
+    def get(self, request):
+        if request.GET.get('bankbook_id'):
+            instance = BankBook.objects.get(id=request.GET.get('bankbook_id'))
+            return self.render_to_response(self.get_context_data(instance))
+        return self.render_to_response(self.get_context_data())
+
+
+    def get_context_data(self, *args, **kwargs):
         form = CashBoxIncomeCreateForm()
         context = {'form': form}
+        if args:
+            flat = Flat.objects.get(id=args[0].flat_id)
+            context['bankbook'] = args[0]
+            context['owner'] = Owner.objects.get(user_id=flat.owner_id)
+            context['flat_create'] = True
         return context
 
     def post(self, request, *args, **kwargs):
@@ -1117,7 +1135,9 @@ class UpdateIncome(UpdateView):
     def get_context_data(self, **kwargs):
         instance = CashBox.objects.get(id=self.kwargs['pk'])
         form = CashBoxIncomeCreateForm(instance=instance)
-        context = {'form': form, 'update': True}
+        bankbook = BankBook.objects.get(id=instance.bankbook_id)
+        flat = Flat.objects.get(id=bankbook.flat_id)
+        context = {'form': form, 'update': True, 'owner': Owner.objects.get(user_id=flat.owner_id)}
         return context
 
     def post(self, request, *args, **kwargs):
@@ -1176,6 +1196,7 @@ def delete_cash_box(request, cash_box_id):
 
 
 class BankBookList(StatisticMixin, FormMixin, ListView):
+    paginate_by = 10
     model = BankBook
     template_name = 'admin_app/bank_book/index.html'
     form_class = BankBookFilterForm
@@ -1302,6 +1323,7 @@ def get_counters(request):
 
 
 class ReceiptList(FormMixin, FilterMixin, StatisticMixin, ListView):
+    paginate_by = 10
     model = Receipt
     form_class = ReceiptFilterForm
     template_name = 'admin_app/receipt/index.html'
@@ -1320,7 +1342,13 @@ class CreateReceipt(CreateView):
     model = Receipt
     template_name = 'admin_app/receipt/update.html'
 
-    def get_context_data(self, **kwargs):
+    def get(self, request):
+        if request.GET.get('flat_id'):
+            instance = Flat.objects.get(id=request.GET.get('flat_id'))
+            return self.render_to_response(self.get_context_data(instance))
+        return self.render_to_response(self.get_context_data())
+
+    def get_context_data(self, *args, **kwargs):
         form = ReceiptCreateForm()
         formset = ReceiptServiceFormSet(prefix='receiptservice_set')
         counters = Counter.objects.all()
@@ -1331,6 +1359,14 @@ class CreateReceipt(CreateView):
             'counters': counters,
 
         }
+        if args:
+            flat = args[0]
+            house = House.objects.get(id=flat.house_id)
+            section = Section.objects.get(id=flat.section_id)
+            context['flat'] = flat
+            context['house'] = house
+            context['section'] = section
+            context['update_flat'] = True
         return context
 
     def post(self, request, *args, **kwargs):
@@ -1353,12 +1389,18 @@ class UpdateReceipt(UpdateView):
         form = ReceiptCreateForm(instance=instance)
         formset = ReceiptServiceFormSet(instance=instance, prefix='receiptservice_set')
         counters = Counter.objects.filter(flat_id=instance.flat_id)
+        flat = Flat.objects.get(id=instance.flat_id)
+        house = House.objects.get(id=flat.house_id)
+        section = Section.objects.get(id=flat.section_id)
 
         context = {
             'form': form,
             'formset': formset,
             'counters': counters,
+            'house': house,
+            'section': section,
             'update': True
+
         }
         return context
 
@@ -1393,3 +1435,44 @@ def delete_receipt(request, receipt_id=None):
         logger.info(request.POST)
         Receipt.objects.filter(id__in=request.POST.getlist('ids[]')).delete()
     return redirect('/admin_app/receipt_list')
+
+
+class MasterRequestList(FormMixin, FilterMixin, ListView):
+    paginate_by = 10
+    model = MasterRequest
+    template_name = 'admin_app/master_request/index.html'
+    form_class = MasterRequestFilterForm
+    ordering = ['-id']
+
+    def get_form_kwargs(self):
+        # use GET parameters as the data
+        kwargs = super().get_form_kwargs()
+        if self.request.method == 'GET':
+            kwargs.update({
+                'data': self.request.GET,
+            })
+        return kwargs
+
+
+class MasterRequestCreate(CreateView):
+    model = MasterRequest
+    template_name = 'admin_app/master_request/create.html'
+    form_class = MasterRequestForm
+    success_url = reverse_lazy('master_request_list')
+
+
+class MasterRequestUpdate(UpdateView):
+    model = MasterRequest
+    template_name = 'admin_app/master_request/create.html'
+    form_class = MasterRequestForm
+    success_url = reverse_lazy('master_request_list')
+
+
+class MasterRequestDetail(DetailView):
+    model = MasterRequest
+    template_name = 'admin_app/master_request/detail.html'
+
+
+def delete_master_request(request, pk):
+    MasterRequest.objects.get(id=pk).delete()
+    return redirect('/admin_app/master_request_list')
