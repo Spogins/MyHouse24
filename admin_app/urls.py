@@ -38,7 +38,6 @@ urlpatterns = [
     path('update_owner/<int:pk>', UpdateOwner.as_view(), name='update_owner'),
     path('detail_owner/<int:pk>', DetailOwner.as_view(), name='detail_owner'),
     path('delete_owner/<int:owner_id>', delete_owner, name='delete_owner'),
-    path('create_message', MessageCreate.as_view(), name='create_message'),
     path('invite/', InviteView.as_view(), name='invite'),
 
     path('house_list', HouseList.as_view(), name='house_list'),
@@ -96,4 +95,9 @@ urlpatterns = [
     path('update_master_request/<int:pk>', MasterRequestUpdate.as_view(), name='update_master_request'),
     path('detail_master_request/<int:pk>', MasterRequestDetail.as_view(), name='detail_master_request'),
     path('delete_master_request/<str:pk>', delete_master_request, name='delete_master_request'),
+
+    path('message_list', MessageList.as_view(), name='message_list'),
+    path('create_message', MessageCreate.as_view(), name='create_message'),
+    path('detail_message/<int:pk>', MessageDetail.as_view(), name='detail_message'),
+    path('delete_messages', delete_message, name='delete_messages'),
 ]

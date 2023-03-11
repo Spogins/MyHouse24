@@ -81,7 +81,22 @@ class Profile(models.Model):
         return f'{self.role} - {self.user.first_name} {self.user.last_name}'
 
 
+class PermissionPage(models.Model):
+    name = models.CharField(max_length=30)
 
+    def __str__(self):
+        return str(self.id)
+
+
+class PermissionUrl(models.Model):
+    page = models.ForeignKey(PermissionPage, on_delete=models.CASCADE)
+    url = models.CharField(max_length=250)
+
+
+class PermissionAccess(models.Model):
+    page = models.ForeignKey(PermissionPage, on_delete=models.SET_NULL, null=True)
+    access = models.BooleanField()
+    role = models.CharField(choices=Profile.Role.choices, max_length=100)
 
 
 

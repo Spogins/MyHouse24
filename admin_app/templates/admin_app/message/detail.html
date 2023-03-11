@@ -1,0 +1,47 @@
+{% extends 'admin_app/base.html' %}
+{% load static %}
+{% block content %}
+        <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+              <div class="col-sm-6">
+                <h1>Сообщения</h1>
+              </div>
+              <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                  <li class="breadcrumb-item"><a href="/admin">Главная</a></li>
+                  <li class="breadcrumb-item"><a href="{% url 'message_list' %}">Сообщения</a></li>
+                    <li class="breadcrumb-item active">Сообщение</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+    </section>
+
+     <section class="content">
+        <div class="row">
+            <div class="col-xs-12 col-md-12">
+                <div class="card">
+                    <div class="card-body no-padding">
+                        <div class="mailbox-read-info">
+                            <h3>{{ message.title }}</h3>
+                            <h5>
+                                От: {{ message.from_user }} <span class="mailbox-read-time pull-right">{{ message.created }}</span>
+                            </h5>
+                        </div>
+                        <div class="mailbox-read-message">
+                            {{ message.text }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+     </section>
+{% endblock %}
+{% block script %}
+    <script>
+
+    $('.nav-link.active').removeClass('active');
+        $('.nav-link').find('p:contains("Сообщения")').parents('.nav-link').addClass('active');
+    </script>
+{% endblock %}

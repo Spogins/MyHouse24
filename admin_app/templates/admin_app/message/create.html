@@ -1,0 +1,140 @@
+{% extends 'admin_app/base.html' %}
+{% load widget_tweaks %}
+{% load static %}
+{% block content %}
+        <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+              <div class="col-sm-6">
+                <h1>Новое сообщение</h1>
+              </div>
+              <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                  <li class="breadcrumb-item"><a href="/admin_app">Главная</a></li>
+                  <li class="breadcrumb-item"><a href="{% url 'message_list' %}">Сообщения</a></li>
+                    <li class="breadcrumb-item active">Новое сообщение</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+    </section>
+
+    <section class="content">
+        <div class="card">
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-xs-12 col-md-12">
+                             <div class="col-xs-12 col-md-8">
+                                <label class=" requiredField">
+
+                                </label>
+                                <div class="input-group">
+                                    {{ form.title|add_class:"form-control"|append_attr:"placeholder:Тема сообщения:" }}
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-md-8">
+                                <label class=" requiredField">
+
+                                </label>
+                                <div class="input-group">
+                                    {{ form.text|add_class:"form-control"|append_attr:"placeholder:Текст сообщения:" }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-md-6">
+                            <h4>Кому отправить:</h4>
+                            {% if owner %}
+                            <div class="col-xs-12 col-md-8">
+                                <label class=" requiredField">
+
+                                </label>
+                                <div class="input-group">
+                                    {{ form.owner|add_class:"form-control" }}
+                                </div>
+                            </div>
+
+                            {% else %}
+                            <div class="col-xs-12 col-md-8">
+                                <label class=" requiredField">
+                                    {{ form.has_debt }} Владельцам с задолженностями
+                                </label>
+                            </div>
+                            <div class="col-xs-12 col-md-8">
+                                <label class=" requiredField">
+                                    ЖК
+                                </label>
+                                <div class="input-group">
+                                    {{ form.house|add_class:"form-control" }}
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-md-8">
+                                <label class=" requiredField">
+                                    Секция
+                                </label>
+                                <div class="input-group">
+                                    {{ form.section|add_class:"form-control" }}
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-md-8">
+                                <label class=" requiredField">
+                                    Этаж
+                                </label>
+                                <div class="input-group">
+                                    {{ form.level|add_class:"form-control" }}
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-md-8">
+                                <label class=" requiredField">
+                                    Квартира
+                                </label>
+                                <div class="input-group">
+                                   {{ form.flat|add_class:"form-control" }}
+                                </div>
+                            </div>
+
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group float-right">
+                                        <button type="submit" class="btn btn-success">Отправить</button>
+                                    </div>
+                                </div>
+                            </div>
+                </form>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+{% block script %}
+    <script src="{% static 'dist/js/section_flat.js' %}"></script>
+    <script>
+
+    $('.nav-link.active').removeClass('active');
+        $('.nav-link').find('p:contains("Сообщения")').parents('.nav-link').addClass('active');
+
+        $('#id_house').on('change', function(){
+           let house = $(this).val();
+           get_sections_levels(house);
+           get_sections_flats(house);
+        });
+
+        $('#id_section').on('change', function (){
+            get_flats($(this).val());
+        });
+
+        $('#id_level').on('change', function (){
+            get_flats_by_level($(this).val());
+        });
+        $('#id_section, #id_level, #id_flat').empty();
+        {% if owner %}
+            $('#id_owner').val('{{ owner }}');
+        {% endif %}
+        {% if has_debt %}
+            $('#id_has_debt').prop('checked', true);
+        {% endif %}
+    </script>
+{% endblock %}

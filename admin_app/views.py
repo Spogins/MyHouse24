@@ -1,5 +1,6 @@
 import json
 
+from django.contrib.auth.mixins import UserPassesTestMixin
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
@@ -10,6 +11,7 @@ from django.views.generic.list import MultipleObjectMixin
 
 from account.forms import *
 from account.models import *
+from account.views import has_access_for_class, has_access
 from admin_app.forms import *
 from admin_app.models import *
 
@@ -682,14 +684,15 @@ class InviteView(CreateView):
         return context
 
 
-class MessageCreate(CreateView):
-    pass
-
-
-class HouseList(FormMixin, FilterMixin, ListView):
+class HouseList(UserPassesTestMixin, FormMixin, FilterMixin, ListView):
     model = House
     form_class = HouseFilterForm
     template_name = 'admin_app/house/index.html'
+
+    def test_func(self):
+        profile = Profile.objects.get(user_id=self.request.user.id)
+        role = Role.objects.get(name=profile.role)
+        return role.house
 
 
 class CreateHouse(CreateView):
@@ -1476,3 +1479,37 @@ class MasterRequestDetail(DetailView):
 def delete_master_request(request, pk):
     MasterRequest.objects.get(id=pk).delete()
     return redirect('/admin_app/master_request_list')
+
+
+class MessageList(ListView):
+    model = Message
+    template_name = 'admin_app/message/index.html'
+    ordering = ['-id']
+
+
+class MessageCreate(CreateView):
+    model = Message
+    template_name = 'admin_app/message/create.html'
+    form_class = MessageForm
+    success_url = reverse_lazy('message_list')
+
+    def form_valid(self, form):
+        print(self.request.user)
+        form.instance.from_user = self.request.user
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        owner = self.request.GET.get('owner_id')
+        context['owner'] = owner
+        context['has_debt'] = self.request.GET.get('has_debt')
+        return context
+
+
+class MessageDetail(DetailView):
+    model = Message
+    template_name = 'admin_app/message/detail.html'
+
+
+def delete_message(request):
+    pass

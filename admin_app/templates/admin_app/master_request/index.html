@@ -40,7 +40,7 @@
                 </div>
                     <div class="card-body">
                     <form method="get" id="filter-form">
-                        <table class="table table-bordered table-hover sorting-table" data-filter-control="true" >
+                        <table id="application-table" class="table table-bordered table-hover sorting-table" data-filter-control="true" >
                             <thead>
                                 <tr>
                                     <th>№ заявки</th>
@@ -98,15 +98,7 @@
                             {% endfor %}
                             </tbody>
                         </table>
-                              <div class="row" style="display: flex; justify-content: flex-end;">
-                   <ul class="pagination">
-                              <li class="page-item"><a class="page-link" href="?page=1"> << </a></li>
-                              {%for p in page_obj.paginator.page_range%}
-                            <li class="page-item"><a class="page-link" href="?page={{p}}">{{p}}</a></li>
-                            {%endfor%}
-                         <li class="page-item"> <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}"> >> </a></li>
-                        </ul>
-                    </div>
+
                     </form>
                     </div>
                 </div>
@@ -122,10 +114,7 @@
     $('.nav-link.active').removeClass('active');
         $('.nav-link').find('p:contains("Заявки вызова мастера")').parents('.nav-link').addClass('active');
 
-        $('#id_id, #id_date_range, #id_type, #id_description, #id_flat__number, #id_flat__owner_id, #id_flat__owner_phone, #id_master_id, #id_status').on('change', function (){
-            console.log('change');
-            $('#filter-form').submit();
-        });
+
 
         let date = $('#id_date_range').daterangepicker({
             "autoUpdateInput": false,
@@ -148,18 +137,35 @@
   $(this).trigger('change');
 });
 
-                $(".sorting-table").DataTable({
-          "responsive": true, "lengthChange": false, "autoWidth": false, "searching": false, "paging": false,
-            "bInfo" : false, "bSortCellsTop": true,
-          "buttons": [],
-            rowReorder: true,
-            columnDefs: [
-            { orderable: true, className: 'reorder', targets: 0 },
-                { orderable: true, className: 'reorder', targets: 1 },
-                { orderable: true, className: 'reorder', targets: 2 },
-            { orderable: false, targets: '_all' }
-        ]
-        }).buttons().container().appendTo('.sorting-table_wrapper .col-md-6:eq(0)');
+
+
+        $(document).ready(function () {
+        $('#application-table').DataTable({
+            ordering: false,
+            dom: 'rtp',
+            language: {
+                paginate: {
+                    "previous": "<<",
+                    "next": ">>"
+                }
+            },
+
+            initComplete: function () {
+                this.api()
+                    .columns()
+                    .every(function () {
+                        let that = this;
+
+                        $('#id_id, #id_date_range, #id_type, #id_description, #id_flat__number, #id_flat__owner_id, #id_flat__owner_phone, #id_master_id, #id_status', this.header()).on('keyup change clear', function () {
+                            console.log(this.id)
+                            if (that.search() !== this.value) {
+                                that.search(this.value).draw();
+                            }
+                        });
+                    });
+            },
+        });
+    })
 
     </script>
 {% endblock %}

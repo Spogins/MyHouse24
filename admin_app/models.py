@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import Max, Min, Sum
 from django.urls import reverse
@@ -349,3 +350,31 @@ class MasterRequest(models.Model):
     master = models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='Мастер')
     description = models.TextField("Описание")
     comment = models.TextField("Комментарий", null=True, blank=True)
+
+
+class Message(models.Model):
+    title = models.CharField("Заголовок", max_length=100)
+    text = models.TextField("Текст сообщения")
+    house = models.ForeignKey(House, on_delete=models.SET_NULL, verbose_name='ЖК', null=True, blank=True)
+    section = models.ForeignKey(Section, on_delete=models.SET_NULL, verbose_name='Секция', null=True, blank=True)
+    level = models.ForeignKey(Level, on_delete=models.SET_NULL, verbose_name='Этаж', null=True, blank=True)
+    flat = models.ForeignKey(Flat, on_delete=models.SET_NULL, verbose_name='Квартира', null=True, blank=True)
+    owner = models.ForeignKey(Owner, on_delete=models.SET_NULL, verbose_name='Владелец квартир', null=True, blank=True)
+    has_debt = models.BooleanField("Владельцам с задолженностями", default=False)
+    created = models.DateTimeField(auto_now_add=True)
+    from_user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+
+    def recipients(self):
+        answer = ''
+        if self.owner is not None:
+            return self.owner.fullname()
+        if self.house is None:
+            return 'Всем'
+        answer = self.house.name
+        if self.section is not None:
+            answer += ', ' + self.section.name
+        if self.level is not None:
+            answer += ', ' + self.level.name
+        if self.flat is not None:
+            answer += ', кв.' + self.flat.number
+        return answer

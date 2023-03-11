@@ -420,17 +420,20 @@ class ReceiptServiceForm(forms.ModelForm):
 
 
 class MasterRequestFilterForm(forms.Form):
+    flat__owner = [(f'{x}', f'{x}') for x in Owner.objects.all()]
+    flat__owner.insert(0, ('', ''))
+    master = [(f'{x}', f'{x}') for x in Profile.objects.all()]
+    master.insert(0, ('', ''))
     id = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
     date_range = forms.CharField(max_length=20, widget=forms.TextInput(attrs={'class': 'form-control'}))
     type = forms.ChoiceField(choices=MasterRequest.TypeMaster.choices,
                              widget=forms.Select(attrs={'class': 'form-control'}))
     description = forms.CharField(max_length=20, widget=forms.TextInput(attrs={'class': 'form-control'}))
     flat__number = forms.CharField(max_length=20, widget=forms.NumberInput(attrs={'class': 'form-control'}))
-    flat__owner_id = forms.ModelChoiceField(queryset=Owner.objects.all(), empty_label='',
-                                            widget=forms.Select(attrs={'class': 'form-control'}))
+    flat__owner_id = forms.ChoiceField(choices=flat__owner, widget=forms.Select(attrs={'class': 'form-control'}))
     flat__owner_phone = forms.CharField(max_length=20, widget=forms.TextInput(attrs={'class': 'form-control'}))
-    master_id = forms.ModelChoiceField(queryset=Profile.objects.all(), empty_label='',
-                                       widget=forms.Select(attrs={'class': 'form-control'}))
+
+    master_id = forms.ChoiceField(choices=master, widget=forms.Select(attrs={'class': 'form-control'}))
     status = forms.ChoiceField(choices=MasterRequest.Status.choices,
                                widget=forms.Select(attrs={'class': 'form-control'}))
 
@@ -455,6 +458,13 @@ class MasterRequestForm(forms.ModelForm):
     class Meta:
         model = MasterRequest
         fields = '__all__'
+
+
+class MessageForm(forms.ModelForm):
+
+    class Meta:
+        model = Message
+        exclude = ['from_user']
 
 
 ServiceFormset = modelformset_factory(model=Service, form=ServiceForm, extra=0)
