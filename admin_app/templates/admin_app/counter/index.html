@@ -61,16 +61,16 @@
                             </thead>
                             <tbody>
                             {% for counter in counter_list %}
-                                <tr class="clickable-row" href="{% url 'flat_counter_list' counter.flat_id %}?service={{ counter.service_id }}">
-                                    <td>{{ counter.flat.house }}</td>
-                                    <td>{{ counter.flat.section }}</td>
-                                    <td>{{ counter.flat.number }}</td>
-                                    <td>{{ counter.service }}</td>
-                                    <td>{{ counter.indication }}</td>
-                                    <td>{{ counter.service.unit }}</td>
+                                <tr >
+                                    <td class="clickable-row" href="{% url 'flat_counter_list' counter.flat_id %}?service={{ counter.service_id }}">{{ counter.flat.house }}</td>
+                                    <td class="clickable-row" href="{% url 'flat_counter_list' counter.flat_id %}?service={{ counter.service_id }}">{{ counter.flat.section }}</td>
+                                    <td class="clickable-row" href="{% url 'flat_counter_list' counter.flat_id %}?service={{ counter.service_id }}">{{ counter.flat.number }}</td>
+                                    <td class="clickable-row" href="{% url 'flat_counter_list' counter.flat_id %}?service={{ counter.service_id }}">{{ counter.service }}</td>
+                                    <td class="clickable-row" href="{% url 'flat_counter_list' counter.flat_id %}?service={{ counter.service_id }}">{{ counter.indication }}</td>
+                                    <td class="clickable-row" href="{% url 'flat_counter_list' counter.flat_id %}?service={{ counter.service_id }}">{{ counter.service.unit }}</td>
                                     <td>
                                         <div class="btn-group float-right" style="z-index: 1000">
-                                            <a class="btn btn-default btn-sm" href="{% url 'create_counter' %}?flat={{ counter.flat_id }}&service={{ counter.service_id }}&house={{ counter.flat.house_id }}&section={{ counter.flat.section_id }}" title="Снять новое показание счетчика" data-toggle="tooltip">
+                                            <a class="btn btn-default btn-sm" href="{% url 'create_counter' %}?flat={{ counter.flat_id }}&service={{ counter.service_id }}&house={{ counter.flat.house_id }}&section={{ counter.flat.section_id }}" target="_blank" title="Снять новое показание счетчика" data-toggle="tooltip">
                                                 <i class="fas fa-tachometer-alt"></i>
                                             </a>
                                             <a class="btn btn-default btn-sm" href="{% url 'flat_counter_list' counter.flat_id %}?service={{ counter.service_id }}" title="Открыть историю показаний для счетчика" data-toggle="tooltip">

@@ -1,14 +1,15 @@
 import json
-
+from datetime import datetime
+import xlwt
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect
+from django.template import RequestContext
 from django.urls import reverse_lazy
 from django.views.decorators.http import require_POST
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
-from django.views.generic.edit import FormMixin
+from django.views.generic.edit import FormMixin, FormView
 from django.views.generic.list import MultipleObjectMixin
-
 from account.forms import *
 from account.models import *
 from account.views import has_access_for_class, has_access
@@ -21,9 +22,52 @@ def is_ajax(request):
     return request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
 
 
-def index(request):
-    user = User.objects.get(id=request.user.id)
-    return render(request, 'admin_app/statistic.html')
+
+class StatisticData:
+
+    def __init__(self):
+        self.house_count = House.objects.all().count()
+        self.owner_count = Owner.objects.filter(status='Активен').count()
+        self.master_request_in_process_count = MasterRequest.objects.filter(status='в процессе').count()
+        self.flat_count = Flat.objects.all().count()
+        self.bankbook_count = BankBook.objects.all().count()
+        self.master_request_new_count = MasterRequest.objects.filter(status='новое').count()
+        self.incomes_expenses = self.get_incomes_expenses()
+        self.sum_account_debts = sum(get_account_debts())
+        self.sum_account_balance = sum(get_account_balance())
+        self.state_cashbox = get_state_cashbox()
+
+    def get_incomes_expenses(self):
+        current_year = datetime.now().year
+        labels = ['Янв.,', 'Фев.,', 'Мар.,', 'Апр.,', 'Май,', 'Июн.,', 'Июл.,', 'Авг.,', 'Сен.,', 'Окт.,', 'Нояб.,', 'Дек.,']
+        labels = [label + str(current_year) for label in labels]
+        data_incomes = []
+        data_expenses = []
+        for i in range(12):
+            expenses = str(CashBox.objects.filter(type='расход', date__month=i+1).aggregate(Sum('amount_of_money'))\
+                .get('amount_of_money__sum'))
+            incomes = str(CashBox.objects.filter(type='приход', date__month=i+1).aggregate(Sum('amount_of_money')) \
+                .get('amount_of_money__sum'))
+            data_incomes.append(incomes)
+            data_expenses.append(expenses)
+        return {"labels": labels, "incomes": data_incomes, "expenses": data_expenses}
+
+
+def error_403(request, exception):
+    return render(request, 'admin_app/403_csrf.html')
+
+class IndexView(UserPassesTestMixin, FormView):
+    template_name = 'admin_app/statistic.html'
+
+
+    def get_context_data(self, **kwargs):
+        context = {'statistic': StatisticData()}
+        return context
+
+    def test_func(self):
+        profile = Profile.objects.get(user_id=self.request.user.id)
+        role = Role.objects.get(name=profile.role)
+        return role.statistic
 
 
 class FilterMixin(MultipleObjectMixin):
@@ -53,7 +97,7 @@ class FilterMixin(MultipleObjectMixin):
         return kwargs
 
 
-class CreateService(CreateView):
+class CreateService(UserPassesTestMixin, CreateView):
     template_name = 'admin_app/settings/services.html'
 
     def get_context_data(self, **kwargs):
@@ -77,6 +121,10 @@ class CreateService(CreateView):
             form.save()
         return redirect('/admin_app/services/')
 
+    def test_func(self):
+            profile = Profile.objects.get(user_id=self.request.user.id)
+            role = Role.objects.get(name=profile.role)
+            return role.service
 
 @require_POST
 def delete_service(request):
@@ -92,9 +140,14 @@ def delete_unit(request):
     return JsonResponse({'pk': pk})
 
 
-class TariffList(ListView):
+class TariffList(UserPassesTestMixin, ListView):
     model = Tariff
     template_name = 'admin_app/settings/tariff/index.html'
+
+    def test_func(self):
+        profile = Profile.objects.get(user_id=self.request.user.id)
+        role = Role.objects.get(name=profile.role)
+        return role.tariff
 
 
 class CreateTariff(CreateView):
@@ -226,7 +279,7 @@ class ShowTariff(DetailView):
         return context
 
 
-class RoleList(ListView):
+class RoleList(UserPassesTestMixin, ListView):
     model = Role
     template_name = 'admin_app/settings/roles.html'
 
@@ -242,10 +295,20 @@ class RoleList(ListView):
             form.save()
         return redirect('/admin_app/roles/')
 
+    def test_func(self):
+        profile = Profile.objects.get(user_id=self.request.user.id)
+        role = Role.objects.get(name=profile.role)
+        return role.role
 
-class UserList(ListView):
+
+class UserList(UserPassesTestMixin, ListView):
     model = Profile
     template_name = 'admin_app/settings/user/index.html'
+
+    def test_func(self):
+        profile = Profile.objects.get(user_id=self.request.user.id)
+        role = Role.objects.get(name=profile.role)
+        return role.users
 
 
 
@@ -336,7 +399,7 @@ def delete_user(request, user_id):
     return redirect('/admin_app/user_list/')
 
 
-class PaymentDetailsView(DetailView):
+class PaymentDetailsView(UserPassesTestMixin, DetailView):
     model = PaymentDetails
     template_name = 'admin_app/settings/payment_details.html'
     context_object_name = 'form'
@@ -352,6 +415,11 @@ class PaymentDetailsView(DetailView):
     def form_valid(self, form):
         form.save()
         return redirect('/admin_app/payment_details/')
+
+    def test_func(self):
+        profile = Profile.objects.get(user_id=self.request.user.id)
+        role = Role.objects.get(name=profile.role)
+        return role.requisites
 
 
 class PaymentItemList(ListView):
@@ -384,7 +452,7 @@ def delete_payment(request, payment_id):
     return redirect('/admin_app/payment_items/')
 
 
-class MainPageView(CreateView):
+class MainPageView(UserPassesTestMixin, CreateView):
     template_name = 'admin_app/pages/main_page.html'
     instance = MainPage.objects.all()[0]
     instance_seo = instance.seo
@@ -430,8 +498,13 @@ class MainPageView(CreateView):
         }
         return self.render_to_response(context)
 
+    def test_func(self):
+        profile = Profile.objects.get(user_id=self.request.user.id)
+        role = Role.objects.get(name=profile.role)
+        return role.site_management
 
-class InfoPage(CreateView):
+
+class InfoPage(UserPassesTestMixin, CreateView):
     template_name = 'admin_app/pages/info_page.html'
     instance = Info.objects.all()[0]
 
@@ -485,6 +558,11 @@ class InfoPage(CreateView):
         }
         return self.render_to_response(context)
 
+    def test_func(self):
+        profile = Profile.objects.get(user_id=self.request.user.id)
+        role = Role.objects.get(name=profile.role)
+        return role.site_management
+
 
 def delete_document(request, pk):
     Document.objects.get(pk=pk).delete()
@@ -496,7 +574,7 @@ def delete_from_gallery(request, image_id):
     return redirect('/admin_app/info_page/')
 
 
-class ServicePageView(CreateView):
+class ServicePageView(UserPassesTestMixin, CreateView):
     template_name = 'admin_app/pages/service_page.html'
     instance = ServicePage.objects.all()[0]
 
@@ -523,14 +601,16 @@ class ServicePageView(CreateView):
         return redirect('/admin_app/service_page/')
 
     def form_invalid(self, formset, seo_form):
-        print(formset.errors)
-        print('---------')
-        print(seo_form.errors)
         context = {
             'formset': formset,
             'seo_form': seo_form,
         }
         return self.render_to_response(context)
+
+    def test_func(self):
+        profile = Profile.objects.get(user_id=self.request.user.id)
+        role = Role.objects.get(name=profile.role)
+        return role.site_management
 
 
 def delete_service_page(request, service_id):
@@ -538,7 +618,7 @@ def delete_service_page(request, service_id):
     return redirect('/admin_app/service_page/')
 
 
-class ContactPageView(CreateView):
+class ContactPageView(UserPassesTestMixin, CreateView):
     template_name = 'admin_app/pages/contact_page.html'
     instance = ContactPage.objects.all()[0]
 
@@ -571,8 +651,13 @@ class ContactPageView(CreateView):
         }
         return self.render_to_response(context)
 
+    def test_func(self):
+        profile = Profile.objects.get(user_id=self.request.user.id)
+        role = Role.objects.get(name=profile.role)
+        return role.site_management
 
-class OwnerList(FormMixin, ListView):
+
+class OwnerList(UserPassesTestMixin, FormMixin, ListView):
     paginate_by = 10
     model = Owner
     form_class = OwnerFilterForm
@@ -587,6 +672,10 @@ class OwnerList(FormMixin, ListView):
             })
         return kwargs
 
+    def test_func(self):
+        profile = Profile.objects.get(user_id=self.request.user.id)
+        role = Role.objects.get(name=profile.role)
+        return role.owner
 
 class CreateOwner(CreateView):
     template_name = 'admin_app/owner/update.html'
@@ -796,11 +885,16 @@ def delete_house(request, house_id):
     return redirect('/admin_app/house_list')
 
 
-class FlatList(FormMixin, ListView):
+class FlatList(UserPassesTestMixin, FormMixin, ListView):
     paginate_by = 10
     model = Flat
     template_name = 'admin_app/flat/index.html'
     form_class = FlatFilterForm
+
+    def test_func(self):
+        profile = Profile.objects.get(user_id=self.request.user.id)
+        role = Role.objects.get(name=profile.role)
+        return role.apartment
 
 
 def get_section_level(request):
@@ -931,11 +1025,16 @@ class StatisticMixin(MultipleObjectMixin):
         return context
 
 
-class CounterView(FilterMixin, FormMixin, ListView):
+class CounterView(UserPassesTestMixin, FilterMixin, FormMixin, ListView):
     paginate_by = 10
     model = Counter
     template_name = 'admin_app/counter/index.html'
     form_class = CounterFilterForm
+
+    def test_func(self):
+        profile = Profile.objects.get(user_id=self.request.user.id)
+        role = Role.objects.get(name=profile.role)
+        return role.meter
 
 
 def filter_flat_counter(flat, params):
@@ -952,7 +1051,10 @@ def filter_flat_counter(flat, params):
     return counters
 
 
-class FlatCounterList(FormMixin, ListView):
+
+
+
+class FlatCounterList(UserPassesTestMixin, FormMixin, ListView):
     model = Flat
     template_name = 'admin_app/counter/flat_counter.html'
     form_class = FlatCounterFilterForm
@@ -976,16 +1078,25 @@ class FlatCounterList(FormMixin, ListView):
             })
         return kwargs
 
+    def test_func(self):
+        profile = Profile.objects.get(user_id=self.request.user.id)
+        role = Role.objects.get(name=profile.role)
+        return role.meter
+
 
 class CreateCounter(CreateView):
     model = Counter
     template_name = 'admin_app/counter/update.html'
 
     def get_context_data(self, **kwargs):
+        print(self.request.GET)
         form = CounterCreateForm()
         context = {
             'form': form
         }
+        if self.request.GET.get('flat'):
+            context['get_params'] = self.request.GET.dict()
+
         return context
 
     def post(self, request, *args, **kwargs):
@@ -1082,7 +1193,7 @@ class CashBoxMixin(MultipleObjectMixin):
         return context
 
 
-class CashBoxList(StatisticMixin, FormMixin, FilterMixin, CashBoxMixin, ListView):
+class CashBoxList(UserPassesTestMixin, StatisticMixin, FormMixin, FilterMixin, CashBoxMixin, ListView):
     paginate_by = 10
     model = CashBox
     template_name = 'admin_app/cash_box/index.html'
@@ -1096,6 +1207,11 @@ class CashBoxList(StatisticMixin, FormMixin, FilterMixin, CashBoxMixin, ListView
                 'data': self.request.GET,
             })
         return kwargs
+
+    def test_func(self):
+        profile = Profile.objects.get(user_id=self.request.user.id)
+        role = Role.objects.get(name=profile.role)
+        return role.cash_box
 
 
 class CashBoxDetail(DetailView):
@@ -1188,9 +1304,46 @@ class UpdateExpense(UpdateView):
             return redirect('/admin_app/cashbox_list')
 
 
+def write_columns(ws, columns, font_style, row_num):
+    for col_num in range(len(columns)):
+        ws.write(row_num, col_num, columns[col_num], font_style)
+        col = ws.col(col_num)
+        col.width = 256*(len(columns[col_num])+5)
+
 
 def export_cashbox(request):
-    pass
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename="cashbox.xls"'
+    wb = xlwt.Workbook(encoding='utf-8')
+    ws = wb.add_sheet('sheet1')
+    row_num = 0
+    font_style = xlwt.XFStyle()
+    font_style.font.bold = True
+
+    columns = ['#', 'Дата', 'Приход/расход', 'Статус', 'Статья', 'Сумма', 'Владелец квартиры', 'Лицевой счет']
+    write_columns(ws, columns, font_style, row_num)
+    font_style = xlwt.XFStyle()
+
+    rows = CashBox.objects.all().values_list('id', 'date', 'type', 'status', 'payment_type__name',
+                                             'amount_of_money', 'bankbook__flat__owner', 'bankbook')
+    for row in rows:
+        row_num += 1
+        for col_num in range(len(row)):
+            if col_num == 6 and Owner.objects.filter(user_id=row[col_num]).exists():
+                owner = Owner.objects.get(user_id=row[col_num])
+                ws.write(row_num, col_num, owner.fullname(), font_style)
+                col = ws.col(col_num)
+                if col.width < 256 * len(owner.fullname()):
+                    col.width = 256 * (len(owner.fullname()) + 5)
+                continue
+            elif row[col_num] is None:
+                continue
+            ws.write(row_num, col_num, str(row[col_num]), font_style)
+            col = ws.col(col_num)
+            if col.width < 256 * len(str(row[col_num])):
+                col.width = 256 * (len(str(row[col_num])) + 5)
+    wb.save(response)
+    return response
 
 
 def delete_cash_box(request, cash_box_id):
@@ -1198,7 +1351,7 @@ def delete_cash_box(request, cash_box_id):
     return redirect('/admin_app/cashbox_list')
 
 
-class BankBookList(StatisticMixin, FormMixin, ListView):
+class BankBookList(UserPassesTestMixin, StatisticMixin, FormMixin, ListView):
     paginate_by = 10
     model = BankBook
     template_name = 'admin_app/bank_book/index.html'
@@ -1227,6 +1380,11 @@ class BankBookList(StatisticMixin, FormMixin, ListView):
                 'data': self.request.GET,
             })
         return kwargs
+
+    def test_func(self):
+        profile = Profile.objects.get(user_id=self.request.user.id)
+        role = Role.objects.get(name=profile.role)
+        return role.personal_account
 
 
 
@@ -1325,7 +1483,7 @@ def get_counters(request):
         return JsonResponse({'counters': list(counters)}, safe=False)
 
 
-class ReceiptList(FormMixin, FilterMixin, StatisticMixin, ListView):
+class ReceiptList(UserPassesTestMixin, FormMixin, FilterMixin, StatisticMixin, ListView):
     paginate_by = 10
     model = Receipt
     form_class = ReceiptFilterForm
@@ -1340,7 +1498,10 @@ class ReceiptList(FormMixin, FilterMixin, StatisticMixin, ListView):
             })
         return kwargs
 
-
+    def test_func(self):
+        profile = Profile.objects.get(user_id=self.request.user.id)
+        role = Role.objects.get(name=profile.role)
+        return role.invoice
 class CreateReceipt(CreateView):
     model = Receipt
     template_name = 'admin_app/receipt/update.html'
@@ -1440,7 +1601,7 @@ def delete_receipt(request, receipt_id=None):
     return redirect('/admin_app/receipt_list')
 
 
-class MasterRequestList(FormMixin, FilterMixin, ListView):
+class MasterRequestList(UserPassesTestMixin, FormMixin, FilterMixin, ListView):
     paginate_by = 10
     model = MasterRequest
     template_name = 'admin_app/master_request/index.html'
@@ -1455,6 +1616,11 @@ class MasterRequestList(FormMixin, FilterMixin, ListView):
                 'data': self.request.GET,
             })
         return kwargs
+
+    def test_func(self):
+        profile = Profile.objects.get(user_id=self.request.user.id)
+        role = Role.objects.get(name=profile.role)
+        return role.application
 
 
 class MasterRequestCreate(CreateView):
@@ -1481,10 +1647,15 @@ def delete_master_request(request, pk):
     return redirect('/admin_app/master_request_list')
 
 
-class MessageList(ListView):
+class MessageList(UserPassesTestMixin, ListView):
     model = Message
     template_name = 'admin_app/message/index.html'
     ordering = ['-id']
+
+    def test_func(self):
+        profile = Profile.objects.get(user_id=self.request.user.id)
+        role = Role.objects.get(name=profile.role)
+        return role.message
 
 
 class MessageCreate(CreateView):
