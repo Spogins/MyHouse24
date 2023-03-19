@@ -150,7 +150,7 @@ class TariffList(UserPassesTestMixin, ListView):
         return role.tariff
 
 
-class CreateTariff(CreateView):
+class CreateTariff(UserPassesTestMixin, CreateView):
     model = Tariff
     form_class = TariffCreateForm
     template_name = 'admin_app/settings/tariff/create.html'
@@ -179,8 +179,13 @@ class CreateTariff(CreateView):
                     full_form.save()
         return redirect('/admin_app/tariff_list/')
 
+    def test_func(self):
+        profile = Profile.objects.get(user_id=self.request.user.id)
+        role = Role.objects.get(name=profile.role)
+        return role.tariff
 
-class UpdateTariff(UpdateView):
+
+class UpdateTariff(UserPassesTestMixin, UpdateView):
     model = Tariff
     template_name = 'admin_app/settings/tariff/create.html'
     success_url = '/admin_app/tariff_list/'
@@ -211,8 +216,13 @@ class UpdateTariff(UpdateView):
                     full_form.save()
         return redirect('/admin_app/tariff_list/')
 
+    def test_func(self):
+        profile = Profile.objects.get(user_id=self.request.user.id)
+        role = Role.objects.get(name=profile.role)
+        return role.tariff
 
-class CloneTariff(UpdateView):
+
+class CloneTariff(UserPassesTestMixin, UpdateView):
     model = Tariff
     template_name = 'admin_app/settings/tariff/create.html'
     success_url = '/admin_app/tariff_list/'
@@ -268,7 +278,7 @@ def delete_service_tariff(request):
     return JsonResponse({'pk': pk})
 
 
-class ShowTariff(DetailView):
+class ShowTariff(UserPassesTestMixin, DetailView):
     model = Tariff
     template_name = 'admin_app/settings/tariff/tariff.html'
     context_object_name = 'tariff'
@@ -277,6 +287,11 @@ class ShowTariff(DetailView):
         context = super().get_context_data(**kwargs)
         context['services'] = TariffService.objects.filter(tariff=self.kwargs['pk'])
         return context
+
+    def test_func(self):
+        profile = Profile.objects.get(user_id=self.request.user.id)
+        role = Role.objects.get(name=profile.role)
+        return role.tariff
 
 
 class RoleList(UserPassesTestMixin, ListView):
@@ -312,7 +327,7 @@ class UserList(UserPassesTestMixin, ListView):
 
 
 
-class CreateUser(CreateView):
+class CreateUser(UserPassesTestMixin, CreateView):
     model = Profile
     template_name = 'admin_app/settings/user/update.html'
     user = User()
@@ -343,7 +358,13 @@ class CreateUser(CreateView):
         return redirect('/admin_app/user_list/')
 
 
-class UpdateUser(UpdateView):
+    def test_func(self):
+        profile = Profile.objects.get(user_id=self.request.user.id)
+        role = Role.objects.get(name=profile.role)
+        return role.users
+
+
+class UpdateUser(UserPassesTestMixin, UpdateView):
     model = Profile
     template_name = 'admin_app/settings/user/update.html'
 
@@ -384,11 +405,21 @@ class UpdateUser(UpdateView):
         }
         return self.render_to_response(context)
 
+    def test_func(self):
+        profile = Profile.objects.get(user_id=self.request.user.id)
+        role = Role.objects.get(name=profile.role)
+        return role.users
 
-class ShowProfile(DetailView):
+
+class ShowProfile(UserPassesTestMixin, DetailView):
     model = User
     template_name = 'admin_app/settings/user/profile.html'
     context_object_name = 'user'
+
+    def test_func(self):
+        profile = Profile.objects.get(user_id=self.request.user.id)
+        role = Role.objects.get(name=profile.role)
+        return role.users
 
 
 def delete_user(request, user_id):
@@ -677,7 +708,8 @@ class OwnerList(UserPassesTestMixin, FormMixin, ListView):
         role = Role.objects.get(name=profile.role)
         return role.owner
 
-class CreateOwner(CreateView):
+
+class CreateOwner(UserPassesTestMixin, CreateView):
     template_name = 'admin_app/owner/update.html'
 
     def get_context_data(self, **kwargs):
@@ -713,8 +745,13 @@ class CreateOwner(CreateView):
         }
         return self.render_to_response(context)
 
+    def test_func(self):
+        profile = Profile.objects.get(user_id=self.request.user.id)
+        role = Role.objects.get(name=profile.role)
+        return role.owner
 
-class UpdateOwner(UpdateView):
+
+class UpdateOwner(UserPassesTestMixin, UpdateView):
     model = Owner
     template_name = 'admin_app/owner/update.html'
 
@@ -753,11 +790,21 @@ class UpdateOwner(UpdateView):
         }
         return self.render_to_response(context)
 
+    def test_func(self):
+        profile = Profile.objects.get(user_id=self.request.user.id)
+        role = Role.objects.get(name=profile.role)
+        return role.owner
 
-class DetailOwner(DetailView):
+
+class DetailOwner(UserPassesTestMixin, DetailView):
     model = Owner
     template_name = 'admin_app/owner/detail.html'
     context_object_name = 'owner'
+
+    def test_func(self):
+        profile = Profile.objects.get(user_id=self.request.user.id)
+        role = Role.objects.get(name=profile.role)
+        return role.owner
 
 
 def delete_owner(request, owner_id):
@@ -784,7 +831,7 @@ class HouseList(UserPassesTestMixin, FormMixin, FilterMixin, ListView):
         return role.house
 
 
-class CreateHouse(CreateView):
+class CreateHouse(UserPassesTestMixin, CreateView):
     template_name = 'admin_app/house/update.html'
 
     def get_context_data(self, **kwargs):
@@ -827,8 +874,13 @@ class CreateHouse(CreateView):
         }
         return self.render_to_response(context)
 
+    def test_func(self):
+        profile = Profile.objects.get(user_id=self.request.user.id)
+        role = Role.objects.get(name=profile.role)
+        return role.house
 
-class UpdateHouse(UpdateView):
+
+class UpdateHouse(UserPassesTestMixin, UpdateView):
     model = House
     template_name = 'admin_app/house/update.html'
 
@@ -874,10 +926,20 @@ class UpdateHouse(UpdateView):
         }
         return self.render_to_response(context)
 
+    def test_func(self):
+        profile = Profile.objects.get(user_id=self.request.user.id)
+        role = Role.objects.get(name=profile.role)
+        return role.house
 
-class HouseDetail(DetailView):
+
+class HouseDetail(UserPassesTestMixin, DetailView):
     model = House
     template_name = 'admin_app/house/detail.html'
+
+    def test_func(self):
+        profile = Profile.objects.get(user_id=self.request.user.id)
+        role = Role.objects.get(name=profile.role)
+        return role.house
 
 
 def delete_house(request, house_id):
@@ -905,7 +967,7 @@ def get_section_level(request):
         return JsonResponse(json.dumps({'sections': list(sections), 'levels': list(levels)}), safe=False)
 
 
-class CreateFlat(CreateView):
+class CreateFlat(UserPassesTestMixin, CreateView):
     model = Flat
     template_name = 'admin_app/flat/update.html'
 
@@ -940,8 +1002,13 @@ class CreateFlat(CreateView):
         }
         return self.render_to_response(context)
 
+    def test_func(self):
+        profile = Profile.objects.get(user_id=self.request.user.id)
+        role = Role.objects.get(name=profile.role)
+        return role.apartment
 
-class UpdateFlat(UpdateView):
+
+class UpdateFlat(UserPassesTestMixin, UpdateView):
     model = Flat
     template_name = 'admin_app/flat/update.html'
 
@@ -978,10 +1045,20 @@ class UpdateFlat(UpdateView):
         }
         return self.render_to_response(context)
 
+    def test_func(self):
+        profile = Profile.objects.get(user_id=self.request.user.id)
+        role = Role.objects.get(name=profile.role)
+        return role.apartment
 
-class FlatDetail(DetailView):
+
+class FlatDetail(UserPassesTestMixin, DetailView):
     model = Flat
     template_name = 'admin_app/flat/detail.html'
+
+    def test_func(self):
+        profile = Profile.objects.get(user_id=self.request.user.id)
+        role = Role.objects.get(name=profile.role)
+        return role.apartment
 
 
 def delete_flat(request, pk):
@@ -1051,9 +1128,6 @@ def filter_flat_counter(flat, params):
     return counters
 
 
-
-
-
 class FlatCounterList(UserPassesTestMixin, FormMixin, ListView):
     model = Flat
     template_name = 'admin_app/counter/flat_counter.html'
@@ -1084,7 +1158,7 @@ class FlatCounterList(UserPassesTestMixin, FormMixin, ListView):
         return role.meter
 
 
-class CreateCounter(CreateView):
+class CreateCounter(UserPassesTestMixin, CreateView):
     model = Counter
     template_name = 'admin_app/counter/update.html'
 
@@ -1116,6 +1190,11 @@ class CreateCounter(CreateView):
         }
         return self.render_to_response(context)
 
+    def test_func(self):
+        profile = Profile.objects.get(user_id=self.request.user.id)
+        role = Role.objects.get(name=profile.role)
+        return role.meter
+
 
 def get_section_flat(request):
     if is_ajax(request):
@@ -1143,7 +1222,7 @@ def get_flats_by_owner(request):
         return JsonResponse(json.dumps({'flats': list(flats)}), safe=False)
 
 
-class UpdateCounter(UpdateView):
+class UpdateCounter(UserPassesTestMixin, UpdateView):
     model = Counter
     template_name = 'admin_app/counter/update.html'
 
@@ -1171,10 +1250,20 @@ class UpdateCounter(UpdateView):
         }
         return self.render_to_response(context)
 
+    def test_func(self):
+        profile = Profile.objects.get(user_id=self.request.user.id)
+        role = Role.objects.get(name=profile.role)
+        return role.meter
 
-class CounterDetail(DetailView):
+
+class CounterDetail(UserPassesTestMixin, DetailView):
     model = Counter
     template_name = 'admin_app/counter/detail.html'
+
+    def test_func(self):
+        profile = Profile.objects.get(user_id=self.request.user.id)
+        role = Role.objects.get(name=profile.role)
+        return role.meter
 
 
 def delete_counter(request, counter_id):
@@ -1214,12 +1303,17 @@ class CashBoxList(UserPassesTestMixin, StatisticMixin, FormMixin, FilterMixin, C
         return role.cash_box
 
 
-class CashBoxDetail(DetailView):
+class CashBoxDetail(UserPassesTestMixin, DetailView):
     model = CashBox
     template_name = 'admin_app/cash_box/detail.html'
 
+    def test_func(self):
+        profile = Profile.objects.get(user_id=self.request.user.id)
+        role = Role.objects.get(name=profile.role)
+        return role.cash_box
 
-class CreateIncome(CreateView):
+
+class CreateIncome(UserPassesTestMixin, CreateView):
     model = CashBox
     template_name = 'admin_app/cash_box/update_income.html'
 
@@ -1246,8 +1340,13 @@ class CreateIncome(CreateView):
             form.save()
             return redirect('/admin_app/cashbox_list')
 
+    def test_func(self):
+        profile = Profile.objects.get(user_id=self.request.user.id)
+        role = Role.objects.get(name=profile.role)
+        return role.cash_box
 
-class UpdateIncome(UpdateView):
+
+class UpdateIncome(UserPassesTestMixin, UpdateView):
     model = CashBox
     template_name = 'admin_app/cash_box/update_income.html'
 
@@ -1266,8 +1365,13 @@ class UpdateIncome(UpdateView):
             form.save()
             return redirect('/admin_app/cashbox_list')
 
+    def test_func(self):
+        profile = Profile.objects.get(user_id=self.request.user.id)
+        role = Role.objects.get(name=profile.role)
+        return role.cash_box
 
-class CreateExpense(CreateView):
+
+class CreateExpense(UserPassesTestMixin, CreateView):
     model = CashBox
     template_name = 'admin_app/cash_box/update_expense.html'
 
@@ -1285,8 +1389,13 @@ class CreateExpense(CreateView):
             print(form.errors)
             return self.render_to_response({'form': form.errors})
 
+    def test_func(self):
+        profile = Profile.objects.get(user_id=self.request.user.id)
+        role = Role.objects.get(name=profile.role)
+        return role.cash_box
 
-class UpdateExpense(UpdateView):
+
+class UpdateExpense(UserPassesTestMixin, UpdateView):
     model = CashBox
     template_name = 'admin_app/cash_box/update_expense.html'
 
@@ -1302,6 +1411,11 @@ class UpdateExpense(UpdateView):
         if form.is_valid():
             form.save()
             return redirect('/admin_app/cashbox_list')
+
+    def test_func(self):
+        profile = Profile.objects.get(user_id=self.request.user.id)
+        role = Role.objects.get(name=profile.role)
+        return role.cash_box
 
 
 def write_columns(ws, columns, font_style, row_num):
@@ -1387,8 +1501,7 @@ class BankBookList(UserPassesTestMixin, StatisticMixin, FormMixin, ListView):
         return role.personal_account
 
 
-
-class CreateBankBook(CreateView):
+class CreateBankBook(UserPassesTestMixin, CreateView):
     model = BankBook
     template_name = 'admin_app/bank_book/update.html'
 
@@ -1403,8 +1516,13 @@ class CreateBankBook(CreateView):
             form.save()
             return redirect('/admin_app/bankbook_list')
 
+    def test_func(self):
+        profile = Profile.objects.get(user_id=self.request.user.id)
+        role = Role.objects.get(name=profile.role)
+        return role.personal_account
 
-class UpdateBankBook(UpdateView):
+
+class UpdateBankBook(UserPassesTestMixin, UpdateView):
     model = BankBook
     template_name = 'admin_app/bank_book/update.html'
 
@@ -1422,15 +1540,25 @@ class UpdateBankBook(UpdateView):
             form.save()
             return redirect('/admin_app/bankbook_list')
 
+    def test_func(self):
+        profile = Profile.objects.get(user_id=self.request.user.id)
+        role = Role.objects.get(name=profile.role)
+        return role.personal_account
+
 
 def delete_bankbook(request, bankbook_id):
     BankBook.objects.get(id=bankbook_id).delete()
     return redirect('/admin_app/bankbook_list')
 
 
-class BankbookDetail(DetailView):
+class BankbookDetail(UserPassesTestMixin, DetailView):
     model = BankBook
     template_name = 'admin_app/bank_book/detail.html'
+
+    def test_func(self):
+        profile = Profile.objects.get(user_id=self.request.user.id)
+        role = Role.objects.get(name=profile.role)
+        return role.personal_account
 
 
 def get_owner(request):
@@ -1447,7 +1575,38 @@ def get_owner(request):
 
 
 def export_bankbook(request):
-    pass
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename="accounts.xls"'
+    wb = xlwt.Workbook(encoding='utf-8')
+    ws = wb.add_sheet('sheet1')
+    row_num = 0
+    font_style = xlwt.XFStyle()
+    font_style.font.bold = True
+
+    columns = ['Лицевой счет', 'Статус', 'Дом', 'Секция', 'Квартира', 'Владелец', 'Остаток']
+    write_columns(ws, columns, font_style, row_num)
+    font_style = xlwt.XFStyle()
+
+    rows = BankBook.objects.all().values_list('id', 'status', 'flat__house__name', 'flat__house__section__name',
+                                              'flat__number', 'flat__owner')
+    for row in rows:
+        row_num += 1
+        for col_num in range(len(row)):
+            if col_num == 5 and Owner.objects.filter(user_id=row[col_num]).exists():
+                owner = Owner.objects.get(user_id=row[col_num])
+                ws.write(row_num, col_num, owner.fullname(), font_style)
+                col = ws.col(col_num)
+                if col.width < 256 * len(owner.fullname()):
+                    col.width = 256 * (len(owner.fullname()) + 5)
+                continue
+            elif row[col_num] is None:
+                continue
+            ws.write(row_num, col_num, str(row[col_num]), font_style)
+            col = ws.col(col_num)
+            if col.width < 256 * len(str(row[col_num])):
+                col.width = 256 * (len(str(row[col_num])) + 5)
+    wb.save(response)
+    return response
 
 
 def get_bankbooks(request):
@@ -1502,7 +1661,9 @@ class ReceiptList(UserPassesTestMixin, FormMixin, FilterMixin, StatisticMixin, L
         profile = Profile.objects.get(user_id=self.request.user.id)
         role = Role.objects.get(name=profile.role)
         return role.invoice
-class CreateReceipt(CreateView):
+
+
+class CreateReceipt(UserPassesTestMixin, CreateView):
     model = Receipt
     template_name = 'admin_app/receipt/update.html'
 
@@ -1543,8 +1704,13 @@ class CreateReceipt(CreateView):
                 formset.save()
                 return redirect('/admin_app/receipt_list')
 
+    def test_func(self):
+        profile = Profile.objects.get(user_id=self.request.user.id)
+        role = Role.objects.get(name=profile.role)
+        return role.invoice
 
-class UpdateReceipt(UpdateView):
+
+class UpdateReceipt(UserPassesTestMixin, UpdateView):
     model = Receipt
     template_name = 'admin_app/receipt/update.html'
 
@@ -1579,8 +1745,13 @@ class UpdateReceipt(UpdateView):
                 formset.save()
                 return redirect('/admin_app/receipt_list')
 
+    def test_func(self):
+        profile = Profile.objects.get(user_id=self.request.user.id)
+        role = Role.objects.get(name=profile.role)
+        return role.invoice
 
-class ReceiptDetail(DetailView):
+
+class ReceiptDetail(UserPassesTestMixin, DetailView):
     model = Receipt
     template_name = 'admin_app/receipt/detail.html'
 
@@ -1590,6 +1761,11 @@ class ReceiptDetail(DetailView):
         context['total'] = receipt.receiptservice_set.all(). \
             aggregate(Sum('price')).get('price__sum', 0.00)
         return context
+
+    def test_func(self):
+        profile = Profile.objects.get(user_id=self.request.user.id)
+        role = Role.objects.get(name=profile.role)
+        return role.invoice
 
 
 def delete_receipt(request, receipt_id=None):
@@ -1623,23 +1799,38 @@ class MasterRequestList(UserPassesTestMixin, FormMixin, FilterMixin, ListView):
         return role.application
 
 
-class MasterRequestCreate(CreateView):
+class MasterRequestCreate(UserPassesTestMixin, CreateView):
     model = MasterRequest
     template_name = 'admin_app/master_request/create.html'
     form_class = MasterRequestForm
     success_url = reverse_lazy('master_request_list')
 
+    def test_func(self):
+        profile = Profile.objects.get(user_id=self.request.user.id)
+        role = Role.objects.get(name=profile.role)
+        return role.application
 
-class MasterRequestUpdate(UpdateView):
+
+class MasterRequestUpdate(UserPassesTestMixin, UpdateView):
     model = MasterRequest
     template_name = 'admin_app/master_request/create.html'
     form_class = MasterRequestForm
     success_url = reverse_lazy('master_request_list')
 
+    def test_func(self):
+        profile = Profile.objects.get(user_id=self.request.user.id)
+        role = Role.objects.get(name=profile.role)
+        return role.application
 
-class MasterRequestDetail(DetailView):
+
+class MasterRequestDetail(UserPassesTestMixin, DetailView):
     model = MasterRequest
     template_name = 'admin_app/master_request/detail.html'
+
+    def test_func(self):
+        profile = Profile.objects.get(user_id=self.request.user.id)
+        role = Role.objects.get(name=profile.role)
+        return role.application
 
 
 def delete_master_request(request, pk):
@@ -1658,7 +1849,7 @@ class MessageList(UserPassesTestMixin, ListView):
         return role.message
 
 
-class MessageCreate(CreateView):
+class MessageCreate(UserPassesTestMixin, CreateView):
     model = Message
     template_name = 'admin_app/message/create.html'
     form_class = MessageForm
@@ -1676,11 +1867,23 @@ class MessageCreate(CreateView):
         context['has_debt'] = self.request.GET.get('has_debt')
         return context
 
+    def test_func(self):
+        profile = Profile.objects.get(user_id=self.request.user.id)
+        role = Role.objects.get(name=profile.role)
+        return role.message
 
-class MessageDetail(DetailView):
+
+class MessageDetail(UserPassesTestMixin, DetailView):
     model = Message
     template_name = 'admin_app/message/detail.html'
 
+    def test_func(self):
+        profile = Profile.objects.get(user_id=self.request.user.id)
+        role = Role.objects.get(name=profile.role)
+        return role.message
+
 
 def delete_message(request):
-    pass
+    logger.info(request.POST)
+    Message.objects.filter(id__in=request.POST.getlist('ids[]')).delete()
+    return redirect('/admin_app/message_list')

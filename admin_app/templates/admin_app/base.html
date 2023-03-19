@@ -103,6 +103,7 @@
                     data-accordion="false">
                     <!-- Add icons to the links using the .nav-icon class
                          with font-awesome or any other icon font library -->
+                    {% if statistic %}
 
                     <li class="nav-item">
                         <a href="{% url 'index' %}" class="nav-link">
@@ -112,7 +113,8 @@
                             </p>
                         </a>
                     </li>
-
+                    {% endif %}
+                    {% if cash_box %}
 
                     <li class="nav-item">
                         <a href="{% url 'cashbox_list' %}" class="nav-link">
@@ -122,6 +124,8 @@
                             </p>
                         </a>
                     </li>
+                    {% endif %}
+                    {% if invoice %}
 
                     <li class="nav-item">
                         <a href="{% url 'receipt_list' %}" class="nav-link">
@@ -131,6 +135,8 @@
                             </p>
                         </a>
                     </li>
+                    {% endif %}
+                    {% if personal_account %}
 
                     <li class="nav-item">
                         <a href="{% url 'bankbook_list' %}" class="nav-link">
@@ -140,6 +146,8 @@
                             </p>
                         </a>
                     </li>
+                    {% endif %}
+                    {% if apartment %}
 
                     <li class="nav-item">
                         <a href="{% url 'flat_list' %}" class="nav-link">
@@ -149,6 +157,8 @@
                             </p>
                         </a>
                     </li>
+                    {% endif %}
+                    {% if owner %}
 
                     <li class="nav-item">
                         <a href="{% url 'owner_list' %}" class="nav-link">
@@ -158,6 +168,8 @@
                             </p>
                         </a>
                     </li>
+                    {% endif %}
+                    {% if house %}
 
                     <li class="nav-item">
                         <a href="{% url 'house_list' %}" class="nav-link">
@@ -167,6 +179,8 @@
                             </p>
                         </a>
                     </li>
+                    {% endif %}
+                    {% if message %}
 
                     <li class="nav-item">
                         <a href="{% url 'message_list' %}" class="nav-link">
@@ -176,6 +190,8 @@
                             </p>
                         </a>
                     </li>
+                     {% endif %}
+                    {% if application %}
 
                     <li class="nav-item">
                         <a href="{% url 'master_request_list' %}" class="nav-link">
@@ -185,6 +201,8 @@
                             </p>
                         </a>
                     </li>
+                    {% endif %}
+                    {% if meter %}
 
                     <li class="nav-item">
                         <a href="{% url 'counter_list' %}" class="nav-link">
@@ -194,6 +212,8 @@
                             </p>
                         </a>
                     </li>
+                     {% endif %}
+                    {% if site_management %}
 
                     <li class="nav-item">
                         <a href="#" class="nav-link">
@@ -230,6 +250,7 @@
                             </li>
                         </ul>
                     </li>
+                    {% endif %}
                     <li class="nav-item">
                         <a href="#" class="nav-link">
                             <i class="nav-icon fas fa-cogs"></i>
@@ -239,6 +260,7 @@
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
+                            {% if service %}
 
                             <li class="nav-item">
                                 <a href="{% url 'services' %}" class="nav-link">
@@ -246,6 +268,8 @@
                                     <p>Услуги</p>
                                 </a>
                             </li>
+                            {% endif %}
+                            {% if tariff %}
 
                             <li class="nav-item">
                                 <a href="{% url 'tariff_list' %}" class="nav-link">
@@ -253,6 +277,8 @@
                                     <p>Тарифы</p>
                                 </a>
                             </li>
+                            {% endif %}
+                            {% if role %}
 
                             <li class="nav-item">
                                 <a href="{% url 'roles' %}" class="nav-link">
@@ -260,6 +286,8 @@
                                     <p>Роли</p>
                                 </a>
                             </li>
+                            {% endif %}
+                            {% if users %}
 
                             <li class="nav-item">
                                 <a href="{% url 'user_list' %}" class="nav-link">
@@ -267,7 +295,8 @@
                                     <p>Пользователи</p>
                                 </a>
                             </li>
-
+                            {% endif %}
+                            {% if requisites %}
 
                             <li class="nav-item">
                                 <a href="{% url 'payment_details' %}" class="nav-link">
@@ -275,7 +304,7 @@
                                     <p>Платежные реквизиты</p>
                                 </a>
                             </li>
-
+                            {% endif %}
                             <li class="nav-item">
                                 <a href="{% url 'payment_items' %}" class="nav-link">
                                     <i class="far fa-circle nav-icon"></i>
