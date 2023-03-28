@@ -1,0 +1,106 @@
+{% extends 'cabinet/base.html' %}
+{% block content %}
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+              <div class="col-sm-6">
+                <h1>Сводка {{ flat.house.name }}, кв.{{ flat.number }}</h1>
+              </div>
+              <div class="col-sm-6">
+              </div>
+            </div>
+          </div>
+    </section>
+
+    <section class="content">
+    <div class="row">
+    <div class="col-xs-12 col-md-6 col-lg-4">
+        <div class="small-box bg-green">
+            <div class="inner">
+                <h3>{{ flat.balance|floatformat:2 }} грн</h3>
+                <p>Баланс по квартире</p>
+            </div>
+            <div class="icon">
+                <i class="fa fa-money"></i>
+            </div>
+            <span class="small-box-footer">
+                &nbsp;
+            </span>
+        </div>
+    </div>
+    <div class="col-xs-12 col-md-6 col-lg-4">
+        <div class="small-box bg-blue">
+            <div class="inner">
+                <h3>{{ flat.bankbook_set.first }}</h3>
+                <p>Лицевой счет</p>
+            </div>
+            <div class="icon">
+                <i class="fa fa-user"></i>
+            </div>
+            <span class="small-box-footer">
+                &nbsp;
+            </span>
+        </div>
+    </div>
+    <div class="col-xs-12 col-md-6 col-lg-4">
+        <div class="small-box bg-yellow">
+            <div class="inner">
+                <h3>{{ flat.avg_expenses }} грн</h3>
+                <p>Средний расход за месяц</p>
+            </div>
+            <div class="icon">
+                <i class="fa fa-pie-chart"></i>
+            </div>
+            <span class="small-box-footer">
+                &nbsp;
+            </span>
+        </div>
+    </div>
+</div>
+
+    <div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header with-border">
+                <h3 id="pieChartTitle" class="card-title">Диаграмма расходов</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <p>Недостаточно данных для отображения статистики</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header with-border">
+                <h3 class="card-title">Диаграмма расходов по месяцам за год</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <p>Недостаточно данных для отображения статистики</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</section>
+{% endblock %}
+{% block script %}
+    <script>
+
+    $('.nav-link.active').removeClass('active');
+        $('.nav-link').find('p:contains("Сводка")').parents('.nav-link').addClass('active');
+
+
+
+
+
+
+    </script>
+{% endblock %}

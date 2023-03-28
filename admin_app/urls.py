@@ -4,7 +4,7 @@ from django.views.defaults import permission_denied
 from .views import *
 
 urlpatterns = [
-    path('', IndexView.as_view(), name='index'),
+    path('', IndexView.as_view(), name='statistic'),
     path('services/', CreateService.as_view(), name='services'),
     path('delete_service', delete_service, name='delete_service'),
     path('delete_unit', delete_unit, name='delete_unit'),
@@ -101,6 +101,8 @@ urlpatterns = [
     path('create_message', MessageCreate.as_view(), name='create_message'),
     path('detail_message/<int:pk>', MessageDetail.as_view(), name='detail_message'),
     path('delete_messages', delete_message, name='delete_messages'),
+
+    path('export_transaction/<int:pk>', export_transaction, name='export_transaction')
 
 ]
 

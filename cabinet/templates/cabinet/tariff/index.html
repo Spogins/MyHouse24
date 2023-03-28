@@ -1,0 +1,52 @@
+{% extends 'cabinet/base.html' %}
+{% load widget_tweaks %}
+{% load static %}
+{% block header %}
+      <link rel="stylesheet" href="{% static 'plugins/daterangepicker/daterangepicker.css'%}">
+{% endblock %}
+{% block content %}
+        <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+              <div class="col-sm-6">
+                <h1>Тарифы - {{ flat.house.name }}, кв.{{ flat.number }}</h1>
+              </div>
+              <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                  <li class="breadcrumb-item"><a href="/admin_app">Главная</a></li>
+                  <li class="breadcrumb-item active">Тарифы - {{ flat.house.name }}, кв.{{ flat.number }}</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+        </section>
+    <section class="content">
+
+        <div class="row">
+            <div class="col-xs-12 col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <table class="table table-bordered table-hover sorting-table" data-filter-control="true" >
+                            <thead>
+                                <tr>
+                                    <th>Услуга</th>
+                                    <th>Ед. Изм.</th>
+                                    <th>Цена за ед., грн</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% for service in flat.tariff.tariffservice_set.all %}
+                                <tr>
+                                    <td>{{ service.service }}</td>
+                                <td>{{ service.service.unit }}</td>
+                                <td>{{ service.price }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

@@ -15,6 +15,7 @@ from account.models import *
 from account.views import has_access_for_class, has_access
 from admin_app.forms import *
 from admin_app.models import *
+from django.core.mail import send_mail
 
 
 # Create your views here.
@@ -757,7 +758,6 @@ class UpdateOwner(UserPassesTestMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         owner = Owner.objects.get(user_id=self.kwargs['pk'])
-        print(owner)
         context = {
             'owner_form': OwnerChangeForm(instance=owner),
             'user_form': UserChangeForm(instance=owner.user)
@@ -774,10 +774,14 @@ class UpdateOwner(UserPassesTestMixin, UpdateView):
             return self.form_invalid(user_form, owner_form)
 
     def form_valid(self, user_form, owner_form):
+        owner = Owner.objects.get(user_id=self.kwargs['pk'])
+        psw = owner.user.password
         created_user = user_form.save()
         created_user.username = user_form.cleaned_data['email']
-        if user_form.cleaned_data['password']:
+        if 'password' in user_form.changed_data and user_form.cleaned_data['password'] != '':
             created_user.set_password(user_form.cleaned_data['password'])
+        else:
+            created_user.set_password(psw)
         created_user.save()
         owner_form.save()
         return redirect('/admin_app/owner_list')
@@ -818,6 +822,22 @@ class InviteView(CreateView):
     def get_context_data(self, **kwargs):
         context = {'form': InviteForm()}
         return context
+
+    def post(self, request, *args, **kwargs):
+        form = InviteForm(request.POST)
+        if form.is_valid():
+            return self.form_valid(form)
+        return redirect('/admin_app/owner_list/')
+
+    def form_valid(self, form):
+        print(form.cleaned_data['mail'])
+        send_mail(
+            'MyHouse24',
+            message='We glad to invite you on MyHouse24!',
+            from_email='MyHouse24',
+            recipient_list=[f'{form.cleaned_data["mail"]}'],
+        )
+        return redirect('/admin_app/owner_list/')
 
 
 class HouseList(UserPassesTestMixin, FormMixin, FilterMixin, ListView):
@@ -1887,3 +1907,53 @@ def delete_message(request):
     logger.info(request.POST)
     Message.objects.filter(id__in=request.POST.getlist('ids[]')).delete()
     return redirect('/admin_app/message_list')
+
+
+def write_rows(ws, columns, font_style):
+    ct = len(columns)
+    for row_num in range(ct):
+        ws.write(row_num, 0, columns[row_num], font_style)
+        col = ws.col(0)
+        if col.width < 256 * len(str(columns[row_num])):
+            col.width = 256 * (len(str(columns[row_num])) + 5)
+
+
+
+def export_transaction(request, pk):
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename="transaction.xls"'
+    wb = xlwt.Workbook(encoding='utf-8')
+    ws = wb.add_sheet('sheet1')
+    font_style = xlwt.XFStyle()
+    font_style.font.bold = True
+
+    _columns = ['Платеж', 'Дата', 'Владелец квартиры', 'Лицевой счет', 'Приход/расход', 'Статус', 'Статья', 'Квитанция',
+                'Услуга', 'Сумма', 'Валюта', 'Комментарий', 'Менеджер']
+    write_rows(ws, _columns, font_style)
+    font_style = xlwt.XFStyle()
+
+    cashbox = CashBox.objects.get(id=pk)
+    try:
+        bank_book = BankBook.objects.get(id=cashbox.bankbook_id)
+    except:
+        bank_book = False
+    status = 'проведен' if cashbox.status else 'не проведен'
+    _columns = [f'#{pk}', f'{cashbox.date}', bank_book.flat.owner.fullname() if bank_book else '', bank_book.id if bank_book else '', cashbox.type, status, cashbox.payment_type.name, 'Не задано',
+                '',
+                f'{cashbox.amount_of_money}',
+                'UAH',
+                cashbox.comment,
+                cashbox.manager.fullname()]
+
+    ct = len(_columns)
+    for row_num in range(ct):
+        if _columns[row_num] is None:
+            continue
+        ws.write(row_num, 1, _columns[row_num], font_style)
+        col = ws.col(1)
+        if col.width < 256 * len(str(_columns[row_num])):
+            col.width = 256 * (len(str(_columns[row_num])) + 5)
+
+    wb.save(response)
+    return response
+

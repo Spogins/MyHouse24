@@ -1,0 +1,100 @@
+{% extends 'cabinet/base.html' %}
+{% load widget_tweaks %}
+{% load static %}
+{% block header %}
+      <link rel="stylesheet" href="{% static 'plugins/daterangepicker/daterangepicker.css'%}">
+{% endblock %}
+{% block content %}
+        <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+              <div class="col-sm-6">
+                <h1>Квитанции на оплату</h1>
+              </div>
+              <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                  <li class="breadcrumb-item"><a href="/admin_app">Главная</a></li>
+                  <li class="breadcrumb-item active">Квитанции</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+        </section>
+    <section class="content">
+
+        <div class="row">
+            <div class="col-xs-12 col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-tools">
+                            <a href="{% url 'receipt_list_cabinet' %}" class="btn btn-default btn-sm">
+                                <span class="hidden-sm">Очистить</span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-bordered table-hover sorting-table" data-filter-control="true" >
+                            <thead>
+                                <tr>
+                                    <th>№ квитанции</th>
+                                    <th>Дата</th>
+                                    <th>Статус</th>
+                                    <th>Сумма (грн.)</th>
+                                </tr>
+                            <tr id="w0-filters" class="filters">
+                                <form method="get" id="filter-form">
+                                    <td></td>
+                                    <td>{{ form.date_range}}</td>
+                                    <td>{{ form.status }}</td>
+                                    <td></td>
+                                </form>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for receipt in receipt_list %}
+                                <tr class="clickable-row" href="{% url 'detail_receipt' receipt.id %}">
+                                    <td>{{ receipt.id }}</td>
+                                <td>{{ receipt.date }}</td>
+                                <td>{{ receipt.status }}</td>
+                                    <td>{{ receipt.get_price }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+{% block script %}
+    <script src="{% static 'plugins/moment/moment-with-locales.min.js' %}"></script>
+    <script src="{% static 'plugins/daterangepicker/daterangepicker.js' %}"></script>
+    <script>
+        $('#id_id, #id_status, #id_date_range').on('change', function (){
+            console.log('change');
+            $('#filter-form').submit();
+        });
+
+        let date = $('#id_date_range').daterangepicker({
+            "autoUpdateInput": false,
+    "showDropdowns": true,
+    "opens": "center",
+        locale: {
+      format: 'YYYY-MM-DD'
+    }
+}, function(start, end, label) {
+  console.log('New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')');
+});
+        $('#id_date_range').on('apply.daterangepicker', function(ev, picker) {
+      $(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format('YYYY-MM-DD'));
+      $(this).trigger('change');
+  });
+
+        $('#id_date_range').on('cancel.daterangepicker', function(ev, picker) {
+  //do something, like clearing an input
+  $('#id_date_range').val('');
+  $(this).trigger('change');
+});
+    </script>
+{% endblock %}

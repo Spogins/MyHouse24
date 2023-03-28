@@ -1,0 +1,77 @@
+{% extends 'cabinet/base.html' %}
+{% load widget_tweaks %}
+{% load static %}
+{% block content %}
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+              <div class="col-sm-6">
+                <h1>Просмотр квитанции: #{{ receipt.id }}</h1>
+              </div>
+              <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                  <li class="breadcrumb-item"><a href="/admin_app">Главная</a></li>
+                  <li class="breadcrumb-item"><a href="{% url 'receipt_list' %}">Квитанции</a></li>
+                    <li class="breadcrumb-item active">Квитанция, №{{ receipt.id }}</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+    </section>
+    <section class="content">
+        <div class="card">
+            <div class="card-header">
+            <div class="card-tools">
+                <a href="" class="btn btn-info btn-sm">
+                    <i class="fa fa-print"></i>
+                    <span>Распечатать</span>
+                </a>
+            </div>
+        </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12">
+                    <div class="table-responsive no-padding margin-top-15">
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th style="width: 40px; min-width: 40px;">#</th>
+                                    <th>Услуга</th>
+                                    <th>Количество потребления (расход)</th>
+                                    <th style="width: 80px; min-width: 80px;">Ед. изм.</th>
+                                    <th>Цена за ед., грн</th>
+                                    <th>Стоимость, грн</th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="5"></td>
+                                    <td colspan="2"><b>Итого: {{ receipt.get_price }}</b></td>
+                                </tr>
+                            </tfoot>
+                <tbody>
+                {% for service in receipt.receiptservice_set.all %}
+                    <tr role="row">
+                            <td>{{ service.id }}</td>
+                            <td>{{ service.service }}</td>
+                            <td>{{ service.amount }}</td>
+                            <td>{{ service.unit }}</td>
+                            <td>{{ service.price_unit }}</td>
+                            <td>{{ service.price }}</td>
+                        </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+                    </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="float-right">
+                    <a href="{% url 'receipt_pdf' receipt.id %}" class="btn btn-sm btn-warning" style="color: white;" download=""><i class="fa fa-file-pdf-o" aria-hidden="true"></i> Скачать в PDF</a>
+                    <a href="" class="btn btn-sm btn-success"><i class="fa fa-credit-card" aria-hidden="true"></i> Оплатить</a>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

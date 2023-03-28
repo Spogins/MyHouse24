@@ -29,8 +29,11 @@ class UserChangeForm(forms.ModelForm):
 
     def clean(self):
         try:
-            password = self.cleaned_data['password']
-            confirm_password = self.cleaned_data['confirm_password']
+            if self.cleaned_data['password'] != '' and self.cleaned_data['confirm_password'] != '':
+                password = self.cleaned_data['password']
+                confirm_password = self.cleaned_data['confirm_password']
+            else:
+                raise forms.ValidationError('Введите пароли')
         except KeyError:
             raise forms.ValidationError('Введите пароли')
         if 'password' in self.changed_data:

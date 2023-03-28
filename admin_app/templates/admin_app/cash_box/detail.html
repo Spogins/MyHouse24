@@ -48,13 +48,13 @@
                             <a href="" class="btn btn-default btn-sm">
                                 <span>Копировать</span>
                             </a>
-                            <a href="{% url 'delete_cashbox' cashbox.id%}" class="btn btn-default btn-sm">
+                            <a href="{% url 'delete_cashbox' cashbox.id %}" class="btn btn-default btn-sm">
                                 <span>Удалить</span>
                             </a>
                             <a href="{% if cashbox.type == 'расход' %}{% url 'update_expense' cashbox.id %}{% else %}{% url 'update_income' cashbox.id %}{% endif %}" class="btn btn-primary btn-sm">
                                 <span class="hidden-xs">Редактировать ведомость</span>
                             </a>
-                            <a href="" class="btn btn-default btn-sm">
+                            <a href="{% url 'export_transaction' cashbox.id %}" class="btn btn-default btn-sm">
                                 <span>Выгрузить в Excel</span>
                             </a>
                         </div>

@@ -5,8 +5,8 @@ from admin_app.models import Role
 
 
 def role_pass(request):
-    print(request.user.id)
-    if request.user.id is not None and Profile.objects.get(user_id=request.user.id):
+   
+    try:
         profile = Profile.objects.get(user_id=request.user.id)
         role = Role.objects.get(name=profile.role)
         context = {
@@ -28,4 +28,5 @@ def role_pass(request):
             'requisites': role.requisites
         }
         return context
-    return {}
+    except:
+        return {}

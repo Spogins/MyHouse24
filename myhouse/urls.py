@@ -23,7 +23,7 @@ from myhouse import settings
 urlpatterns = [
     path('admin_app/', include('admin_app.urls')),
     path('account/', include('account.urls')),
-    path('cabinet/', include('cabinet.urls')),
+    path('cabinet/', include(('cabinet.urls', 'cabinet'), namespace='cabinet')),
     path('', include('main.urls')),
 ]
 handler403 = 'admin_app.views.error_403'

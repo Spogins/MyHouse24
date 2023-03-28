@@ -80,6 +80,9 @@ class Profile(models.Model):
     def __str__(self):
         return f'{self.role} - {self.user.first_name} {self.user.last_name}'
 
+    def fullname(self):
+        return f"{self.user.last_name} {self.user.first_name}"
+
 
 class PermissionPage(models.Model):
     name = models.CharField(max_length=30)
