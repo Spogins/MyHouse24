@@ -27,7 +27,7 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="card-tools">
-                            <a href="{% url 'receipt_list_cabinet' %}" class="btn btn-default btn-sm">
+                            <a href="{% url 'cabinet:receipt_list_cabinet' %}" class="btn btn-default btn-sm">
                                 <span class="hidden-sm">Очистить</span>
                             </a>
                         </div>
@@ -52,7 +52,7 @@
                             </thead>
                             <tbody>
                             {% for receipt in receipt_list %}
-                                <tr class="clickable-row" href="{% url 'detail_receipt' receipt.id %}">
+                                <tr class="clickable-row" href="{% url 'cabinet:detail_receipt' receipt.id %}">
                                     <td>{{ receipt.id }}</td>
                                 <td>{{ receipt.date }}</td>
                                 <td>{{ receipt.status }}</td>
@@ -71,6 +71,9 @@
     <script src="{% static 'plugins/moment/moment-with-locales.min.js' %}"></script>
     <script src="{% static 'plugins/daterangepicker/daterangepicker.js' %}"></script>
     <script>
+    $("#receipt").css('background-color', '#e1f1ea')
+
+
         $('#id_id, #id_status, #id_date_range').on('change', function (){
             console.log('change');
             $('#filter-form').submit();

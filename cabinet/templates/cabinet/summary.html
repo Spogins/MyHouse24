@@ -94,8 +94,11 @@
 {% block script %}
     <script>
 
-    $('.nav-link.active').removeClass('active');
-        $('.nav-link').find('p:contains("Сводка")').parents('.nav-link').addClass('active');
+
+        $("#summary").css('background-color', '#e1f1ea')
+        $("#summary").attr('class', 'active treeview menu-open')
+        $("#summary_{{ flat.id }}").attr('class', 'active')
+
 
 
 

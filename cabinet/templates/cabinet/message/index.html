@@ -64,6 +64,7 @@
 {% endblock %}
 {% block script %}
     <script>
+    $("#message").css('background-color', '#e1f1ea')
     $('.delete-many').on('click', function (e){
             e.preventDefault();
             $('#delete-form').submit();

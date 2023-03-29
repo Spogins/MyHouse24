@@ -11,7 +11,7 @@
               <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                   <li class="breadcrumb-item"><a href="/admin_app">Главная</a></li>
-                  <li class="breadcrumb-item"><a href="{% url 'receipt_list' %}">Квитанции</a></li>
+                  <li class="breadcrumb-item"><a href="{% url 'cabinet:receipt_list_cabinet' %}">Квитанции</a></li>
                     <li class="breadcrumb-item active">Квитанция, №{{ receipt.id }}</li>
                 </ol>
               </div>
@@ -68,7 +68,7 @@
             </div>
             <div class="card-footer">
                 <div class="float-right">
-                    <a href="{% url 'receipt_pdf' receipt.id %}" class="btn btn-sm btn-warning" style="color: white;" download=""><i class="fa fa-file-pdf-o" aria-hidden="true"></i> Скачать в PDF</a>
+                    <a href="{% url 'cabinet:receipt_pdf' receipt.id %}" class="btn btn-sm btn-warning" style="color: white;" download=""><i class="fa fa-file-pdf-o" aria-hidden="true"></i> Скачать в PDF</a>
                     <a href="" class="btn btn-sm btn-success"><i class="fa fa-credit-card" aria-hidden="true"></i> Оплатить</a>
                 </div>
             </div>

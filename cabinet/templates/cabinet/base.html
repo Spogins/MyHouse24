@@ -9,6 +9,7 @@
     <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet"
           href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="{% static 'plugins/fontawesome-free/css/all.min.css'%}">
     <!-- IonIcons -->
@@ -95,9 +96,9 @@
                     <!-- Add icons to the links using the .nav-icon class
                          with font-awesome or any other icon font library -->
 
-                    <li class="nav-item">
+                    <li class="nav-item" id="summary">
                         <a href="#" class="nav-link">
-                            <i class="nav-icon far fa-envelope"></i>
+                            <i class="fa fa-line-chart"></i>
                             <p>
                                 Сводка
                                 <i class="fas fa-angle-left right"></i>
@@ -105,34 +106,34 @@
                         </a>
                         <ul class="nav nav-treeview">
                             {% for flat in flats %}
-                            <li class="nav-item">
+                            <li class="nav-item" id="summary_{{ flat.id }}">
                                 <a href="{% url 'cabinet:summary' flat.id %}" class="nav-link">
-                                    <i class="far fa-circle nav-icon"></i>
+                                    <i class="fa fa-building"></i>
                                     <p>{{ flat.house.name }}, кв.{{ flat.number }}</p>
                                 </a>
                             </li>
                             {% endfor %}
                         </ul>
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item" id="receipt">
                         <a href="#" class="nav-link">
-                            <i class="nav-icon far fa-envelope"></i>
+                            <i class="fa fa-files-o"></i>
                             <p>
                                 Квитанции
                                 <i class="fas fa-angle-left right"></i>
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
-                            <li class="nav-item">
+                            <li class="nav-item" id="receipt_all">
                                 <a href="{% url 'cabinet:receipt_list_cabinet' %}" class="nav-link">
-                                    <i class="far fa-circle nav-icon"></i>
+                                    <i class="fa fa-files-o"></i>
                                     <p>Все квитанции</p>
                                 </a>
                             </li>
                             {% for flat in flats %}
-                            <li class="nav-item">
+                            <li class="nav-item" id="receipt_{{flat.id}}">
                                 <a href="{% url 'cabinet:receipt_list_cabinet' %}?flat_id={{ flat.id }}" class="nav-link">
-                                    <i class="far fa-circle nav-icon"></i>
+                                    <i class="fa fa-file-text"></i>
                                     <p>{{ flat.house.name }}, кв.{{ flat.number }}</p>
                                 </a>
                             </li>
@@ -140,9 +141,9 @@
                         </ul>
                     </li>
 
-                    <li class="nav-item">
+                    <li class="nav-item" id="tariff">
                         <a href="#" class="nav-link">
-                            <i class="nav-icon far fa-envelope"></i>
+                           <i class="fa fa-money"></i>
                             <p>
                                 Тарифы
                                 <i class="fas fa-angle-left right"></i>
@@ -150,9 +151,9 @@
                         </a>
                         <ul class="nav nav-treeview">
                             {% for flat in flats %}
-                            <li class="nav-item">
+                            <li class="nav-item" id="tariff_{{flat.id}}">
                                 <a href="{% url 'cabinet:detail_flatservice' flat.id %}" class="nav-link">
-                                    <i class="far fa-circle nav-icon"></i>
+                                    <i class="fa fa-file-text"></i>
                                     <p>{{ flat.house.name }}, кв.{{ flat.number }}</p>
                                 </a>
                             </li>
@@ -160,26 +161,26 @@
                         </ul>
                     </li>
 
-                    <li class="nav-item">
+                    <li class="nav-item" id="message">
                         <a href="{% url 'cabinet:message_list' %}" class="nav-link">
-                            <i class="nav-icon fas fa-columns"></i>
+                            <i class="fa fa-envelope"></i>
                             <p>
                                 Сообщения
                             </p>
                         </a>
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item" id="request">
                         <a href="{% url 'cabinet:master_request_list' %}" class="nav-link">
-                            <i class="nav-icon fas fa-columns"></i>
+                            <i class="fa fa-wrench"></i>
                             <p>
                                 Вызов мастера
                             </p>
                         </a>
                     </li>
 
-                    <li class="nav-item">
+                    <li class="nav-item" id="owner">
                         <a href="{% url 'cabinet:owner_profile' %}" class="nav-link">
-                            <i class="nav-icon fas fa-columns"></i>
+                            <i class="fa fa-user-circle"></i>
                             <p>
                                 Профиль
                             </p>
