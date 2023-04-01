@@ -84,7 +84,7 @@ class ReceiptList(FormMixin, FilterMixin, ListView):
         flat = Flat.objects.get(owner_id=self.request.user.id)
         receipt_list = Receipt.objects.filter(flat_id=flat.id)
 
-        return {'receipt_list': receipt_list}
+        return {'receipt_list': receipt_list, 'form': ReceiptFilterForm()}
 
     def get_form_kwargs(self, *args, **kwargs):
         # use GET parameters as the data

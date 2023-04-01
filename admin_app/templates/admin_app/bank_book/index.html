@@ -83,7 +83,7 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <table id="receipt-table" class="table table-bordered table-hover sorting-table" data-filter-control="true" >
+                        <table id="bankbook_table" class="table table-bordered table-hover sorting-table" data-filter-control="true" >
                             <thead>
                                 <tr>
                                     <th>№</th>
@@ -103,35 +103,13 @@
                                 <td>{{ form.flat__house_id }}</td>
                                 <td>{{ form.section }}</td>
                                 <td>{{ form.flat__owner_id }}</td>
-                                <td></td>
+                                <td>{{ form.balance }}</td>
                                 <td></td>
 
                             </tr>
                             </thead>
                             <tbody>
-                            {% for bankbook in page_obj %}
-                                <tr class="clickable-row" href="{% url 'detail_bankbook' bankbook.id %}">
-                                    <td>{{ bankbook.id }}</td>
 
-                                    <td>{% if bankbook.status == 'Активен' %}
-                                        <small class="badge badge-success">{{ bankbook.status }}</small>
-                                        {% else %}
-                                        <small class="badge badge-danger">{{ bankbook.status }}</small>
-                                    {% endif %}
-                                    </td>
-                                    <td>{{ bankbook.flat }}</td>
-                                    <td>{{ bankbook.flat.house }}</td>
-                                    <td>{{ bankbook.flat.section }}</td>
-                                    <td>{{ bankbook.flat.owner }}</td>
-                                    <td>{{ bankbook.balance }}</td>
-                                    <td>
-                                        <div class="btn-group float-right">
-                                            <a class="btn btn-default btn-sm" href="{% url 'update_bankbook' bankbook.id %}" title="Редактировать" data-toggle="tooltip"><i class="fas fa-pencil-alt"></i></a>
-                                            <a class="btn btn-default btn-sm" href="{% url 'delete_bankbook' bankbook.id %}" title="Удалить" data-toggle="tooltip" data-pjax="0" data-method="post"><i class="fa fa-trash"></i></a>
-                                        </div>
-                                    </td>
-                                </tr>
-                            {% endfor %}
                             </tbody>
                         </table>
 
@@ -143,37 +121,149 @@
     </section>
 {% endblock %}
 {% block script %}
-    <script>
+<script>
 
-    $('.nav-link.active').removeClass('active');
-        $('.nav-link').find('p:contains("Лицевые счета")').parents('.nav-link').addClass('active');
+$('.nav-link.active').removeClass('active');
+    $('.nav-link').find('p:contains("Лицевые счета")').parents('.nav-link').addClass('active');
 
 
-            $(document).ready(function () {
-        $('#receipt-table').DataTable({
-            ordering: false,
-            dom: 'rtp',
-            language: {
-                paginate: {
-                    "previous": "<<",
-                    "next": ">>"
+$(document).ready(function () {
+
+    var table = $('#bankbook_table').DataTable({
+        filter: true,
+        dom: 'lrtpi',
+        searching: true,
+        order: [0, ''],
+        ordering: true,
+        pageLength: 5,
+        paginate: true,
+        processing: true,
+        serverSide: true,
+        language: {lengthMenu:''},
+        columns: [
+            {'data': '_id',},
+            {'data': 'status',
+                render: function(data, type){
+                    if (data){
+                        if(data == 'Активен'){
+                            return '<small class="badge badge-success">Активен</small>'
+                        }
+                        return '<small class="badge badge-danger">Неактивен</small>'
+                    }
                 }
             },
-
-            initComplete: function () {
-                this.api()
-                    .columns()
-                    .every(function () {
-                        let that = this;
-
-                        $('#id_id, #id_flat__house_id, #id_section, #id_flat__number, #id_status, #id_flat__owner_id', this.header()).on('keyup change clear', function () {
-                            if (that.search() !== this.value) {
-                                that.search(this.value).draw();
-                            }
-                        });
-                    });
+            {'data': 'flat'},
+            {'data': 'house'},
+            {'data': 'section'},
+            {'data': 'owner'},
+            {'data': 'balance'},
+            {'data': '_id',
+                render: function(data, type){
+                    if (data){
+                        var edit_h = `<a class="btn btn-default btn-sm" href="/admin_app/update_bankbook/${data}" title="Редактировать" data-toggle="tooltip"><i class="fas fa-pencil-alt"></i></a>`
+                        var delete_h = `<a class="btn btn-default btn-sm" href="/admin_app/delete_bankbook/${data}" title="Удалить" data-toggle="tooltip" data-pjax="0" data-method="post"><i class="fa fa-trash">`
+                        return '<div class="btn-group float-right">' + edit_h + delete_h + '</div>'
+                    }
+                }
             },
-        });
+        ],
+        ajax: {
+            "data": function () {
+                let info = $('#bankbook_table').DataTable().page.info();
+                $('#bankbook_table').DataTable().ajax.url(`/admin_app/bankbook_search/${(info.page + 1)}`)
+            }
+        },
     })
-    </script>
+
+    table.columns(0).every(function (){
+        var col = this
+        table.on('keyup', '#bb_id', function (){
+            col
+                .search(this.value)
+                .draw()
+        });
+
+    })
+    table.columns(1).every(function (){
+        var col = this
+        table.on('change', '#status', function (){
+            col
+                .search(this.value)
+                .draw()
+        });
+
+    })
+    table.columns(2).every(function (){
+        var col = this
+        table.on('keyup', '#flat', function (){
+            col
+                .search(this.value)
+                .draw()
+        });
+
+    })
+    table.columns(3).every(function (){
+        var col = this
+        table.on('change', '#house', function (){
+            col
+                .search(this.value)
+                .draw()
+        });
+
+    })
+    table.columns(4).every(function (){
+        var col = this
+        table.on('change', '#section', function (){
+            col
+                .search(this.value)
+                .draw()
+        });
+
+    })
+    table.columns(5).every(function (){
+        var col = this
+        table.on('change', '#owner', function (){
+            col
+                .search(this.value)
+                .draw()
+        });
+
+    })
+    table.columns(6).every(function (){
+        var col = this
+        table.on('change', '#balance', function (){
+            col
+                .search(this.value)
+                .draw()
+        });
+
+    })
+
+});
+$('#house').on('change', function (){
+    let house = $(this).val();
+    $.ajax({
+        headers: { "X-CSRFToken": '{{ csrf_token }}' },
+        type: "GET",
+        url: '{% url 'get_section_level' %}',
+        data: {'house': house},
+        contentType: 'json/application',
+        success: function(response){
+            let answer = JSON.parse(response);
+            let sections = answer['sections'];
+            $('#section').empty();
+            $('#section').append($('<option>').text(''));
+            for(let i=0;i<sections.length;i++){
+                console.log(sections[i]);
+                $('#section').append($('<option>').text(sections[i]['name']));
+            }
+        },
+        error: function (responce){
+            $('#section').empty();
+        }
+    });
+});
+
+
+</script>
 {% endblock %}

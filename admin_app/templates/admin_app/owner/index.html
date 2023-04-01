@@ -44,7 +44,7 @@
                 </div>
                 </div>
                     <div class="card-body">
-                        <table class="table table-bordered table-hover sorting-table" data-filter-control="true" >
+                        <table id="owner_search" class="table table-bordered table-hover sorting-table" data-filter-control="true" >
                             <thead>
                                 <tr>
                                     <th>ID</th>
@@ -72,45 +72,9 @@
                             </tr>
                             </thead>
                             <tbody>
-                            {% for owner in object_list %}
-                                <tr class="clickable-row" href="{% url 'detail_owner' owner.user_id %}">
-                                    <td data-number="1">{{ owner.identify }}</td>
-                                    <td data-number="2">{{ owner.fullname }}</td>
-                                    <td data-number="3">{{ owner.phone }}</td>
-                                    <td data-number="4">{{ owner.user.email }}</td>
-                                    <td data-number="5">{{ owner.houses_str }}</td>
-                                    <td data-number="6">{{ owner.flats_str }}</td>
-                                    <td data-number="7">{{ owner.user.date_joined }}</td>
-                                    <td data-number="8">
-                                        {% if owner.status == 'Новый' %}
-                                        <small class="badge badge-warning">{{ owner.status }}</small>
-                                        {% elif owner.status == 'Активен' %}
-                                            <small class="badge badge-success">{{ owner.status }}</small>
-                                        {% else %}
-                                            <small class="badge badge-danger">{{ owner.status }}</small>
-                                        {% endif %}
-                                    </td>
-                                    <td data-number="9">{% if owner.has_debt %}Да{% endif %}</td>
-                                    <td>
-                                        <div class="btn-group float-right">
-                                            <a class="btn btn-default btn-sm" href="{% url 'create_message' %}?owner_id={{ owner.id }}" title="Отправить сообщение" data-toggle="tooltip"><i class="fas fa-envelope"></i></a>
-                                            <a class="btn btn-default btn-sm" href="{% url 'update_owner' owner.user_id %}" title="Редактировать" data-toggle="tooltip"><i class="fas fa-pencil-alt"></i></a>
-                                            <a class="btn btn-default btn-sm" href="{% url 'delete_owner' owner.user.id %}" title="Удалить" data-toggle="tooltip" data-pjax="0" data-method="post"><i class="fa fa-trash"></i></a>
-                                        </div>
-                                    </td>
-                                </tr>
-                            {% endfor %}
+
                             </tbody>
                         </table>
-                           <div class="row" style="display: flex; justify-content: flex-end;">
-                   <ul class="pagination">
-                              <li class="page-item"><a class="page-link" href="?page=1"> << </a></li>
-                              {%for p in page_obj.paginator.page_range%}
-                            <li class="page-item"><a class="page-link" href="?page={{p}}">{{p}}</a></li>
-                            {%endfor%}
-                         <li class="page-item"> <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}"> >> </a></li>
-                        </ul>
-                    </div>
                     </div>
                     </div>
                 </div>
@@ -119,45 +83,174 @@
     </section>
 {% endblock %}
 {% block script %}
-    <script>
+<script>
 
-    $('.nav-link.active').removeClass('active');
-        $('.nav-link').find('p:contains("Владельцы квартир")').parents('.nav-link').addClass('active');
+$('.nav-link.active').removeClass('active');
+$('.nav-link').find('p:contains("Владельцы квартир")').parents('.nav-link').addClass('active');
 
-        $(".sorting-table").DataTable({
-          "responsive": true, "lengthChange": false, "autoWidth": false, "searching": false, "paging": false,
-            "bInfo" : false,
-            "bSortCellsTop": true,
-            "scrollX": true,
-          "buttons": [],
-            rowReorder: true,
-            columnDefs: [
-                { orderable: true, className: 'reorder', targets: 1 },
-                { orderable: true, className: 'reorder', targets: 6 },
-            { orderable: false, targets: '_all' }
-                ]
+$(document).ready(function () {
+
+    var table = $('#owner_search').DataTable({
+        filter: true,
+        dom: 'lrtpi',
+        searching: true,
+        order: [0, ''],
+        ordering: true,
+        pageLength: 5,
+        paginate: true,
+        processing: true,
+        serverSide: true,
+        language: {lengthMenu:''},
+        columns: [
+            {'data': 'identify',},
+            {'data': 'fullname'},
+            {'data': 'phone'},
+            {'data': 'email'},
+            {'data': 'house',
+                render: function(data, type){
+                    if (data != ''){
+                        return `ЖК "${data}"`
+                    }
+                    return ''
+                }
+            },
+            {'data': 'flat',
+                render: function(data, type){
+                    if (data != ''){
+                        return `№${data[0]}, ЖК "${data[1]}"`
+                    }
+                    return ''
+                }
+            },
+            {'data': 'date'},
+            {'data': 'status',
+                render: function(data, type){
+                    let status = ''
+                    if (data){
+                        if(data == 'Новый'){
+                            status = '<small class="badge badge-warning">'+data+'</small>'
+                        }else if(data == 'Активен'){
+                            status = '<small class="badge badge-success">'+data+'</small>'
+                        }else{
+                            status = '<small class="badge badge-danger">'+data+'</small>'
+                        }
+                        return status
+                    }
+                }
+            },
+            {'data': 'debt',
+                render: function(data, type){
+                    let status = ''
+                    if (data){
+                        status = 'Да'
+                        return status
+                    }
+                    return status
+
+                }
+            },
+            {'data': 'id',
+                render: function(data, type){
+                    if (data){
+                        var message = `<a class="btn btn-default btn-sm" href="{% url 'create_message' %}?owner_id=${data}" title="Отправить сообщение" data-toggle="tooltip"><i class="fas fa-envelope"></i></a>`
+                        var edit_h = `<a class="btn btn-default btn-sm" href="/admin_app/update_owner/${data}" title="Редактировать" data-toggle="tooltip"><i class="fas fa-pencil-alt"></i></a>`
+                        var delete_h = `<a class="btn btn-default btn-sm" href="/admin_app/delete_owner/${data}" title="Удалить" data-toggle="tooltip" data-pjax="0" data-method="post"><i class="fa fa-trash"></i></a>`
+                        return '<div class="btn-group float-right">' + message + edit_h + delete_h + '</div>'
+                    }
+                }
+            },
+        ],
+        ajax: {
+            "data": function () {
+                let info = $('#owner_search').DataTable().page.info();
+                $('#owner_search').DataTable().ajax.url(`/admin_app/owner_search/${(info.page + 1)}`)
+            }
+        },
+    })
+
+    table.columns(0).every(function (){
+        var col = this
+        table.on('keyup', '#owner_id', function (){
+            col
+                .search(this.value)
+                .draw()
         });
 
-        $.expr[':'].icontains = function(a, i, m) {
-          return $(a).text().toLowerCase()
-              .indexOf(m[3].toLowerCase()) >= 0;
-        };
+    })
+    table.columns(1).every(function (){
+        var col = this
+        table.on('keyup', '#fullname', function (){
+            col
+                .search(this.value)
+                .draw()
+        });
 
-        $('#id_id, #id_fullname, #id_email, #id_phone, #id_flat, #id_date').on('keyup', function() {
-            let value = $(this).val().toLowerCase();
-            let number = $(this).data('number');
-            console.log(number);
-            console.log($(".table td[data-number='"+number+"']:icontains('" + value + "')"));
-            $(".table td[data-number='"+number+"']:icontains('" + value + "')").parent().show();
-            $(".table td[data-number='"+number+"']:not(:icontains('" + value + "'))").parent().hide();
+    })
+    table.columns(2).every(function (){
+        var col = this
+        table.on('keyup', '#phone', function (){
+            col
+                .search(this.value)
+                .draw()
         });
-        $('#id_house, #id_debt, #id_status').on('change', function (){
-            let value = $(this).find('option:selected').text().toLowerCase();
-            let number = $(this).data('number');
-            console.log(value);
-            console.log($(".table td[data-number='"+number+"']:icontains('" + value + "')"));
-            $(".table td[data-number='"+number+"']:icontains('" + value + "')").parent().show();
-            $(".table td[data-number='"+number+"']:not(:icontains('" + value + "'))").parent().hide();
+
+    })
+    table.columns(3).every(function (){
+        var col = this
+        table.on('keyup', '#email', function (){
+            col
+                .search(this.value)
+                .draw()
         });
-    </script>
+
+    })
+    table.columns(4).every(function (){
+        var col = this
+        table.on('change', '#house', function (){
+            col
+                .search(this.value)
+                .draw()
+        });
+
+    })
+    table.columns(5).every(function (){
+        var col = this
+        table.on('keyup', '#flat', function (){
+            col
+                .search(this.value)
+                .draw()
+        });
+
+    })
+    table.columns(6).every(function (){
+        var col = this
+        table.on('keyup', '#date', function (){
+            col
+                .search(this.value)
+                .draw()
+        });
+
+    })
+    table.columns(7).every(function (){
+        var col = this
+        table.on('change', '#status', function (){
+            col
+                .search(this.value)
+                .draw()
+        });
+
+    })
+    table.columns(8).every(function (){
+        var col = this
+        table.on('change', '#debt', function (){
+            col
+                .search(this.value)
+                .draw()
+        });
+
+    })
+
+});
+
+</script>
 {% endblock %}

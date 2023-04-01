@@ -36,7 +36,7 @@
                     </div>
                     <div class="card-body">
                         <form method="get" id="filter-form">
-                        <table id="house-table" class="table table-bordered table-hover sorting-table">
+                        <table id="house_table" class="table table-bordered table-hover sorting-table">
                             <thead>
                             <tr>
                                 <th>#</th>
@@ -46,25 +46,13 @@
                             </tr>
                             <tr id="w0-filters" class="filters">
                                 <td></td>
-                                <td>{{ form.name }}</td>
-                                <td>{{ form.address }}</td>
+                                <td><input type="text" id="name" class="house_search form-control" ></td>
+                                <td><input type="text" id="address" class="house_search form-control"></td>
                                 <td></td>
                             </tr>
                             </thead>
                             <tbody>
-                                {% for house in house_list %}
-                                    <tr class="clickable-row" href="{% url 'detail_house' house.id %}">
-                                        <td>{{ house.id }}</td>
-                                    <td>{{ house.name }}</td>
-                                    <td>{{ house.address }}</td>
-                                    <td>
-                                    <div class="btn-group float-right">
-                                                <a class="btn btn-default btn-sm" href="{% url 'update_house' house.id %}" title="Редактировать" data-toggle="tooltip"><i class="fas fa-pencil-alt"></i></a>
-                                                <a class="btn btn-default btn-sm" href="{% url 'delete_house' house.id %}" title="Удалить" data-toggle="tooltip" data-pjax="0" data-method="post"><i class="fa fa-trash"></i></a>
-                                            </div>
-                                    </td>
-                                    </tr>
-                                {% endfor %}
+
                             </tbody>
                         </table>
                         </form>
@@ -75,37 +63,70 @@
     </section>
 {% endblock %}
 {% block script %}
-    <script>
+<script>
 
-    $('.nav-link.active').removeClass('active');
-        $('.nav-link').find('p:contains("Дома")').parents('.nav-link').addClass('active');
+$('.nav-link.active').removeClass('active');
+$('.nav-link').find('p:contains("Дома")').parents('.nav-link').addClass('active');
 
+$(document).ready(function () {
 
-
-         $(document).ready(function () {
-        $('#house-table').DataTable({
-            ordering: false,
-            dom: 'rtp',
-            language: {
-                paginate: {
-                    "previous": "<<",
-                    "next": ">>"
+    var table = $('#house_table').DataTable({
+        filter: true,
+        dom: 'lrtpi',
+        searching: true,
+        order: [0, ''],
+        ordering: true,
+        pageLength: 5,
+        paginate: true,
+        processing: true,
+        serverSide: true,
+        language: {lengthMenu:''},
+        columns: [
+            {'data': 'ct',},
+            {'data': 'name'},
+            {'data': 'address'},
+            {'data': 'id',
+                render: function(data, type){
+                    if (data){
+                        var edit_h = `<a class="btn btn-default btn-sm" href="/admin_app/update_house/${data}" title="Редактировать" data-toggle="tooltip"><i class="fas fa-pencil-alt"></i></a>`
+                        var delete_h = `<a class="btn btn-default btn-sm" href="/admin_app/delete_house/${data}" title="Удалить" data-toggle="tooltip" data-pjax="0" data-method="post"><i class="fa fa-trash">`
+                        return '<div class="btn-group float-right">' + edit_h + delete_h + '</div>'
+                    }
                 }
             },
-            initComplete: function () {
-                this.api()
-                    .columns()
-                    .every(function () {
-                        let that = this;
-
-                        $('#id_name, #id_address', this.header()).on('keyup change clear', function () {
-                            if (that.search() !== this.value) {
-                                that.search(this.value).draw();
-                            }
-                        });
-                    });
-            },
-        });
+        ],
+        ajax: {
+            "data": function () {
+                let info = $('#house_table').DataTable().page.info();
+                $('#house_table').DataTable().ajax.url(`/admin_app/house_search/${(info.page + 1)}`)
+            }
+        },
     })
-    </script>
+
+    table.columns(1).every(function (){
+        var col = this
+        table.on('change', '#name', function (){
+            col
+                .search(this.value)
+                .draw()
+        });
+
+    })
+    table.columns(2).every(function (){
+        var col = this
+        table.on('change', '#address', function (){
+            col
+                .search(this.value)
+                .draw()
+        });
+
+    })
+
+});
+
+</script>
 {% endblock %}
+<div class="btn-group float-right">
+    <a class="btn btn-default btn-sm" href="{% url 'update_house' house.id %}" title="Редактировать" data-toggle="tooltip"><i class="fas fa-pencil-alt"></i></a>
+    <a class="btn btn-default btn-sm" href="{% url 'delete_house' house.id %}" title="Удалить" data-toggle="tooltip" data-pjax="0" data-method="post"><i class="fa fa-trash"></i></a>
+</div>

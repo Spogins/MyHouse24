@@ -2,6 +2,7 @@ from django.urls import path
 from django.views.defaults import permission_denied
 
 from .views import *
+from .views_api import *
 
 urlpatterns = [
     path('', IndexView.as_view(), name='statistic'),
@@ -102,7 +103,11 @@ urlpatterns = [
     path('detail_message/<int:pk>', MessageDetail.as_view(), name='detail_message'),
     path('delete_messages', delete_message, name='delete_messages'),
 
-    path('export_transaction/<int:pk>', export_transaction, name='export_transaction')
+    path('export_transaction/<int:pk>', export_transaction, name='export_transaction'),
+
+    path('house_search/<int:page>', house_search, name='house_search'),
+    path('owner_search/<int:page>', owner_search, name='owner_search'),
+    path('bankbook_search/<int:page>', bankbook_search, name='bankbook_search'),
 
 ]
 

@@ -104,18 +104,18 @@ class LoginOwnerForm(LoginForm):
 
 
 class OwnerFilterForm(forms.Form):
-    id = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'data-number': '1'}))
-    fullname = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'data-number': '2'}))
-    phone = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'data-number': '3'}))
-    email = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'data-number': '4'}))
+    id = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'data-number': '1', 'id': 'owner_id'}))
+    fullname = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'data-number': '2', 'id': 'fullname'}))
+    phone = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'data-number': '3', 'id': 'phone'}))
+    email = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'data-number': '4', 'id': 'email'}))
     house = forms.ModelChoiceField(queryset=House.objects.all(), empty_label='',
-                                   widget=forms.Select(attrs={'class': 'form-control', 'data-number': '5'}))
-    flat = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'data-number': '6'}))
-    date = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'data-number': '7'}))
-    status = forms.ChoiceField(choices=Owner.Status.choices,
-                               widget=forms.Select(attrs={'class': 'form-control', 'data-number': '8'}))
+                                   widget=forms.Select(attrs={'class': 'form-control', 'data-number': '5', 'id': 'house'}))
+    flat = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'data-number': '6', 'id': 'flat'}))
+    date = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'data-number': '7', 'id': 'date'}))
+    status = forms.ChoiceField(choices=(('', ''), ('Активен', 'Активен'), ('Новый', 'Новый'), ('Отключен', 'Отключен')),
+                               widget=forms.Select(attrs={'class': 'form-control', 'data-number': '8', 'id': 'status'}))
     debt = forms.ChoiceField(choices=(('', ''), ('Да', 'Да')),
-                             widget=forms.Select(attrs={'class': 'form-control', 'data-number': '9'}))
+                             widget=forms.Select(attrs={'class': 'form-control', 'data-number': '9', 'id': 'debt'}))
 
 
 class OwnerChangeForm(forms.ModelForm):

@@ -279,14 +279,17 @@ class BankBook(models.Model):
         return self.id
 
     def balance(self):
-        incomes = self.cashbox_set.filter(type='приход').aggregate(Sum('amount_of_money')).get('amount_of_money__sum', 0.00)
-        receipts = sum([receipt.get_price() for receipt in self.flat.receipt_set.all()])
-        logger.info(incomes)
-        if incomes:
-            return float(incomes)-receipts
-        if receipts:
-            return 0.00-receipts
-        else:
+        try:
+            incomes = self.cashbox_set.filter(type='приход').aggregate(Sum('amount_of_money')).get('amount_of_money__sum', 0.00)
+            receipts = sum([receipt.get_price() for receipt in self.flat.receipt_set.all()])
+            logger.info(incomes)
+            if incomes:
+                return float(incomes)-receipts
+            if receipts:
+                return 0.00-receipts
+            else:
+                return 0.00
+        except:
             return 0.00
 
 

@@ -344,18 +344,19 @@ class CashBoxExpenseCreateForm(forms.ModelForm):
 
 
 class BankBookFilterForm(forms.Form):
-    flat__house = [(f'{x.name}', f'{x.name}') for x in House.objects.all()]
+    flat__house = [(f'{x.id}', f'{x.name}') for x in House.objects.all()]
     flat__house.insert(0, ('', ''))
     flat__owner = [(f'{x}', f'{x}') for x in Owner.objects.all()]
     flat__owner.insert(0, ('', ''))
-    id = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
+    id = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'id': 'bb_id'}))
     status = forms.ChoiceField(choices=BankBook.Status.choices, widget=forms.Select(attrs={'class': 'form-control',
-                                                                                           'data-number': '2'}))
-    flat__house_id = forms.ChoiceField(choices=flat__house, widget=forms.Select(attrs={'class': 'form-control'}))
-    section = forms.ChoiceField(widget=forms.Select(attrs={'class': 'form-control'}))
-    flat__number = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
-
-    flat__owner_id = forms.ChoiceField(choices=flat__owner, widget=forms.Select(attrs={'class': 'form-control'}))
+                                                                                           'data-number': '2', 'id': 'status'}))
+    flat__house_id = forms.ChoiceField(choices=flat__house, widget=forms.Select(attrs={'class': 'form-control' , 'id': 'house'}))
+    section = forms.ChoiceField(widget=forms.Select(attrs={'class': 'form-control', 'id': 'section'}))
+    flat__number = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'id': 'flat'}))
+    flat__owner_id = forms.ChoiceField(choices=flat__owner, widget=forms.Select(attrs={'class': 'form-control', 'id': 'owner'}))
+    balance = forms.ChoiceField(choices=((' ', ' '), ('Есть долг', 'Есть долг'), ('Нет долга', 'Нет долга')),
+                                       widget=forms.Select(attrs={'class': 'form-control', 'id': 'balance'}))
 
 
 class BankbookCreateForm(forms.ModelForm):

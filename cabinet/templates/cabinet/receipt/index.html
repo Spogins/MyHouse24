@@ -33,7 +33,7 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <table class="table table-bordered table-hover sorting-table" data-filter-control="true" >
+                        <table id="table" class="table table-bordered table-hover sorting-table" data-filter-control="true" >
                             <thead>
                                 <tr>
                                     <th>№ квитанции</th>
@@ -74,30 +74,56 @@
     $("#receipt").css('background-color', '#e1f1ea')
 
 
-        $('#id_id, #id_status, #id_date_range').on('change', function (){
-            console.log('change');
-            $('#filter-form').submit();
-        });
+
 
         let date = $('#id_date_range').daterangepicker({
             "autoUpdateInput": false,
-    "showDropdowns": true,
-    "opens": "center",
-        locale: {
-      format: 'YYYY-MM-DD'
-    }
-}, function(start, end, label) {
-  console.log('New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')');
-});
-        $('#id_date_range').on('apply.daterangepicker', function(ev, picker) {
-      $(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format('YYYY-MM-DD'));
-      $(this).trigger('change');
-  });
+            "showDropdowns": true,
+            "opens": "center",
+                locale: {
+              format: 'YYYY-MM-DD'
+            }
+            }, function(start, end, label) {
+            console.log('New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')');
+            });
+            $('#id_date_range').on('apply.daterangepicker', function(ev, picker) {
+            $(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format('YYYY-MM-DD'));
+            $(this).trigger('change');
+        });
 
-        $('#id_date_range').on('cancel.daterangepicker', function(ev, picker) {
-  //do something, like clearing an input
-  $('#id_date_range').val('');
-  $(this).trigger('change');
-});
+
+
+        $(document).ready(function () {
+        $('#table').DataTable({
+            dom: 'rtp',
+            language: {
+                paginate: {
+                    "previous": "<<",
+                    "next": ">>"
+                }
+            },
+
+            columnDefs: [
+                {orderable: false, targets: 0},
+                {orderable: false, targets: 1},
+                {orderable: false, targets: 2},
+                {orderable: false, targets: 3},
+            ],
+            initComplete: function () {
+                this.api()
+                    .columns()
+                    .every(function () {
+                        let that = this;
+
+                        $('#id_date_range, #id_status', this.header()).on('keyup change clear', function () {
+                            if (that.search() !== this.value) {
+                                that.search(this.value).draw();
+                            }
+                        });
+                    });
+            },
+        });
+    })
+
     </script>
 {% endblock %}

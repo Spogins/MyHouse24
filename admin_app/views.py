@@ -1036,9 +1036,13 @@ class UpdateFlat(UserPassesTestMixin, UpdateView):
         form = FlatCreateForm(instance=Flat.objects.get(id=self.kwargs['pk']))
         context = {
             'form': form,
-            'bankbook': BankBook.objects.get(flat_id=self.kwargs['pk']),
             "update": True,
         }
+        try:
+            context['bankbook'] = BankBook.objects.get(flat_id=self.kwargs['pk'])
+        except:
+            pass
+
         return context
 
     def post(self, request, *args, **kwargs):
@@ -1916,7 +1920,6 @@ def write_rows(ws, columns, font_style):
         col = ws.col(0)
         if col.width < 256 * len(str(columns[row_num])):
             col.width = 256 * (len(str(columns[row_num])) + 5)
-
 
 
 def export_transaction(request, pk):
