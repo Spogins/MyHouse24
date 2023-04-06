@@ -468,6 +468,14 @@ class MessageForm(forms.ModelForm):
         exclude = ['from_user']
 
 
+class ReceiptTemplateForm(forms.ModelForm):
+
+    class Meta:
+        model = Template
+        exclude = ('is_default',)
+
+
+
 ServiceFormset = modelformset_factory(model=Service, form=ServiceForm, extra=0)
 UnitFormset = modelformset_factory(model=Unit, form=UnitForm, extra=0)
 TariffServiceFormSet = modelformset_factory(model=TariffService, form=TariffServiceForm, extra=0)

@@ -1,13 +1,15 @@
 from django.contrib.auth import login, authenticate
-
+from wkhtmltopdf.views import PDFTemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
+from django.template.loader import get_template
 from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import DetailView, ListView, UpdateView
 from django.views.generic.edit import FormMixin, CreateView
-
+from xhtml2pdf import pisa
 from account.forms import *
 from account.models import *
 from admin_app.forms import ReceiptFilterForm, MasterRequestForm
@@ -203,5 +205,40 @@ class UpdateOwner(UpdateView):
         return self.render_to_response(context)
 
 
-def render_pdf_view(request):
-    pass
+def render_pdf_view(request, receipt_id):
+    template_path = 'cabinet/receipt/pdf.html'
+    requisites = PaymentDetails.objects.first()
+    receipt = Receipt.objects.get(id=receipt_id)
+    # print(receipt.flat.owner.user.first_name)
+    print(settings.STATIC_URL)
+    context = {'requisites': requisites.description,
+               'static': settings.STATIC_URL,
+               'receipt': receipt}
+    # Create a Django response object, and specify content_type as pdf
+    response = HttpResponse(content_type='application/pdf')
+    # response['Content-Disposition'] = 'attachment; filename="report.pdf"'
+    response['Content-Disposition'] = 'attachment; filename="report.pdf"'
+    # find the template and render it.
+    template = get_template(template_path)
+    html = template.render(context)
+    # create a pdf
+    pisa_status = pisa.CreatePDF(
+       html.encode('UTF-8'), dest=response, encoding='utf-8')
+    # if error then show some funy view
+    if pisa_status.err:
+       return HttpResponse('We had some errors <pre>' + html + '</pre>')
+    return response
+
+
+class MyPDF(PDFTemplateView):
+    filename = 'my_pdf.pdf'
+    template_name = '/cabinet/receipt/pdf.html'
+    cmd_options = {
+        'margin-top': 3,
+    }
+
+    def get_context_data(self, **kwargs):
+        context = super(MyPDF, self).get_context_data(**kwargs)
+        requisites = PaymentDetails.objects.first()
+        context['requisites'] = requisites.information
+        return context

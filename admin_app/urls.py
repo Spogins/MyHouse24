@@ -1,6 +1,7 @@
 from django.urls import path
 from django.views.defaults import permission_denied
 
+from .services.build_from_template import BuildReceiptFileView
 from .views import *
 from .views_api import *
 
@@ -108,6 +109,13 @@ urlpatterns = [
     path('house_search/<int:page>', house_search, name='house_search'),
     path('owner_search/<int:page>', owner_search, name='owner_search'),
     path('bankbook_search/<int:page>', bankbook_search, name='bankbook_search'),
+
+    path('receipt/template_choose/', TemplateChooseView.as_view(), name='template_choose'),
+    path('receipt/template_create/', ReceiptTemplateCreateView.as_view(), name='template_create'),
+    path('receipt/build_receipt_file/', BuildReceiptFileView.as_view(), name='build_receipt_file'),
+    path('receipt/send/', ReceiptToEmailSend.as_view(), name='send_receipt'),
+    path('receipt/template/<int:template_pk>/', TemplateDefault.as_view(), name='template_default'),
+    path('receipt/delete_template/<int:template_id>/', delete_template, name='delete_template'),
 
 ]
 

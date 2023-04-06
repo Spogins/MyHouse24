@@ -6,8 +6,10 @@ from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect
 from django.template import RequestContext
 from django.urls import reverse_lazy
+from django.views import View
 from django.views.decorators.http import require_POST
-from django.views.generic import ListView, DetailView, CreateView, UpdateView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, TemplateView
+from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import FormMixin, FormView
 from django.views.generic.list import MultipleObjectMixin
 from account.forms import *
@@ -16,6 +18,7 @@ from account.views import has_access_for_class, has_access
 from admin_app.forms import *
 from admin_app.models import *
 from django.core.mail import send_mail
+from django.core.mail import EmailMessage
 
 
 # Create your views here.
@@ -1960,3 +1963,76 @@ def export_transaction(request, pk):
     wb.save(response)
     return response
 
+
+class TemplateChooseView(ListView):
+    model = Template
+    queryset = Template.objects.all()
+    template_name = 'admin_app/receipt/template_download.html'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(object_list=object_list)
+        context['receipt'] = self.request.GET.get('receipt')
+        return context
+
+
+class ReceiptTemplateCreateView(CreateView):
+    model = Template
+    template_name = 'admin_app/receipt/template_create.html'
+    form_class = ReceiptTemplateForm
+    string_permission = 'receipt_access'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['object_list'] = Template.objects.all().order_by('id')
+        return context
+
+    def post(self, request, *args, **kwargs):
+        form = self.get_form_class()(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('/admin_app/receipt/template_create/')
+        return redirect('/admin_app/receipt/template_create/')
+
+
+class ReceiptToEmailSend(CreateView):
+    string_permission = 'receipt_access'
+
+    def get(self, request, *args, **kwargs):
+        file_path = self.request.GET.get('full_path')
+        email = EmailMessage('Квитанція', to=[self.request.user.email])
+        email.attach_file(file_path)
+        if email.send():
+            return JsonResponse({'answer': 'success'})
+        else:
+            return JsonResponse({'answer': 'none'})
+
+
+class TemplateDefault(SingleObjectMixin, View):
+    model = Template
+    pk_url_kwarg = 'template_pk'
+
+    def get_object(self, queryset=None):
+        try:
+            return Template.objects.get(pk=self.kwargs.get('template_pk'))
+        except Template.DoesNotExist:
+            return None
+
+    def get(self, request, *args, **kwargs):
+        obj = self.get_object()
+        if obj:
+            try:
+                another_default = Template.objects.get(is_default=True)
+                another_default.is_default = False
+                another_default.save()
+            except Template.DoesNotExist:
+                pass
+            obj.is_default = True
+            obj.save()
+            return redirect('/admin_app/receipt/template_create/')
+        return redirect('/admin_app/receipt/template_create/')
+
+
+def delete_template(request, template_id):
+    logger.info(request.POST)
+    Template.objects.get(id=template_id).delete()
+    return redirect('/admin_app/receipt/template_create/')

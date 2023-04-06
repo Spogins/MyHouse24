@@ -381,3 +381,9 @@ class Message(models.Model):
         if self.flat is not None:
             answer += ', кв.' + self.flat.number
         return answer
+
+
+class Template(models.Model):
+    name = models.CharField(max_length=255)
+    file = models.FileField(upload_to='receipts/templates')
+    is_default = models.BooleanField(default=False, verbose_name='(template)')

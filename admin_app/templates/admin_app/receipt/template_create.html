@@ -1,0 +1,65 @@
+{% extends 'admin_app/base.html' %}
+{% load static %}
+
+{% block content %}
+ <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+              <div class="col-sm-6">
+                <h1>Настройка шаблонов</h1>
+              </div>
+              <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                  <li class="breadcrumb-item"><a href="/admin_app">Главная</a></li>
+                  <li class="breadcrumb-item"><a href="{% url 'receipt_list' %}">Квитанции</a></li>
+                  <li class="breadcrumb-item active">Настройка шаблонов</li>
+                </ol>
+              </div>
+            </div>
+
+
+          </div>
+    </section>
+<section class="content">
+    <div class="card">
+        <div class="card-body">
+            <h5 style="font-size: 18px; color: grey">Список шаблонов</h5>
+            {% for object in object_list %}
+                <div class="template" style="margin-top: 20px;">
+                    <p>{{ object.name }} {% if object.is_default %}<b>(по-умоланию)</b>{% endif %}</p>
+                    <a href="{{ object.file.url }}" download style="display: inline-block; margin-right: 10px;"><i class="fa fa-download"></i>Скачать шаблон</a>
+                    <a href="{% url 'template_default' template_pk=object.pk %}" style="display: inline-block; color: #2AA514F2; margin-right: 10px;">• Назначить шаблоном по умоланию</a>
+                    <a href="{% url 'delete_template' object.id %}" role="button" style="display: inline-block; color: rgba(213,24,24,0.95); margin-right: 10px;"><i class="fa fa-trash"></i>Удалить шаблон</a>
+                </div>
+            {% endfor %}
+            <div class="row">
+                <div class="col-sm-12 col-lg-6">
+                    <form id="template-form" method="post" action="{% url 'template_create' %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="form-group" style="margin-top: 25px;">
+                            <div class="row" style="display: flex;flex-direction: column;">
+                            <input type="file" accept=".xlsx" id="{{ form.file.auto_id }}" name="{{ form.file.html_name }}">
+                            <label for="{{ form.name.auto_id }}">Название</label>
+                            <input type="text" id="{{ form.name.auto_id }}" name="{{ form.name.html_name }}" class="form-control" style="margin-bottom: 25px;">
+                            </div>
+
+
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12 text-right">
+                                <button type="reset" class="btn btn-default" style="margin-right: 10px;">Отменить</button>
+                                <button type="submit" class="btn btn-success">Сохранить</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+{% block script %}
+<script>
+
+</script>
+{% endblock %}

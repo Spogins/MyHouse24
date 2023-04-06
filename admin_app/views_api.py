@@ -3,7 +3,7 @@ from django.core.paginator import Paginator
 from django.http import JsonResponse
 
 from account.models import Owner
-from admin_app.models import House, Flat, BankBook
+from admin_app.models import House, Flat, BankBook, Receipt
 
 
 def is_ajax(request):
@@ -169,3 +169,5 @@ def bankbook_search(request, page):
     page = paginate.page(page)
     return JsonResponse({'draw': request.GET.get('draw'), "recordsTotal": BankBook.objects.filter().count(),
                          "recordsFiltered": len(_list), 'data': list(page.object_list)})
+
+

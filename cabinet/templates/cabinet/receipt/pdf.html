@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="ru">
-{% load filters %}
+
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
     <style>
-        @font-face { font-family: Arial; src: url('{{ static }}/fonts/ArialMT.ttf'); }
+        @font-face { font-family: Arial; src: url('cabinet/static/fonts/CaviarDreams.ttf'); }
         body{
           font-family: Arial;
             font-size: 16px;
@@ -60,7 +60,7 @@
         <td colspan="2">Баланс о/р</td>
         <td>{{ receipt.flat.bankbook_set.first.balance }}</td>
         <td>на</td>
-        <td colspan="2">{{ receipt.date|ru_strftime:"dd.MM.YYYY" }}</td>
+        <td colspan="2">{{ receipt.date }}</td>
         <td></td>
         <td></td>
         <td colspan="2"></td>
@@ -69,7 +69,7 @@
         <td colspan="2" rowspan="2">ДО СПЛАТИ</td>
         <td rowspan="2"> {{ receipt.get_price }}</td>
         <td rowspan="2">за</td>
-        <td colspan="2" rowspan="2">{{ receipt.date|ru_strftime:"LLLL YYYY" }}</td>
+        <td colspan="2" rowspan="2">{{ receipt.date }}</td>
         <td rowspan="4" colspan="4">
             С условиями приема банком суммы ознакомлен и согласен<br>
             ________________<br>
@@ -133,7 +133,7 @@
 {#        <td colspan="2">Баланс о/р</td>#}
 {#        <td>{{ receipt.flat.bankbook_set.first.balance }}</td>#}
 {#        <td>на</td>#}
-{#        <td>{{ receipt.date|ru_strftime:"dd.MM.YYYY" }}</td>#}
+{#        <td>{{ receipt.date}}</td>#}
 {#        <td></td>#}
 {#        <td></td>#}
 {#        <td></td>#}
@@ -143,7 +143,7 @@
 {#        <td colspan="2">До сплати</td>#}
 {#        <td>0.00</td>#}
 {#        <td>за</td>#}
-{#        <td colspan="2">{{ receipt.date|ru_strftime:"LLLL YYYY" }}</td>#}
+{#        <td colspan="2">{{ receipt.date}}</td>#}
 {#        <td colspan="4" rowspan="4">С условиями приема банком суммы ознакомлен и согласен<br>#}
 {#            ________________<br>#}
 {#            (підпис платника)#}
@@ -198,7 +198,7 @@
         <td colspan="2">Баланс о/р</td>
         <td>{{ receipt.flat.bankbook_set.first.balance }}</td>
         <td>на</td>
-        <td colspan="2">{{ receipt.date|ru_strftime:"dd.MM.YYYY" }}</td>
+        <td colspan="2">{{ receipt.date}}</td>
         <td></td>
         <td></td>
         <td colspan="2"></td>
@@ -207,7 +207,7 @@
         <td colspan="2" rowspan="2">ДО СПЛАТИ</td>
         <td rowspan="2"> {{ receipt.get_price }}</td>
         <td rowspan="2">за</td>
-        <td colspan="2" rowspan="2">{{ receipt.date|ru_strftime:"LLLL YYYY" }}</td>
+        <td colspan="2" rowspan="2">{{ receipt.date }}</td>
         <td rowspan="4" colspan="4">
             С условиями приема банком суммы ознакомлен и согласен<br>
             ________________<br>
