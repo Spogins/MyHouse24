@@ -234,7 +234,7 @@ class FlatCreateForm(forms.ModelForm):
         widget=forms.Select(attrs={'class': 'form-control'}))
     bank_book = forms.ModelChoiceField(
         required=False,
-        queryset=BankBook.objects.filter(status='Активен'),
+        queryset=BankBook.objects.filter(status='Активен', flat_id=None),
         label='Лицевой счет',
         empty_label='Выберите...',
         widget=forms.Select(attrs={'class': 'form-control'}))

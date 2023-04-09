@@ -128,7 +128,10 @@ def bankbook_search(request, page):
         _flat = bankbook.flat.number if bankbook.flat else ''
         _house = bankbook.flat.house.name if bankbook.flat else ''
         _section = bankbook.flat.section.name if bankbook.flat else ''
-        _owner = bankbook.flat.owner.fullname() if bankbook.flat.owner else ''
+        try:
+            _owner = bankbook.flat.owner.fullname()
+        except:
+            _owner = ''
 
         if _id != '' and _id not in str(bankbook.id):
             continue

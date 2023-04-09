@@ -150,14 +150,14 @@
     });
         $(document).ready(function () {
         $('#flat-table').DataTable({
+            filter: true,
+            dom: 'lrtpi',
+            searching: true,
+            order: [0, ''],
             ordering: false,
-            dom: 'rtp',
-            language: {
-                paginate: {
-                    "previous": "<<",
-                    "next": ">>"
-                }
-            },
+            pageLength: 5,
+            paginate: true,
+            language: {lengthMenu:''},
             initComplete: function () {
                 this.api()
                     .columns()

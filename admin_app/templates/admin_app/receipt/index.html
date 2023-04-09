@@ -140,6 +140,9 @@
                                     <td>{{ receipt.get_price }}</td>
                                     <td>
                                         <div class="btn-group float-right">
+                                            <a class="btn btn-default btn-sm" title="Копировать" href="{% url 'create_receipt' %}">
+                                                <i class="fa fa-clone"></i>
+                                            </a>
                                             <a class="btn btn-default btn-sm" href="{% url 'update_receipt' receipt.id %}" title="Редактировать" data-toggle="tooltip"><i class="fas fa-pencil-alt"></i></a>
                                             <a class="btn btn-default btn-sm" href="{% url 'delete_receipt' receipt.id %}" title="Удалить" data-toggle="tooltip" data-pjax="0" data-method="post"><i class="fa fa-trash"></i></a>
                                         </div>
