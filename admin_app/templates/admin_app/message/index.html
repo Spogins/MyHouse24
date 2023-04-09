@@ -39,7 +39,7 @@
                         <div class="row m-0">
                             <div class="col-md-12">
                                     <div class="form-group float-left">
-                                        <button type="button" class="btn btn-default btn-sm checkbox-toggle"><i class="fal fa-square"></i></button>
+                                        <button onclick="check_click()" type="button" class="btn btn-default btn-sm checkbox-toggle"><i class="fal fa-square"></i></button>
                                         <button type="button" class="btn btn-default btn-sm delete-many"><i class="fa fa-trash"></i></button>
                                     </div>
                             </div>
@@ -92,5 +92,12 @@
             "bInfo" : false, "ordering": false,
           "buttons": []
         });
+
+    function check_click(){
+         $('.checkbox-item').each(function(i, elem){
+            elem.click()
+         })
+    }
+
     </script>
 {% endblock %}

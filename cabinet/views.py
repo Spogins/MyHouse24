@@ -112,6 +112,10 @@ class MessageList(ListView):
     model = Message
     template_name = 'cabinet/message/index.html'
 
+    def get_context_data(self, **kwargs):
+        context = {'message_list': Message.objects.filter(owner_id=self.request.user.id)}
+        return context
+
 
 class MessageDetail(DetailView):
     model = Message

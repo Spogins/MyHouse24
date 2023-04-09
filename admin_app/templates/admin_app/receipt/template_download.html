@@ -72,7 +72,7 @@
                     Swal.fire({
                         position: 'top-end',
                         icon: 'success',
-                        title: 'Очікуйте файл до завантаження!',
+                        title: ' Ожидайте файл',
                         showConfirmButton: false,
                         timer: 1200,
                     })
@@ -81,7 +81,7 @@
                     Swal.fire({
                         position: 'top-end',
                         icon: 'error',
-                        title: 'Щось пішло не так!',
+                        title: 'Ошибка скачивания',
                         showConfirmButton: false,
                         timer: 1200
                     });
@@ -107,7 +107,7 @@
                     Swal.fire({
                         position: 'top-end',
                         icon: 'error',
-                        title: 'Щось пішло не так!',
+                        title: 'Что-то пошло не так!',
                         showConfirmButton: false,
                         timer: 1200
                     });
@@ -119,13 +119,13 @@
     function fetchToSendEmail(full_path) {
         $.ajax({
             type: 'GET',
-            url: `{% url 'send_receipt' %}?full_path=${full_path}`,
+            url: `{% url 'send_receipt' %}?full_path=${full_path}&receipt={{ receipt }}`,
             success: function(data) {
                 if (data['answer'] === 'success') {
                     Swal.fire({
                         position: 'top-end',
                         icon: 'success',
-                        title: 'Успішно надіслано!',
+                        title: 'Успешно отправлено!',
                         showConfirmButton: false,
                         timer: 1200,
                     })
@@ -134,7 +134,7 @@
                     Swal.fire({
                         position: 'top-end',
                         icon: 'error',
-                        title: 'Щось пішло не так!',
+                        title: 'Что-то пошло не так!',
                         showConfirmButton: false,
                         timer: 1200
                     });

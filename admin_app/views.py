@@ -1883,8 +1883,12 @@ class MessageCreate(UserPassesTestMixin, CreateView):
     success_url = reverse_lazy('message_list')
 
     def form_valid(self, form):
-        print(self.request.user)
         form.instance.from_user = self.request.user
+        try:
+            flat = Flat.objects.get(id=form.instance.flat_id)
+            form.instance.owner_id = flat.owner_id
+        except:
+            return super().form_valid(form)
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
@@ -1911,6 +1915,7 @@ class MessageDetail(UserPassesTestMixin, DetailView):
 
 
 def delete_message(request):
+    print(request)
     logger.info(request.POST)
     Message.objects.filter(id__in=request.POST.getlist('ids[]')).delete()
     return redirect('/admin_app/message_list')
@@ -1999,7 +2004,10 @@ class ReceiptToEmailSend(CreateView):
 
     def get(self, request, *args, **kwargs):
         file_path = self.request.GET.get('full_path')
-        email = EmailMessage('Квитанція', to=[self.request.user.email])
+        receipt = Receipt.objects.get(id=self.request.GET.get('receipt'))
+        email = EmailMessage('Квитанция', to=[receipt.flat.owner.user.email])
+
+
         email.attach_file(file_path)
         if email.send():
             return JsonResponse({'answer': 'success'})
