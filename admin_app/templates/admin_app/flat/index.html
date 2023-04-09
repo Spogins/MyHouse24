@@ -119,7 +119,7 @@
             $.ajax({
                 headers: { "X-CSRFToken": '{{ csrf_token }}' },
                 type: "GET",
-                url: '{% url 'get_section_level' %}',
+                url: "{% url 'get_section_level' %}",
                 data: {'house': house},
                 contentType: 'json/application',
                 success: function(response){

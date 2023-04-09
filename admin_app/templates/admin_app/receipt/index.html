@@ -132,8 +132,8 @@
                                         {% endif %}
 
                                     </td>
-                                    <td>{{ receipt.date }}</td>
-                                    <td>{{ receipt.date }}</td>
+                                    <td>{{ receipt.date|date:"Y-m-d" }}</td>
+                                    <td>{{ receipt.date|date:"F" }}</td>
                                     <td>{{ receipt.flat }}</td>
                                     <td>{{ receipt.flat.owner }}</td>
                                     <td>{% if receipt.is_checked is True %}Проведена{% else %}Не проведена{% endif %}</td>
@@ -158,6 +158,7 @@
             </div>
         </div>
     </section>
+
 {% endblock %}
 {% block script %}
     <script src="{% static 'plugins/moment/moment-with-locales.min.js' %}"></script>
@@ -196,6 +197,9 @@
 });
 
   $(document).ready(function () {
+    $('.owner_select').select2({}).val('');
+
+
         $('#receipt-table').DataTable({
             ordering: true,
             dom: 'rtp',

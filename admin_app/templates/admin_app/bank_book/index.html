@@ -134,7 +134,7 @@ $(document).ready(function () {
         dom: 'lrtpi',
         searching: true,
         order: [0, ''],
-        ordering: true,
+        ordering: false,
         pageLength: 5,
         paginate: true,
         processing: true,
@@ -145,8 +145,8 @@ $(document).ready(function () {
             {'data': 'status',
                 render: function(data, type){
                     if (data){
-                        if(data == 'Активен'){
-                            return '<small class="badge badge-success">Активен</small>'
+                        if(data === 'Активен'){
+                            return "<small class='badge badge-success'>Активен</small>"
                         }
                         return '<small class="badge badge-danger">Неактивен</small>'
                     }
@@ -245,7 +245,7 @@ $('#house').on('change', function (){
     $.ajax({
         headers: { "X-CSRFToken": '{{ csrf_token }}' },
         type: "GET",
-        url: '{% url 'get_section_level' %}',
+        url: "{% url 'get_section_level' %}",
         data: {'house': house},
         contentType: 'json/application',
         success: function(response){

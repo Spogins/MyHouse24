@@ -117,10 +117,19 @@
                                     <td>{{ cashbox.id }}</td>
                                     <td>{{ cashbox.date }}</td>
                                     <td>{% if cashbox.status is True %}Проведен{% else %}Не проведен{% endif %}</td>
+                                    {% if cashbox.payment_type != None %}
                                     <td>{{ cashbox.payment_type }}</td>
+                                    {% else %}
+                                    <td>(не задано)</td>
+                                    {% endif %}
                                     {% if cashbox.type == 'приход' %}
-                                    <td>{{ cashbox.bankbook.flat.owner }}</td>
-                                    <td>{{ cashbox.bankbook }}</td>
+                                        {% if cashbox.bankbook.flat.owner %}
+                                        <td>{{ cashbox.bankbook.flat.owner }}</td>
+                                        <td>{{ cashbox.bankbook }}</td>
+                                        {% else %}
+                                        <td>(не задано)</td>
+                                        <td>(не задано)</td>
+                                        {% endif %}
                                     {% else %}
                                     <td>(не задано)</td>
                                     <td>(не задано)</td>
@@ -159,7 +168,7 @@
 
     $(document).ready(function () {
         $('#notoriety-table').DataTable({
-            ordering: true,
+            ordering: false,
             dom: 'rtp',
             language: {
                 paginate: {

@@ -1380,9 +1380,16 @@ class UpdateIncome(UserPassesTestMixin, UpdateView):
     def get_context_data(self, **kwargs):
         instance = CashBox.objects.get(id=self.kwargs['pk'])
         form = CashBoxIncomeCreateForm(instance=instance)
-        bankbook = BankBook.objects.get(id=instance.bankbook_id)
-        flat = Flat.objects.get(id=bankbook.flat_id)
-        context = {'form': form, 'update': True, 'owner': Owner.objects.get(user_id=flat.owner_id)}
+        try:
+            bankbook = BankBook.objects.get(id=instance.bankbook_id)
+            flat = Flat.objects.get(id=bankbook.flat_id)
+            owner = Owner.objects.get(user_id=flat.owner_id)
+        except:
+            bankbook = ''
+            flat = ''
+            owner = ''
+
+        context = {'form': form, 'update': True, 'owner': owner}
         return context
 
     def post(self, request, *args, **kwargs):

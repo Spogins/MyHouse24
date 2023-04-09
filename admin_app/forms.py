@@ -384,7 +384,7 @@ class ReceiptFilterForm(forms.Form):
                                widget=forms.Select(attrs={'class': 'form-control'}))
     date_range = forms.CharField(max_length=20, widget=forms.TextInput(attrs={'class': 'form-control'}))
     flat__number = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
-    flat__owner_id = forms.ChoiceField(choices=flat__owner, widget=forms.Select(attrs={'class': 'form-control'}))
+    flat__owner_id = forms.ChoiceField(choices=flat__owner, widget=forms.Select(attrs={'class': 'owner_select form-control', 'name': "states[]"}))
     is_checked = forms.ChoiceField(choices=(('', ''), (True, 'Проведена'), (False, 'Не проведена')),
                                    widget=forms.Select(attrs={'class': 'form-control'}))
 
