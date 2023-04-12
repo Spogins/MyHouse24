@@ -36,7 +36,7 @@
                     </div>
                     <div class="card-body">
                         <form method="get" id="filter-form">
-                        <table id="house_table" class="table table-bordered table-hover sorting-table">
+                        <table id="house_table" class="table table-bordered linkedRow table-hover sorting-table">
                             <thead>
                             <tr>
                                 <th>#</th>
@@ -81,6 +81,10 @@ $(document).ready(function () {
         processing: true,
         serverSide: true,
         language: {lengthMenu:''},
+        columnDefs: [
+            {className:"house", "targets": [0, 1, 2]},
+            {targets: '_all', defaultContent: ''},
+        ],
         columns: [
             {'data': 'ct',},
             {'data': 'name'},
@@ -88,9 +92,11 @@ $(document).ready(function () {
             {'data': 'id',
                 render: function(data, type){
                     if (data){
+
                         var edit_h = `<a class="btn btn-default btn-sm" href="/admin_app/update_house/${data}" title="Редактировать" data-toggle="tooltip"><i class="fas fa-pencil-alt"></i></a>`
                         var delete_h = `<a class="btn btn-default btn-sm" href="/admin_app/delete_house/${data}" title="Удалить" data-toggle="tooltip" data-pjax="0" data-method="post"><i class="fa fa-trash">`
                         return '<div class="btn-group float-right">' + edit_h + delete_h + '</div>'
+
                     }
                 }
             },
@@ -120,6 +126,11 @@ $(document).ready(function () {
                 .draw()
         });
 
+    })
+
+
+    table.on('click', 'tbody tr .house', function () {
+        window.location.href = '/admin_app/detail_house/12345'.replace(/12345/, table.row(this).data().id)
     })
 
 });

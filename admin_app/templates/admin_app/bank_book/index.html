@@ -83,7 +83,7 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <table id="bankbook_table" class="table table-bordered table-hover sorting-table" data-filter-control="true" >
+                        <table id="bankbook_table" class="table linkedRow table-bordered table-hover sorting-table" data-filter-control="true" >
                             <thead>
                                 <tr>
                                     <th>№</th>
@@ -140,8 +140,12 @@ $(document).ready(function () {
         processing: true,
         serverSide: true,
         language: {lengthMenu:''},
+        columnDefs: [
+            {className:"bankbook", "targets": [0, 1, 2, 3, 4, 5, 6]},
+            {targets: '_all', defaultContent: ''},
+        ],
         columns: [
-            {'data': '_id',},
+            {'data': 'id',},
             {'data': 'status',
                 render: function(data, type){
                     if (data){
@@ -157,7 +161,7 @@ $(document).ready(function () {
             {'data': 'section'},
             {'data': 'owner'},
             {'data': 'balance'},
-            {'data': '_id',
+            {'data': 'id',
                 render: function(data, type){
                     if (data){
                         var edit_h = `<a class="btn btn-default btn-sm" href="/admin_app/update_bankbook/${data}" title="Редактировать" data-toggle="tooltip"><i class="fas fa-pencil-alt"></i></a>`
@@ -237,6 +241,11 @@ $(document).ready(function () {
                 .draw()
         });
 
+    })
+
+    table.on('click', 'tbody tr .bankbook', function () {
+        console.log(table.row(this).data()._id)
+        window.location.href = '/admin_app/detail_bankbook/123456789'.replace(/123456789/, table.row(this).data().id)
     })
 
 });

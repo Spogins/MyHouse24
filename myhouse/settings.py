@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     'cabinet.apps.CabinetConfig',
     'main.apps.MainConfig',
     'widget_tweaks',
-
+    'django_xhtml2pdf',
 ]
 
 MIDDLEWARE = [

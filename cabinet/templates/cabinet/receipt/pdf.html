@@ -10,9 +10,7 @@
           font-family: Arial;
             font-size: 16px;
         }
-        .pdf-table{
-            border: 4px solid black;
-        }
+
         td{
             padding-top: 4px;
             padding-left: 2px;
@@ -24,157 +22,21 @@
     </style>
 </head>
 <body>
+
 <table class="pdf-table">
     <tr>
         <td colspan="8" rowspan="4">Отримувач/Виконувач<br> {{ requisites }}</td>
         <td colspan="2">№ О/рахунку</td>
-    </tr>
-    <tr>
-        <td colspan="2" style="font-size: 12px">{{ receipt.flat.bankbook_set.first }}</td>
-    </tr>
-    <tr>
-        <td colspan="2"></td>
-    </tr>
-    <tr>
-        <td colspan="2"></td>
-    </tr>
-    <tr>
-        <td colspan="2"> Платник </td>
-        <td colspan="6">
-            {{ receipt.flat.owner.user.last_name }} {{ receipt.flat.owner.user.first_name|slice:1 }}.
-         {{ receipt.flat.owner.patronymic|slice:1 }}. {{ receipt.flat.house.address }} кв. {{ receipt.flat.number }}
-        </td>
-        <td colspan="2"></td>
-    </tr>
-    <tr>
-        <td colspan="2"> Нараховано</td>
-        <td>{{ receipt.get_price }}</td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td colspan="2"></td>
-    </tr>
-    <tr>
-        <td colspan="2">Баланс о/р</td>
-        <td>{{ receipt.flat.bankbook_set.first.balance }}</td>
-        <td>на</td>
-        <td colspan="2">{{ receipt.date }}</td>
-        <td></td>
-        <td></td>
-        <td colspan="2"></td>
-    </tr>
-    <tr>
-        <td colspan="2" rowspan="2">ДО СПЛАТИ</td>
-        <td rowspan="2"> {{ receipt.get_price }}</td>
-        <td rowspan="2">за</td>
-        <td colspan="2" rowspan="2">{{ receipt.date }}</td>
-        <td rowspan="4" colspan="4">
-            С условиями приема банком суммы ознакомлен и согласен<br>
-            ________________<br>
-            (підпис платника)
-        </td>
-    </tr>
-    <tr>
 
     </tr>
     <tr>
-        <td colspan="5" rowspan="2"></td>
-        <td rowspan="2"></td>
-    </tr>
-    <tr>
-    </tr>
-    <tr>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-    </tr>
-{#    <tr>#}
-{#        <td colspan="8" rowspan="4">#}
-{#            Отримувач/Виконувач<br> {{ requisites }}#}
-{#        </td>#}
-{#        <td colspan="2">№ О/рахунку</td>#}
-{#    </tr>#}
-{#    <tr>#}
-{#        <td colspan="2" style="font-size: 12px">{{ receipt.flat.bankbook_set.first }}</td>#}
-{#    </tr>#}
-{#    <tr>#}
-{#        <td colspan="2"> </td>#}
-{#    </tr>#}
-{#    <tr>#}
-{#        <td colspan="2"> </td>#}
-{#    </tr>#}
-{#    <tr>#}
-{#        <td colspan="2">Платник</td>#}
-{#        <td colspan="6">{{ receipt.flat.owner.user.last_name }} {{ receipt.flat.owner.user.first_name|slice:1 }}.#}
-{#         {{ receipt.flat.owner.patronymic|slice:1 }}. {{ receipt.flat.house.address }} кв. {{ receipt.flat.number }}</td>#}
-{#        <td colspan="2"></td>#}
-{#    </tr>#}
-{#    <tr>#}
-{#        <td colspan="2">Нараховано</td>#}
-{#        <td>{{ receipt.get_price }}</td>#}
-{#        <td></td>#}
-{#        <td></td>#}
-{#        <td></td>#}
-{#        <td></td>#}
-{#        <td></td>#}
-{#        <td colspan="2"></td>#}
-{##}
-{#    </tr>#}
-{#    <tr>#}
-{#        <td colspan="2">Баланс о/р</td>#}
-{#        <td>{{ receipt.flat.bankbook_set.first.balance }}</td>#}
-{#        <td>на</td>#}
-{#        <td>{{ receipt.date}}</td>#}
-{#        <td></td>#}
-{#        <td></td>#}
-{#        <td></td>#}
-{#        <td colspan="2"></td>#}
-{#    </tr>#}
-{#    <tr>#}
-{#        <td colspan="2">До сплати</td>#}
-{#        <td>0.00</td>#}
-{#        <td>за</td>#}
-{#        <td colspan="2">{{ receipt.date}}</td>#}
-{#        <td colspan="4" rowspan="4">С условиями приема банком суммы ознакомлен и согласен<br>#}
-{#            ________________<br>#}
-{#            (підпис платника)#}
-{#        </td>#}
-{#    </tr>#}
-{#    <tr>#}
-{#        <td colspan="5"></td>#}
-{#        <td></td>#}
-{#    </tr>#}
-{#    <tr>#}
-{#        <td colspan="5"></td>#}
-{#        <td></td>#}
-{#    </tr>#}
-{#    <tr>#}
-{#        <td colspan="5"></td>#}
-{#        <td></td>#}
-{#    </tr>#}
-</table>
-<table class="pdf-table">
-    <tr>
-        <td colspan="8" rowspan="4">Отримувач/Виконувач<br> {{ requisites }}</td>
-        <td colspan="2">№ О/рахунку</td>
-    </tr>
-    <tr>
         <td colspan="2" style="font-size: 12px">{{ receipt.flat.bankbook_set.first }}</td>
     </tr>
     <tr>
-        <td colspan="2"></td>
+        <td colspan="2">КВIТАНЦIЯ</td>
     </tr>
     <tr>
-        <td colspan="2"></td>
+        <td colspan="2">{{receipt.id}}</td>
     </tr>
     <tr>
         <td colspan="2"> Платник </td>
@@ -208,11 +70,7 @@
         <td rowspan="2"> {{ receipt.get_price }}</td>
         <td rowspan="2">за</td>
         <td colspan="2" rowspan="2">{{ receipt.date }}</td>
-        <td rowspan="4" colspan="4">
-            С условиями приема банком суммы ознакомлен и согласен<br>
-            ________________<br>
-            (підпис платника)
-        </td>
+
     </tr>
     <tr>
 

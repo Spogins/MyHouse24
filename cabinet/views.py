@@ -234,15 +234,20 @@ def render_pdf_view(request, receipt_id):
     return response
 
 
-class MyPDF(PDFTemplateView):
-    filename = 'my_pdf.pdf'
-    template_name = '/cabinet/receipt/pdf.html'
-    cmd_options = {
-        'margin-top': 3,
-    }
+def print_pdf(request, receipt_id):
+    template_path = 'cabinet/receipt/pdf.html'
+    requisites = PaymentDetails.objects.first()
+    receipt = Receipt.objects.get(id=receipt_id)
+    context = {'requisites': requisites.description,
+               'static': settings.STATIC_URL,
+               'receipt': receipt}
+    template = get_template(template_path)
+    html = template.render(context)
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'inline; filename="file.pdf"'
+    pisa_status = pisa.CreatePDF(html, dest=response)
+    if pisa_status.err:
+        return HttpResponse('Conversion failed!', status=404)
 
-    def get_context_data(self, **kwargs):
-        context = super(MyPDF, self).get_context_data(**kwargs)
-        requisites = PaymentDetails.objects.first()
-        context['requisites'] = requisites.information
-        return context
+    return response
+

@@ -158,7 +158,7 @@ def bankbook_search(request, page):
             continue
 
         res = {
-            '_id': bankbook.id,
+            'id': bankbook.id,
             'status': bankbook.status,
             'flat': _flat,
             'house': _house,

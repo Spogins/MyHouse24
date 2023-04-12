@@ -17,4 +17,5 @@ urlpatterns = [
     path('delete_master_request/<int:pk>', delete_master_request, name='delete_master_request'),
     path('owner_profile', OwnerProfile.as_view(), name='owner_profile'),
     path('update_owner/<int:pk>', UpdateOwner.as_view(), name='update_owner'),
+    path('print_pdf/<int:receipt_id>', print_pdf, name='print_pdf')
 ]

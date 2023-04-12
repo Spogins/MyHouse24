@@ -44,7 +44,7 @@
                 </div>
                 </div>
                     <div class="card-body">
-                        <table id="owner_search" class="table table-bordered table-hover sorting-table" data-filter-control="true" >
+                        <table id="owner_search" class="table linkedRow table-bordered table-hover sorting-table" data-filter-control="true" >
                             <thead>
                                 <tr>
                                     <th>ID</th>
@@ -101,6 +101,10 @@ $(document).ready(function () {
         processing: true,
         serverSide: true,
         language: {lengthMenu:''},
+        columnDefs: [
+            {className:"owner", "targets": [0, 1, 2, 3, 4, 5, 6, 7, 8]},
+            {targets: '_all', defaultContent: ''},
+        ],
         columns: [
             {'data': 'identify',},
             {'data': 'fullname'},
@@ -248,6 +252,10 @@ $(document).ready(function () {
                 .draw()
         });
 
+    })
+
+    table.on('click', 'tbody tr .owner', function () {
+        window.location.href = '/admin_app/detail_owner/12345'.replace(/12345/, table.row(this).data().id)
     })
 
 });
