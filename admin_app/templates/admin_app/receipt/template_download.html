@@ -69,22 +69,10 @@
             success: function(data) {
                 if (data['answer'] === 'success') {
                     window.location = data['file_path'];
-                    Swal.fire({
-                        position: 'top-end',
-                        icon: 'success',
-                        title: ' Ожидайте файл',
-                        showConfirmButton: false,
-                        timer: 1200,
-                    })
+                    console.log(data)
                 }
                 else {
-                    Swal.fire({
-                        position: 'top-end',
-                        icon: 'error',
-                        title: 'Ошибка скачивания',
-                        showConfirmButton: false,
-                        timer: 1200
-                    });
+                    console.log(data)
                 }
             }
         })
@@ -100,17 +88,10 @@
             },
             success: function(data) {
                 if (data['answer'] === 'success') {
-                    let full_path = data['full_path'];
-                    fetchToSendEmail(full_path);
+                    console.log(data)
                 }
                 else {
-                    Swal.fire({
-                        position: 'top-end',
-                        icon: 'error',
-                        title: 'Что-то пошло не так!',
-                        showConfirmButton: false,
-                        timer: 1200
-                    });
+                    console.log(data)
                 }
             }
         })
@@ -122,22 +103,10 @@
             url: `{% url 'send_receipt' %}?full_path=${full_path}&receipt={{ receipt }}`,
             success: function(data) {
                 if (data['answer'] === 'success') {
-                    Swal.fire({
-                        position: 'top-end',
-                        icon: 'success',
-                        title: 'Успешно отправлено!',
-                        showConfirmButton: false,
-                        timer: 1200,
-                    })
+                    console.log(data)
                 }
                 else {
-                    Swal.fire({
-                        position: 'top-end',
-                        icon: 'error',
-                        title: 'Что-то пошло не так!',
-                        showConfirmButton: false,
-                        timer: 1200
-                    });
+                    console.log(data)
                 }
             }
         })
