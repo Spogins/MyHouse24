@@ -91,7 +91,7 @@ class Role(models.Model):
     site_management = models.BooleanField(default=False)
     service = models.BooleanField(default=False)
     tariff = models.BooleanField(default=False)
-    role = models.BooleanField(default=False)
+    role = models.BooleanField(default=True)
     users = models.BooleanField(default=False)
     requisites = models.BooleanField(default=False)
 

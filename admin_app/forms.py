@@ -245,11 +245,16 @@ class FlatCreateForm(forms.ModelForm):
 
 
 class CounterFilterForm(forms.Form):
-    flat__house = [(f'{x.name}', f'{x.name}') for x in House.objects.all()]
+    try:
+        flat__house = [(f'{x.name}', f'{x.name}') for x in House.objects.all()]
+        services = [(f'{x.name}', f'{x.name}') for x in Service.objects.all()]
+        sections = [(f'{x.name}', f'{x.name}') for x in Section.objects.all()]
+    except:
+        flat__house = ['']
+        services = ['']
+        sections = ['']
     flat__house.insert(0, ('', ''))
-    services = [(f'{x.name}', f'{x.name}') for x in Service.objects.all()]
     services.insert(0, ('', ''))
-    sections = [(f'{x.name}', f'{x.name}') for x in Section.objects.all()]
     sections.insert(0, ('', ''))
     flat__house_id = forms.ChoiceField(choices=flat__house, widget=forms.Select(attrs={'class': 'form-control', 'data-number': '1'}))
     section = forms.ChoiceField(choices=sections, widget=forms.Select(attrs={'class': 'form-control', 'data-number': '2'}))
@@ -282,13 +287,16 @@ class FlatCounterFilterForm(CounterFilterForm):
 
 
 class CashBoxFilterForm(forms.Form):
-    payment_type = [(f'{x.name}', f'{x.name}') for x in PaymentItems.objects.all()]
+    try:
+        payment_type = [(f'{x.name}', f'{x.name}') for x in PaymentItems.objects.all()]
+        bankbook__flat__owner = [(f'{x}', f'{x}') for x in Owner.objects.all()]
+    except:
+        payment_type = ['']
+        bankbook__flat__owner = ['']
+
     payment_type.insert(0, ('', ''))
-    bankbook__flat__owner = [(f'{x}', f'{x}') for x in Owner.objects.all()]
     bankbook__flat__owner.insert(0, ('', ''))
     bankbook__flat__owner.insert(1, ('(не задано)', '(не задано)'))
-
-
     id = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
     date_range = forms.CharField(max_length=20, widget=forms.TextInput(attrs={'class': 'form-control'}))
     status = forms.ChoiceField(choices=(('', ''), ('Проведен', 'Проведен'), ('Не проведен', 'Не проведен')),
@@ -344,9 +352,16 @@ class CashBoxExpenseCreateForm(forms.ModelForm):
 
 
 class BankBookFilterForm(forms.Form):
-    flat__house = [(f'{x.id}', f'{x.name}') for x in House.objects.all()]
+    try:
+        flat__house = [(f'{x.id}', f'{x.name}') for x in House.objects.all()]
+
+        flat__owner = [(f'{x}', f'{x}') for x in Owner.objects.all()]
+    except:
+        flat__house = ['']
+        flat__owner = ['']
+
     flat__house.insert(0, ('', ''))
-    flat__owner = [(f'{x}', f'{x}') for x in Owner.objects.all()]
+
     flat__owner.insert(0, ('', ''))
     id = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'id': 'bb_id'}))
     status = forms.ChoiceField(choices=BankBook.Status.choices, widget=forms.Select(attrs={'class': 'form-control',
@@ -377,7 +392,11 @@ class BankbookCreateForm(forms.ModelForm):
 
 
 class ReceiptFilterForm(forms.Form):
-    flat__owner = [(f'{x}', f'{x}') for x in Owner.objects.all()]
+    try:
+        flat__owner = [(f'{x}', f'{x}') for x in Owner.objects.all()]
+    except:
+        flat__owner = ['']
+
     flat__owner.insert(0, ('', ''))
     id = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
     status = forms.ChoiceField(choices=Receipt.Status.choices,
@@ -421,9 +440,13 @@ class ReceiptServiceForm(forms.ModelForm):
 
 
 class MasterRequestFilterForm(forms.Form):
-    flat__owner = [(f'{x}', f'{x}') for x in Owner.objects.all()]
+    try:
+        flat__owner = [(f'{x}', f'{x}') for x in Owner.objects.all()]
+        master = [(f'{x}', f'{x}') for x in Profile.objects.all()]
+    except:
+        flat__owner = ['']
+        master = ['']
     flat__owner.insert(0, ('', ''))
-    master = [(f'{x}', f'{x}') for x in Profile.objects.all()]
     master.insert(0, ('', ''))
     id = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
     date_range = forms.CharField(max_length=20, widget=forms.TextInput(attrs={'class': 'form-control'}))

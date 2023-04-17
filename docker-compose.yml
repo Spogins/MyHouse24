@@ -3,26 +3,33 @@ version: '3.8'
 services:
   web:
     build: .
-    command: python manage.py runserver --bind 0.0.0.0:8000
+    command: gunicorn myhouse.wsgi:application --bind 0.0.0.0:8000
     volumes:
-      - .:/app:rw
       - static_volume:/usr/src/app/static
       - media_volume:/usr/src/app/media
     ports:
       - "8000:8000"
     env_file:
-      - .env.dev
-    depends_on:
-      - db
+      - .env
+
 
   db:
-    image: postgres:13.0-alpine
+    image: postgres:13.0
     volumes:
-      - postgres_data:/var/lib/postgresql/data/
-    environment:
-      - POSTGRES_USER=hello_django
-      - POSTGRES_PASSWORD=hello_django
-      - POSTGRES_DB=hello_django_dev
+      - ./docker/postgresql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    env_file:
+      - .env
+
+  nginx:
+    build: ./docker/nginx
+    volumes:
+      - static_volume:/usr/src/app/static
+      - media_volume:/usr/src/app/media
+    ports:
+      - 80:80
+    depends_on:
+      - web
+
 
 volumes:
   postgres_data:

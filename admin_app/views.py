@@ -489,8 +489,12 @@ def delete_payment(request, payment_id):
 
 class MainPageView(UserPassesTestMixin, CreateView):
     template_name = 'admin_app/pages/main_page.html'
-    instance = MainPage.objects.all()[0]
-    instance_seo = instance.seo
+    try:
+        instance = MainPage.objects.all()[0]
+        instance_seo = instance.seo
+    except:
+        instance = None
+        instance_seo = None
 
     def get_context_data(self, **kwargs):
         formset = SlideFormSet(queryset=Slide.objects.all(), prefix='slide')
@@ -541,7 +545,10 @@ class MainPageView(UserPassesTestMixin, CreateView):
 
 class InfoPage(UserPassesTestMixin, CreateView):
     template_name = 'admin_app/pages/info_page.html'
-    instance = Info.objects.all()[0]
+    try:
+        instance = Info.objects.all()[0]
+    except:
+        instance = None
 
     def get_context_data(self, **kwargs):
         form = InfoForm(instance=self.instance)
@@ -611,7 +618,10 @@ def delete_from_gallery(request, image_id):
 
 class ServicePageView(UserPassesTestMixin, CreateView):
     template_name = 'admin_app/pages/service_page.html'
-    instance = ServicePage.objects.all()[0]
+    try:
+        instance = ServicePage.objects.all()[0]
+    except:
+        instance = None
 
     def get_context_data(self, **kwargs):
         formset = ServiceBlockFormSet(queryset=ServiceBlock.objects.all())
@@ -655,7 +665,10 @@ def delete_service_page(request, service_id):
 
 class ContactPageView(UserPassesTestMixin, CreateView):
     template_name = 'admin_app/pages/contact_page.html'
-    instance = ContactPage.objects.all()[0]
+    try:
+        instance = ContactPage.objects.all()[0]
+    except:
+        instance = None
 
     def get_context_data(self, **kwargs):
         form = ContactPageForm(instance=self.instance, prefix='form')

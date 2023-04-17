@@ -6,10 +6,14 @@ from account.models import Profile
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        admin = User.objects.get(is_superuser=True)
+        admin = User.objects.create()
         admin.first_name = 'admin'
         admin.last_name = 'admin'
         admin.email = 'admin@admin.com'
+        admin.username = 'admin@admin.com'
+        admin.is_superuser = True
+        admin.is_stuff = True
+        admin.set_password('523164')
         admin.save()
         profile = Profile.objects.create(
             user_id=admin.id,

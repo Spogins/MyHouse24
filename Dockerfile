@@ -6,8 +6,13 @@ FROM python:3.10
 #RUN mkdir /usr/src/app
 #RUN mkdir /usr/src/app/static
 #RUN mkdir /usr/src/app/media
-WORKDIR /usr/src/app
+#WORKDIR /usr/src/app
 
+ENV APP_HOME=/usr/src/app
+RUN mkdir $APP_HOME
+RUN mkdir $APP_HOME/static
+RUN mkdir $APP_HOME/media
+WORKDIR $APP_HOME
 # set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1

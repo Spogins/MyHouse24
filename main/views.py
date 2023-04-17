@@ -8,10 +8,16 @@ from admin_app.models import *
 
 class MainPageView(FormView):
     template_name = 'main/pages/main_page.html'
-    main_page = MainPage.objects.first()
-    near = NearBlock.objects.all()
-    contacts = ContactPage.objects.all()[0]
-    gallery = Slide.objects.all()
+    try:
+        main_page = MainPage.objects.first()
+        near = NearBlock.objects.all()
+        contacts = ContactPage.objects.all()[0]
+        gallery = Slide.objects.all()
+    except:
+        main_page = None
+        near = None
+        contacts = None
+        gallery = None
 
     def get_context_data(self, **kwargs):
         context = {
@@ -26,10 +32,16 @@ class MainPageView(FormView):
 
 class AboutUsPage(FormView):
     template_name = 'main/pages/about_us_page.html'
-    page = Info.objects.first()
-    gallery_main = Gallery.objects.filter(additional=False)
-    gallery_additional = Gallery.objects.filter(additional=True)
-    documents = Document.objects.all()
+    try:
+        page = Info.objects.first()
+        gallery_main = Gallery.objects.filter(additional=False)
+        gallery_additional = Gallery.objects.filter(additional=True)
+        documents = Document.objects.all()
+    except:
+        page = None
+        gallery_main = None
+        gallery_additional = None
+        documents = None
 
     def get_context_data(self, **kwargs):
         context = {
@@ -44,8 +56,12 @@ class AboutUsPage(FormView):
 
 class ServicePage(FormView):
     template_name = 'main/pages/service_page.html'
-    page = ServicePage.objects.first()
-    services = ServiceBlock.objects.all()
+    try:
+        page = ServicePage.objects.first()
+        services = ServiceBlock.objects.all()
+    except:
+        page = None
+        services = None
 
     def get_context_data(self, **kwargs):
         context = {
@@ -57,7 +73,10 @@ class ServicePage(FormView):
 
 class ContactPage(FormView):
     template_name = 'main/pages/contact_page.html'
-    page = ContactPage.objects.first()
+    try:
+        page = ContactPage.objects.first()
+    except:
+        page = None
 
     def get_context_data(self, **kwargs):
         context = {
