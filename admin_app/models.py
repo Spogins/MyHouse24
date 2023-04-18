@@ -206,6 +206,7 @@ class Flat(models.Model):
 
     def balance(self):
         if self.bankbook_set.first():
+
             return self.bankbook_set.first().balance()
         return '(нет счета)'
 

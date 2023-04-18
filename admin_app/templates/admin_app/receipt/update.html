@@ -507,14 +507,15 @@
             $('#id_section').append($('<option>', { value : {{section.id}}, selected : 'selected' }).text('{{section.name}}'));
 
              $('#id_flat').trigger('change');
-              let num = parseInt(moment().format('DD/MM/YYYY HH:mm').toString().replace(/\D+/g,""));
+              let num = parseInt(moment().format('DD/MM/YYYY m:SS:ss').toString().replace(/\D+/g,""));
             console.log(num);
             $('#id_id').val(num);
+
 
         {% else %}
             $('#id_section').empty().append($('<option>'));
             $('#id_flat').empty().append($('<option>'));
-            let num = parseInt(moment().format('DD/MM/YYYY HH:mm').toString().replace(/\D+/g,""));
+            let num = parseInt(moment().format('DD/MM/YYYY m:SS:ss').toString().replace(/\D+/g,""));
             console.log(num);
             $('#id_id').val(num);
         {% endif %}

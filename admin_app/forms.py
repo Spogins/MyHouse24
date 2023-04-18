@@ -246,9 +246,9 @@ class FlatCreateForm(forms.ModelForm):
 
 class CounterFilterForm(forms.Form):
     try:
-        flat__house = [(f'{x.name}', f'{x.name}') for x in House.objects.all()]
-        services = [(f'{x.name}', f'{x.name}') for x in Service.objects.all()]
-        sections = [(f'{x.name}', f'{x.name}') for x in Section.objects.all()]
+        flat__house = [(f'{x.id}', f'{x.name}') for x in House.objects.all()]
+        services = [(f'{x.id}', f'{x.name}') for x in Service.objects.all()]
+        sections = [(f'{x.id}', f'{x.name}') for x in Section.objects.all()]
     except:
         flat__house = ['']
         services = ['']
@@ -280,7 +280,15 @@ class CounterCreateForm(forms.ModelForm):
 
 
 class FlatCounterFilterForm(CounterFilterForm):
+    try:
+        flat__house = [(f'{x.id}', f'{x.name}') for x in House.objects.all()]
+    except:
+        flat__house = ['']
+    flat__house_id = forms.ChoiceField(choices=flat__house,
+                                       widget=forms.Select(attrs={'class': 'form-control', 'id': 'id_flat__house_id'}))
+    section = forms.ChoiceField(widget=forms.Select(attrs={'class': 'form-control', 'id': 'id_section'}))
     id = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'data-number': '5'}))
+    flat__number = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'id': 'id_flat__number'}))
     status = forms.ChoiceField(choices=Counter.TypesCounter.choices, widget=forms.Select(
         attrs={'class': 'form-control', 'data-number': '6'}))
     date = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'data-number': '7'}))

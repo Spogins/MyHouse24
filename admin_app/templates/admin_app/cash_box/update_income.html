@@ -187,13 +187,15 @@
         let owner = $(this).val();
            get_bankbooks(owner);
     });
+        $(document).ready(function () {
         {% if update is True %}
             $('#id_owner').append($('<option>', {value: {{owner.user_id}}, selected : 'selected'}).text('{{owner}}'));
 
         {% else %}
-            let num = parseInt(moment().format('DD/MM/YYYY HH:mm').toString().replace(/\D+/g,""));
+            let num = parseInt(moment().format('DD/MM/YYYY m:SS:ss').toString().replace(/\D+/g,""));
             $('#id_id').val(num);
         {% endif %}
+        })
 
         {% if flat_create is True %}
             $('#id_owner').append($('<option>', {value: {{owner.user_id}}, selected : 'selected'}).text('{{owner}}'));

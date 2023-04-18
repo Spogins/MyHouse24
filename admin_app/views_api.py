@@ -38,6 +38,7 @@ def house_search(request, page):
 def owner_search(request, page):
     if is_ajax(request):
         owner_list = Owner.objects.filter()
+        print(owner_list)
         _list = []
 
         identify = request.GET.get('columns[0][search][value]')
@@ -77,24 +78,25 @@ def owner_search(request, page):
                 'fullname': owner.fullname(),
                 'phone': owner.phone,
                 'email': owner.user.email,
-                'house': '',
-                'flat': '',
+                'house': [],
+                'flat': [],
                 'date': owner.user.date_joined.strftime("%d.%m.%Y"),
                 'status': owner.status,
                 'debt': owner.has_debt(),
                 'id': owner.user_id
             }
+
             try:
-                _flat = Flat.objects.get(owner_id=owner.user_id)
+                _flats = Flat.objects.filter(owner_id=owner.user_id)
+                for _flat in _flats:
+                    if house != '' and house != str(_flat.house.id):
+                        continue
 
-                if house != '' and house != str(_flat.house.id):
-                    continue
+                    if flat != '' and flat not in str(_flat.number):
+                        continue
 
-                if flat != '' and flat not in str(_flat.number):
-                    continue
-
-                res['house'] = _flat.house.name
-                res['flat'] = [_flat.number, _flat.house.name]
+                    res['house'].append(f'<a href="/admin_app/detail_house/{_flat.house.id}">{_flat.house.name}</a>')
+                    res['flat'].append([f'<a href="/admin_app/detail_flat/{_flat.id}">№{_flat.number}</a>', f'<a href="/admin_app/detail_flat/{_flat.id}">"ЖК {_flat.house.name}"</a><br>'])
                 _list.append(res)
             except ObjectDoesNotExist:
                 if house != '':

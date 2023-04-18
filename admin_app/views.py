@@ -711,14 +711,7 @@ class OwnerList(UserPassesTestMixin, FormMixin, ListView):
     form_class = OwnerFilterForm
     template_name = 'admin_app/owner/index.html'
 
-    def get_form_kwargs(self, *args, **kwargs):
-        # use GET parameters as the data
-        kwargs = super().get_form_kwargs(*args, **kwargs)
-        if self.request.method == 'GET':
-            kwargs.update({
-                'data': self.request.GET,
-            })
-        return kwargs
+
 
     def test_func(self):
         profile = Profile.objects.get(user_id=self.request.user.id)
@@ -1576,8 +1569,13 @@ class UpdateBankBook(UserPassesTestMixin, UpdateView):
     def get_context_data(self, **kwargs):
         instance = BankBook.objects.get(id=self.kwargs['pk'])
         form = BankbookCreateForm(instance=instance)
-        flat = Flat.objects.get(id=instance.flat_id)
-        context = {'form': form, 'update': True, 'bankbook': flat, "house": House.objects.get(id=flat.house_id)}
+        try:
+            flat = Flat.objects.get(id=instance.flat_id)
+            house = House.objects.get(id=flat.house_id)
+            exist = True
+            context = {'form': form, 'update': exist, 'bankbook': flat, "house": house}
+        except:
+            context = {'form': form}
         return context
 
     def post(self, request, *args, **kwargs):

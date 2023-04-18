@@ -112,16 +112,23 @@ $(document).ready(function () {
             {'data': 'email'},
             {'data': 'house',
                 render: function(data, type){
-                    if (data != ''){
-                        return `ЖК "${data}"`
+                    if (data){
+                        // return `ЖК "${data}"`
+
+                        let res = ''
+                        $(data).each((i, e) => {res += `${e};&nbsp&nbsp`})
+                        return res
                     }
                     return ''
                 }
             },
             {'data': 'flat',
                 render: function(data, type){
-                    if (data != ''){
-                        return `№${data[0]}, ЖК "${data[1]}"`
+                    if (data){
+                        // return `№${data[0]}, ЖК "${data[1]}"`
+                        let res = ''
+                        $(data).each((i, e) => {res += `${e[0]}, ${e[1]}`})
+                        return res
                     }
                     return ''
                 }
