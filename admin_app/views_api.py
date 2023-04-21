@@ -91,12 +91,12 @@ def owner_search(request, page):
                 for _flat in _flats:
                     if house != '' and house != str(_flat.house.id):
                         continue
-
                     if flat != '' and flat not in str(_flat.number):
                         continue
-
                     res['house'].append(f'<a href="/admin_app/detail_house/{_flat.house.id}">{_flat.house.name}</a>')
                     res['flat'].append([f'<a href="/admin_app/detail_flat/{_flat.id}">№{_flat.number}</a>', f'<a href="/admin_app/detail_flat/{_flat.id}">"ЖК {_flat.house.name}"</a><br>'])
+                if len(res['house']) == 0 or len(res['flat']) == 0:
+                    continue
                 _list.append(res)
             except ObjectDoesNotExist:
                 if house != '':

@@ -176,18 +176,18 @@
 
         let date = $('#id_date_range').daterangepicker({
             "autoUpdateInput": false,
-    "showDropdowns": true,
-    "opens": "center",
-        locale: {
-      format: 'YYYY-MM-DD'
-    }
-}, function(start, end, label) {
-  console.log('New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')');
-});
+            "showDropdowns": true,
+            "opens": "center",
+            locale: {format: 'YYYY-MM-DD'}
+            },
+            function(start, end, label) {
+                console.log('New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')');
+         });
+
         $('#id_date_range').on('apply.daterangepicker', function(ev, picker) {
-      $(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format('YYYY-MM-DD'));
-      $(this).trigger('change');
-  });
+            $(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format('YYYY-MM-DD'));
+            $(this).trigger('change');
+        });
 
         $('#id_date_range').on('cancel.daterangepicker', function(ev, picker) {
   //do something, like clearing an input
