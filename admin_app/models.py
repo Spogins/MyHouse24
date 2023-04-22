@@ -165,7 +165,7 @@ class ContactPage(models.Model):
     title = models.CharField(max_length=100, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     link_commercial = models.URLField(max_length=200, null=True, blank=True)
-    name = models.CharField(max_length=200, null=True, blank=True)
+    name_u = models.CharField(max_length=200, null=True, blank=True)
     location = models.CharField(max_length=100, null=True, blank=True)
     address = models.CharField(max_length=100, null=True, blank=True)
     phone = models.CharField(max_length=15, null=True, blank=True)
