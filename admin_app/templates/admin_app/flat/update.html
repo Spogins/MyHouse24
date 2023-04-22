@@ -96,7 +96,7 @@
                                 Лицевой счет
                             </label>
                             <div class="input-group">
-                                {{ form.bank_book|add_class:'form-control' }}
+                                {{ form.bank_book }}
                             </div>
 
                         </div>
@@ -175,7 +175,6 @@
             let section = $('#id_section').val();
             let level = $('#id_level').val();
             get_sections_levels($('#id_house').val(), section, level);
-            $('#id_bank_book').append($('<option>', {value: {{bankbook.id}}, selected : 'selected'}).text({{bankbook.id}}));
         {% else %}
             $('#id_section').empty().append($('<option>'));
             $('#id_level').empty().append($('<option>'));

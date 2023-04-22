@@ -17,14 +17,14 @@
                 <div class="page-header">
                     <h1>{{ page.title }}</h1>
                 </div>
-                {{ page.description }}
+                {{ page.description|safe }}
             </div>
             <div class="col-xs-12 col-sm-5 col-md-4">
                 <div class="page-header">
                     <h1>Контакты</h1>
                 </div>
                 <div class="box">
-                    <p><i class="fas fa-user-circle"></i> {{ page.title }}</p>
+                    <p><i class="fas fa-user-circle"></i> {{ page.name }}</p>
                     <p><i class="fas fa-compass"></i> {{ page.location }}</p>
                     <p><i class="fas fa-map-marker"></i> {{ page.address }}</p>
                     <p><i class="fas fa-phone"></i> <a href="">{{ page.phone }}</a></p>

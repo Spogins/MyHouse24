@@ -339,8 +339,8 @@ class CreateUser(UserPassesTestMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = {
-            'profile_form': ProfileChangeForm(instance=self.profile),
-            'register_form': UserChangeForm(instance=self.user)
+            'profile_form': ProfileChangeForm(),
+            'register_form': UserChangeForm()
         }
         return context
 
@@ -646,6 +646,7 @@ class ServicePageView(UserPassesTestMixin, CreateView):
         return redirect('/admin_app/service_page/')
 
     def form_invalid(self, formset, seo_form):
+        print(formset.errors)
         context = {
             'formset': formset,
             'seo_form': seo_form,

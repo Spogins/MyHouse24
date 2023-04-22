@@ -26,7 +26,7 @@
                         <div class="card">
                             <div class="card-body card-profile">
                                 <div class="text-center">
-                                    <img class="profile-user-img img-responsive img-circle" src="{{ owner.image.url }}" alt="Аватар">
+                                    <img class="profile-user-img img-responsive img-circle" src="{% if owner.image %}{{ owner.image.url }}{% else %}{% static '/dist/img/empty.jpg' %}{% endif %}" alt="Аватар">
                                 </div>
                                 <h3 class="profile-username text-center">{{ owner.fullname }}</h3>
                                 <p class="text-muted text-center">Владелец квартиры</p>

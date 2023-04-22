@@ -96,7 +96,7 @@ $(document).ready(function () {
         searching: true,
         order: [0, ''],
         ordering: false,
-        pageLength: 5,
+        pageLength: 10,
         paginate: true,
         processing: true,
         serverSide: true,
@@ -112,7 +112,7 @@ $(document).ready(function () {
             {'data': 'email'},
             {'data': 'house',
                 render: function(data, type){
-                    if (data){
+                    if (data !== ''){
                         // return `ЖК "${data}"`
 
                         let res = ''
@@ -124,7 +124,8 @@ $(document).ready(function () {
             },
             {'data': 'flat',
                 render: function(data, type){
-                    if (data){
+                console.log(data)
+                    if (data !== ''){
                         // return `№${data[0]}, ЖК "${data[1]}"`
                         let res = ''
                         $(data).each((i, e) => {res += `${e[0]}, ${e[1]}`})

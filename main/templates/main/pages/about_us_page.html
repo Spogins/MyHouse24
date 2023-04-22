@@ -13,7 +13,7 @@
         </div>
         <div class="row flex-row-reverse">
             <div class="col-md-3 text-end">
-                <img src="{{ page.image.url }}" alt="" class="w-100 margin-bottom-15">
+                <img src="{% if page.image %}{{ page.image.url }}{% else %}{% static '/dist/img/empty.jpg' %}{% endif %}" alt="" class="w-100 margin-bottom-15">
             </div>
             <div class="col-md-9">
                 {{ page.description|safe }}

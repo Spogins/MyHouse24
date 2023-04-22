@@ -3,7 +3,7 @@ version: '3.8'
 services:
   web:
     build: .
-    command: gunicorn myhouse.wsgi:application --bind 0.0.0.0:8000
+    command: gunicorn myhouse.wsgi:application --bind 209.38.242.118
     volumes:
       - static_volume:/usr/src/app/static
       - media_volume:/usr/src/app/media

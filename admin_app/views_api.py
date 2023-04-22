@@ -37,8 +37,7 @@ def house_search(request, page):
 
 def owner_search(request, page):
     if is_ajax(request):
-        owner_list = Owner.objects.filter()
-        print(owner_list)
+        owner_list = Owner.objects.all()
         _list = []
 
         identify = request.GET.get('columns[0][search][value]')
@@ -78,15 +77,17 @@ def owner_search(request, page):
                 'fullname': owner.fullname(),
                 'phone': owner.phone,
                 'email': owner.user.email,
-                'house': [],
-                'flat': [],
+                'house': '',
+                'flat': '',
                 'date': owner.user.date_joined.strftime("%d.%m.%Y"),
                 'status': owner.status,
                 'debt': owner.has_debt(),
                 'id': owner.user_id
             }
 
-            try:
+            if Flat.objects.filter(owner_id=owner.user_id):
+                res['house'] = []
+                res['flat'] = []
                 _flats = Flat.objects.filter(owner_id=owner.user_id)
                 for _flat in _flats:
                     if house != '' and house != str(_flat.house.id):
@@ -98,13 +99,11 @@ def owner_search(request, page):
                 if len(res['house']) == 0 or len(res['flat']) == 0:
                     continue
                 _list.append(res)
-            except ObjectDoesNotExist:
+            else:
                 if house != '':
                     continue
-
                 if flat != '':
                     continue
-
                 _list.append(res)
 
         paginate = Paginator(_list, request.GET.get('length'))
