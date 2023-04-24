@@ -395,7 +395,7 @@ class UpdateUser(UserPassesTestMixin, UpdateView):
     def form_valid(self, form_user, form_profile):
         created_user = form_user.save()
         created_user.username = form_user.cleaned_data['email']
-        if form_user.cleaned_data['password']:
+        if form_user.cleaned_data['password'] != '' and form_user.cleaned_data['password']:
             created_user.set_password(form_user.cleaned_data['password'])
         created_user.save()
         form_profile.save()
@@ -403,9 +403,10 @@ class UpdateUser(UserPassesTestMixin, UpdateView):
 
     def form_invalid(self, form_user, form_profile):
         """If the form is invalid, render the invalid form."""
+        print(form_profile.errors,form_user.errors)
         context = {
-            'profile_form': form_profile.errors,
-            'register_form': form_user.errors
+            'profile_form': form_profile,
+            'register_form': form_user
         }
         return self.render_to_response(context)
 
@@ -788,10 +789,10 @@ class UpdateOwner(UserPassesTestMixin, UpdateView):
         psw = owner.user.password
         created_user = user_form.save()
         created_user.username = user_form.cleaned_data['email']
-        if 'password' in user_form.changed_data and user_form.cleaned_data['password'] != '':
+        if user_form.cleaned_data['password'] is None or user_form.cleaned_data['password'] == '':
+            created_user.password = psw
+        if user_form.cleaned_data['password'] == user_form.cleaned_data['confirm_password'] and user_form.cleaned_data['password'] is not None:
             created_user.set_password(user_form.cleaned_data['password'])
-        else:
-            created_user.set_password(psw)
         created_user.save()
         owner_form.save()
         return redirect('/admin_app/owner_list')

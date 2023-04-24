@@ -53,7 +53,7 @@
                     <h3>Контакты</h3>
                 </div>
                 <div class="box">
-                    <p><i class="fas fa-user-circle"></i> {{ contacts.fullname }}</p>
+                    <p><i class="fas fa-user-circle"></i> {{ contacts.name_u }}</p>
                     <p><i class="fas fa-compass"></i> {{ contacts.location }}</p>
                     <p><i class="fas fa-map-marker"></i> {{ contacts.address }}</p>
                     <p><i class="fas fa-phone"></i> <a href="">{{ contacts.phone }}</a></p>
@@ -90,7 +90,7 @@
 {% block script %}
 <script>
     $('.carousel-block').find('.carousel-item:first').addClass('active');
-
+    $('#main').addClass('active');
 
 </script>
 {% endblock %}

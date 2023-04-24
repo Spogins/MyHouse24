@@ -89,7 +89,7 @@
                                 <div class="btn-group float-right">
                                     <a class="btn btn-default btn-sm" href="" title="Отправить приглашение"
                                        data-toggle="tooltip"><i class="fas fa-redo-alt"></i></a>
-                                    <a class="btn btn-default btn-sm" href="{% url 'update_user' profile.user_id %}"
+                                    <a class="btn btn-default btn-sm" href="{% url 'update_user' profile.id %}"
                                        title="Редактировать" data-toggle="tooltip"><i class="fas fa-pencil-alt"></i></a>
                                     <a class="btn btn-default btn-sm {% if profile.user.is_superuser %}disabled{% endif %}"
                                        onclick="{% if not profile.user.is_superuser %}del_user({{profile.user_id}}){% endif %}"

@@ -27,6 +27,13 @@ class UserChangeForm(forms.ModelForm):
             self.fields['password'] = forms.CharField(label='Пароль', widget=forms.PasswordInput, required=True)
             self.fields['confirm_password'] = forms.CharField(label='Пароль', widget=forms.PasswordInput, required=True)
 
+    def clean_password(self):
+        password = self.cleaned_data['password']
+        if password:
+            return password
+        else:
+            return None
+
     def clean(self):
         try:
             if self.cleaned_data['password'] != '' and self.cleaned_data['confirm_password'] != '':

@@ -42,11 +42,11 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarScroll">
       <ul class="navbar-nav ms-auto my-2 my-lg-0 navbar-nav-scroll" style="--bs-scroll-height: 100px;">
-        <li class="nav-item"><a class="nav-link active" aria-current="page" href="/">Главная</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'about_us_page'%}">О нас</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'service_page'%}">Услуги</a></li>
+        <li class="nav-item"><a class="nav-link" id="main" aria-current="page" href="/">Главная</a></li>
+                    <li class="nav-item"><a class="nav-link" id="about" href="{% url 'about_us_page'%}">О нас</a></li>
+                    <li class="nav-item"><a class="nav-link" id="service" href="{% url 'service_page'%}">Услуги</a></li>
                     <li class="nav-item"><a class="nav-link" href="https://avada-media.ua/moydom24/">Условия приобретения</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'contact_page'%}">Контакты</a></li>
+                    <li class="nav-item"><a class="nav-link" id="contact" href="{% url 'contact_page'%}">Контакты</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'login'%}"><i class="fas fa-sign-in-alt"></i> Вход</a></li>
       </ul>
     </div>

@@ -182,8 +182,8 @@
                 contentType: 'json/application',
                 success: function(response){
                     let answer = JSON.parse(response);
-                    $('#user-fullname').html("<a href='/admin/update_owner/"+answer['owner']['id']+"'>"+answer['owner']['fullname']+"</a");
-                    $('#user-phone').html("<a href=''>"+answer['owner']['phone']+"</a>");
+                    $('#user-fullname').html("<a href='/admin_app/detail_owner/"+answer['owner']['id']+"'>"+answer['owner']['fullname']+"</a");
+                    $('#user-phone').html("<a href='/admin_app/detail_owner/"+answer['owner']['id']+"'>"+answer['owner']['phone']+"</a>");
 
                 },
                 error: function (responce){
