@@ -74,7 +74,7 @@ class ServicePage(FormView):
 class ContactPage(FormView):
     template_name = 'main/pages/contact_page.html'
     try:
-        page = ContactPage.objects.first()
+        page = ContactPage.objects.all()[0]
     except:
         page = None
 
