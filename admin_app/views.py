@@ -670,8 +670,7 @@ class ContactPageView(UserPassesTestMixin, CreateView):
     try:
         instance = ContactPage.objects.all()[0]
     except:
-        instance = ContactPage.objects.create()
-        instance.save()
+        instance = None
 
     def get_context_data(self, **kwargs):
         form = ContactPageForm(instance=self.instance, prefix='form')
