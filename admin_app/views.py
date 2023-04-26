@@ -668,7 +668,7 @@ def delete_service_page(request, service_id):
 class ContactPageView(UserPassesTestMixin, CreateView):
     template_name = 'admin_app/pages/contact_page.html'
     try:
-        instance = ContactPage.objects.all()[0]
+        instance = ContactPage.objects.first()
     except:
         instance = None
 
