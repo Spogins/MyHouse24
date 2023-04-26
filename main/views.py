@@ -9,9 +9,9 @@ from admin_app.models import *
 class MainPageView(FormView):
     template_name = 'main/pages/main_page.html'
     try:
-        main_page = MainPage.objects.get(id=1)
+        main_page = MainPage.objects.first()
         near = NearBlock.objects.all()
-        contacts = ContactPage.objects.get(id=1)
+        contacts = ContactPage.objects.all()[0]
         gallery = Slide.objects.all()
     except:
         main_page = None
@@ -74,7 +74,7 @@ class ServicePage(FormView):
 class ContactPage(FormView):
     template_name = 'main/pages/contact_page.html'
     try:
-        page = ContactPage.objects.get(id=1)
+        page = ContactPage.objects.first()
     except:
         page = None
 

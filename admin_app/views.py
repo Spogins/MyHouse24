@@ -491,7 +491,7 @@ def delete_payment(request, payment_id):
 class MainPageView(UserPassesTestMixin, CreateView):
     template_name = 'admin_app/pages/main_page.html'
     try:
-        instance = MainPage.objects.get(id=1)
+        instance = MainPage.objects.all()[0]
         instance_seo = instance.seo
     except:
         instance = None
@@ -668,7 +668,7 @@ def delete_service_page(request, service_id):
 class ContactPageView(UserPassesTestMixin, CreateView):
     template_name = 'admin_app/pages/contact_page.html'
     try:
-        instance = ContactPage.objects.get(id=1)
+        instance = ContactPage.objects.all()[0]
     except:
         instance = None
 
