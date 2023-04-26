@@ -88,8 +88,9 @@
                         <div class="mt-3">
                                 {%if bankbook.flat_id%}
 
-
-                                <p><a href="{% url 'flat_counter_list' bankbook.flat_id %}">Посмотреть показания счетчиков</a></p>
+                                {%if counter%}
+                                <p><a href="{% url 'flat_counter_list' bankbook.flat_id %}?service={{counter.service_id}}">Посмотреть показания счетчиков</a></p>
+                                {%endif%}
                                 <p><a href="{% url 'cashbox_list' %}?type=приход&bankbook_id={{ bankbook.pk }}">Посмотреть приходы</a></p>
                                 <p><a href="{% url 'receipt_list' %}?flat__number={{ bankbook.flat.number }}">Посмотреть квитанции</a></p>
                             {%endif%}

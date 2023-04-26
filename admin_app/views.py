@@ -1602,7 +1602,20 @@ class BankbookDetail(UserPassesTestMixin, DetailView):
     model = BankBook
     template_name = 'admin_app/bank_book/detail.html'
 
+    def get_context_data(self, **kwargs):
+        bank_book = BankBook.objects.get(pk=self.kwargs['pk'])
+        try:
+            counter = Counter.objects.get(flat_id=bank_book.flat_id)
+        except:
+            counter = False
+        context = {
+            'bankbook': bank_book,
+            'counter': counter
+        }
+        return context
+
     def test_func(self):
+
         profile = Profile.objects.get(user_id=self.request.user.id)
         role = Role.objects.get(name=profile.role)
         return role.personal_account
@@ -1682,7 +1695,6 @@ def get_service(request):
 
 def get_counters(request):
     if is_ajax(request):
-        print(request.GET.get('flat'), '55555555555')
         counters = Counter.objects.filter(flat_id=request.GET.get('flat')).\
             values('id', 'status', 'date', 'flat__house__name', 'flat__section__name', 'flat__number',
                    'service', 'indication', 'service__unit')

@@ -161,7 +161,11 @@
                             $('#id_section').append($('<option>', { value : sections[i]['id'], selected : 'selected' }).text(sections[i]['name']));
                         }
                         else{
+                            {% if update is True %}
                             $('#id_section').append($('<option>', { value : sections[i]['id'], selected : 'selected' }).text(sections[i]['name']));
+                            {%else%}
+                            $('#id_section').append($('<option>', { value : sections[i]['id']}).text(sections[i]['name']));
+                            {%endif%}
                         }
                     }
 
@@ -173,7 +177,10 @@
                             $('#id_flat').append($('<option>', {value: flats[i]['id'], selected : 'selected'}).text(flats[i]['number']));
                         }
                         else{
+
                             $('#id_flat').append($('<option>', {value: flats[i]['id']}).text(flats[i]['number']));
+
+
                         }
                     }
                 }
