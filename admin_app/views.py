@@ -667,10 +667,11 @@ def delete_service_page(request, service_id):
 
 class ContactPageView(UserPassesTestMixin, CreateView):
     template_name = 'admin_app/pages/contact_page.html'
-    try:
+    if ContactPage.objects.first():
         instance = ContactPage.objects.all()[0]
-    except:
-        instance = None
+    else:
+        instance = ContactPage.objects.create()
+        instance.save()
 
     def get_context_data(self, **kwargs):
         form = ContactPageForm(instance=self.instance, prefix='form')
