@@ -9,7 +9,7 @@ from admin_app.models import *
 class MainPageView(FormView):
     template_name = 'main/pages/main_page.html'
     try:
-        main_page = MainPage.objects.first()
+        main_page = MainPage.objects.all()[0]
         near = NearBlock.objects.all()
         contacts = ContactPage.objects.all()[0]
         gallery = Slide.objects.all()
@@ -33,7 +33,7 @@ class MainPageView(FormView):
 class AboutUsPage(FormView):
     template_name = 'main/pages/about_us_page.html'
     try:
-        page = Info.objects.first()
+        page = Info.objects.all()[0]
         gallery_main = Gallery.objects.filter(additional=False)
         gallery_additional = Gallery.objects.filter(additional=True)
         documents = Document.objects.all()
@@ -57,7 +57,7 @@ class AboutUsPage(FormView):
 class ServicePage(FormView):
     template_name = 'main/pages/service_page.html'
     try:
-        page = ServicePage.objects.first()
+        page = ServicePage.objects.all()[0]
         services = ServiceBlock.objects.all()
     except:
         page = None
