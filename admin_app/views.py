@@ -1090,6 +1090,15 @@ class FlatDetail(UserPassesTestMixin, DetailView):
     model = Flat
     template_name = 'admin_app/flat/detail.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        try:
+            context['counter'] = Counter.objects.get(flat_id=self.kwargs['pk'])
+        except:
+            context['counter'] = False
+
+        return context
+
     def test_func(self):
         profile = Profile.objects.get(user_id=self.request.user.id)
         role = Role.objects.get(name=profile.role)

@@ -26,7 +26,7 @@
                     <div class="card-tools">
                         <a {% if flat.bankbook_set.first %}href="{% url 'create_income' %}?bankbook_id={{ flat.bankbook_set.first.id }}"{% endif %} class="btn btn-default btn-sm {% if not flat.bankbook_set.first %}disabled{% endif %}" data-confirm="Лицевой счет неактивен"><i class="fa fa-dollar"></i>Принять платеж</a>
                         <a {% if flat.bankbook_set.first %}href="{% url 'create_receipt' %}?flat_id={{ flat.id }}"{% endif %} class="btn btn-default btn-sm {% if not flat.bankbook_set.first %}disabled{% endif %}" data-confirm="Лицевой счет неактивен"><i class="fa fa-files-o"></i> Оформить квитанцию</a>
-                        <a href="{% url 'update_flat' flat.id %}" class="btn btn-primary btn-sm">
+                        <a href="" class="btn btn-primary btn-sm">
                             <span class="hidden-xs">Редактировать квартиру</span>
                         </a>
                 </div>
@@ -70,8 +70,10 @@
                                 </table>
 
                             <div>
-                                <p><a href="{% url 'flat_counter_list' flat.pk %}">Посмотреть показания счетчиков</a></p>
-                                <p><a href="{% url 'cashbox_list' %}?incomes_expenses=приход{% if flat.bankbook_set.first %}&bankbook_id={{ flat.bankbook_set.first }}{% endif %}">Посмотреть приходы</a></p>
+                                {%if counter%}
+                                <p><a href="{% url 'flat_counter_list' flat.id %}?service={{counter}}">Посмотреть показания счетчиков</a></p>
+                                {%endif%}
+                                <p><a href="{% url 'cashbox_list' %}?type=приход{% if flat.bankbook_set.first %}&bankbook_id={{ flat.bankbook_set.first }}{% endif %}">Посмотреть приходы</a></p>
                                 <p><a href="{% url 'receipt_list' %}?flat_id={{ flat.pk }}">Посмотреть квитанции</a></p>
                             </div>
                             </div>
